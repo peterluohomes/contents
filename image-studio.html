@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Studio · Pinnacle Listing System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#16243f;--navy-soft:#22324f;--gold:#bb9b46;--gold-deep:#9a7e33;--cream:#f6f2e8;--cream-2:#fbf9f3;--ink:#1d2433;--muted:#6b7385;--line:#e3dccb;--shadow:0 1px 2px rgba(22,36,63,.06),0 10px 30px rgba(22,36,63,.10)}
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;line-height:1.5}
+  header.bar{background:var(--navy);color:var(--cream);padding:16px 22px;border-bottom:3px solid var(--gold);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  header.bar .eyebrow{font-size:.64rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  header.bar h1{font-family:"Playfair Display",serif;font-weight:600;font-size:1.3rem;margin:0}
+  header.bar .note{font-size:.78rem;color:#bcc6d8;margin-left:auto}
+  .app{display:grid;grid-template-columns:400px 1fr;min-height:calc(100vh - 60px)}
+  .controls{padding:20px 22px 40px;overflow-y:auto;border-right:1px solid var(--line);background:var(--cream-2)}
+  .stage{padding:26px;display:flex;flex-direction:column;align-items:center;gap:16px;background:repeating-conic-gradient(#efeadd 0% 25%,#f6f2e8 0% 50%) 50%/26px 26px}
+  .grp{margin-bottom:18px}
+  .grp>label{display:block;font-size:.64rem;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--gold-deep);margin-bottom:9px}
+  .pills{display:flex;gap:7px;flex-wrap:wrap}
+  .pill{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:7px 13px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.12s;font-family:inherit}
+  .pill:hover{border-color:var(--gold)}
+  .pill.on{background:var(--navy);color:var(--cream);border-color:var(--navy)}
+  .pill.lang.on{background:var(--gold);color:var(--navy);border-color:var(--gold-deep)}
+  .pill .sz{display:block;font-size:.6rem;font-weight:500;color:var(--muted);margin-top:1px}
+  .pill.on .sz{color:#cfd6e4}
+  .fld{margin-bottom:13px}
+  .fld label{display:block;font-size:.72rem;font-weight:600;color:var(--muted);margin-bottom:4px}
+  .fld .row{display:flex;gap:6px}
+  .fld input,.fld textarea,.fld select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:.9rem;color:var(--ink);background:#fff}
+  .fld textarea{resize:vertical;min-height:50px;line-height:1.4}
+  .fld select.preset{flex:0 0 42px;width:42px;padding:9px 4px;color:var(--gold-deep);cursor:pointer;text-align:center}
+  .fld input:focus,.fld textarea:focus,.fld select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(187,155,70,.15)}
+  .libsel{width:100%;border:1px solid var(--gold);border-radius:9px;padding:10px 11px;font-family:inherit;font-size:.86rem;color:var(--navy);background:#fffdf8;margin-bottom:13px;cursor:pointer;font-weight:600}
+  .btn{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:9px;padding:9px 13px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.12s}
+  .btn:hover{border-color:var(--gold)}.btn.ghost{color:var(--muted)}
+  .photo-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .thumbs{display:flex;gap:10px;flex-wrap:wrap;margin-top:11px}
+  .tcard{display:flex;flex-direction:column;gap:4px;align-items:center;width:58px}
+  .tcard img{width:58px;height:58px;border-radius:7px;object-fit:cover;border:1px solid var(--line)}
+  .tcard input[type=range]{width:58px;accent-color:var(--gold)}
+  .tcard .x{font-size:.66rem;color:var(--muted);cursor:pointer;border:none;background:none;padding:0}
+  .hint{font-size:.74rem;color:var(--muted);margin-top:9px;line-height:1.4}
+  .divider{height:1px;background:var(--line);margin:2px 0 18px}
+  #canvas{max-width:100%;max-height:72vh;width:auto;height:auto;border-radius:6px;box-shadow:var(--shadow);background:#fff;touch-action:none}
+  .dl{background:var(--gold);color:var(--navy);border:1px solid var(--gold-deep);border-radius:10px;padding:12px 22px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.02em}
+  .dl:hover{background:#cba954}
+  .fmt-note{font-size:.78rem;color:var(--muted);text-align:center;max-width:420px}.fmt-note b{color:var(--navy)}
+  @media (max-width:820px){.app{grid-template-columns:1fr}.controls{border-right:none;border-bottom:1px solid var(--line);order:2}.stage{order:1;padding:18px}#canvas{max-height:54vh}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <span class="eyebrow">Pinnacle Listing System</span><h1>Image Studio</h1>
+  <span class="note">On-brand graphics in seconds</span>
+</header>
+<div class="app">
+  <div class="controls">
+    <div class="grp"><label>Template</label><div class="pills" id="tpls"></div></div>
+    <div class="grp"><label>Size / platform</label><div class="pills" id="fmts"></div></div>
+    <div class="grp" id="langGrp"><label>Language — written in parallel, never translated</label>
+      <div class="pills"><button class="pill lang on" data-lang="en">English</button><button class="pill lang" data-lang="zh">中文</button></div></div>
+    <div class="grp" id="themeGrp" style="display:none"><label>Background</label>
+      <div class="pills"><button class="pill theme on" data-theme="cream">Cream</button><button class="pill theme" data-theme="navy">Navy</button></div></div>
+    <div class="divider"></div>
+    <div id="libWrap"></div>
+    <div class="grp" id="fields"></div>
+    <div class="grp" id="photoGrp" style="display:none"><label>Photos — 1 to 4 (auto-collage)</label>
+      <div class="photo-row"><button class="btn" id="addPhoto">+ Add photos</button><button class="btn ghost" id="clearPhoto">Clear</button>
+        <input type="file" id="photoInput" accept="image/*" multiple style="display:none"></div>
+      <div class="thumbs" id="thumbs"></div>
+      <p class="hint">Drag a photo on the canvas to reposition · scroll to zoom · or use each photo's slider. 2 split · 3 feature+pair · 4 grid.</p>
+    </div>
+  </div>
+  <div class="stage">
+    <canvas id="canvas" width="1080" height="1920"></canvas>
+    <button class="dl" id="download">Download PNG</button>
+    <p class="fmt-note" id="fmtNote"></p>
+  </div>
+</div>
+<script>
+(function(){
+  const cv=document.getElementById('canvas'), ctx=cv.getContext('2d');
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const FORMATS={'9:16':{w:1080,h:1920,label:'Reels · Shorts · RED · WeChat · Stories'},'4:5':{w:1080,h:1350,label:'Instagram / Facebook feed'},'1:1':{w:1080,h:1080,label:'Square — universal'}};
+  const TEMPLATES={
+    stat:{name:'Market Stat',photo:false,theme:true,fields:[['eyebrow','Eyebrow','text'],['stat','Big number','text'],['statLabel','Stat label','text'],['subline','Context line','area'],['source','Source','text']]},
+    sold:{name:'Just Sold',photo:true,theme:false,fields:[['headline','Headline','text'],['line1','Address (English)','text'],['line2','Detail line','text']]},
+    listed:{name:'Just Listed',photo:true,theme:false,fields:[['headline','Headline','text'],['line1','Address (English)','text'],['line2','Detail line','text']]},
+    forsale:{name:'For Sale',photo:true,theme:false,fields:[['headline','Headline','text'],['line1','Address (English)','text'],['line2','Detail line','text']]},
+    quote:{name:'Quote Card',photo:false,theme:false,fields:[['quote','Quote','area'],['attrib','Attribution','text'],['lesson','Market lesson','area']]},
+    community:{name:'Community',photo:true,theme:false,fields:[['eyebrow','Eyebrow','text'],['name','Community (English)','text'],['tagline','Tagline','area']]}
+  };
+  const ADDR=['18 Hayfield Crescent, Richmond Hill','— your listing address —'];
+  const PRESETS={
+    stat:{en:{eyebrow:'RICHMOND HILL · THIS MONTH',stat:'18 DAYS',statLabel:'average time on market',subline:'Homes priced right are still moving fast.',source:'Source: TRREB Market Watch'},
+          zh:{eyebrow:'列治文山 · 本月',stat:'18 天',statLabel:'平均售出天数',subline:'定价合理的房源，依然成交迅速。',source:'数据来源：多伦多地产局 TRREB'}},
+    sold:{en:{headline:'JUST SOLD',line1:ADDR[0],line2:'Sold over asking — ask me how'},zh:{headline:'已 售 出',line1:ADDR[0],line2:'高于要价成交 — 详情请私信'}},
+    listed:{en:{headline:'JUST LISTED',line1:ADDR[0],line2:'4 bed · 3 bath · offers welcome'},zh:{headline:'新 上 市',line1:ADDR[0],line2:'4 卧 · 3 卫 · 欢迎出价'}},
+    forsale:{en:{headline:'FOR SALE',line1:ADDR[0],line2:'Book your private showing'},zh:{headline:'出 售',line1:ADDR[0],line2:'预约专属看房'}},
+    quote:{en:{quote:'Nature does not hurry, yet everything is accomplished.',attrib:'— Tao Te Ching',lesson:'The right buyer comes to the well-prepared home.'},
+           zh:{quote:'道常无为，而无不为。',attrib:'— 道德经',lesson:'准备充分的房子，自有有缘人。'}},
+    community:{en:{eyebrow:'COMMUNITY SPOTLIGHT',name:'Cathedraltown',tagline:'Markham living, at its most picturesque.'},
+               zh:{eyebrow:'社区聚焦',name:'Cathedraltown',tagline:'万锦最美的生活方式。'}}
+  };
+  const COMMUNITIES=['Cathedraltown','Berczy Village','Unionville','Cornell','Wismer','Greensborough','Angus Glen','Cachet','Markham Village','Mill Pond','Oak Ridges','Jefferson','Westbrook','Bayview Hill','Devonsleigh','Rouge Woods','Doncrest','Bayview Glen','Aileen-Willowbrook','German Mills','Langstaff','North Richvale','South Richvale','Box Grove','Raymerville','Milliken Mills','Sherwood-Amberglen'];
+  const OPTIONS={
+    stat:{eyebrow:{en:['RICHMOND HILL · THIS MONTH','MARKHAM · THIS MONTH','YORK REGION · THIS MONTH','VAUGHAN · THIS MONTH','MARKET UPDATE'],zh:['列治文山 · 本月','万锦 · 本月','约克区 · 本月','旺市 · 本月','市场速递']},
+      stat:{en:['18 DAYS','+6.2%','102%','2.1 MONTHS','$1.48M'],zh:['18 天','+6.2%','102%','2.1 个月','$1.48M']},
+      statLabel:{en:['average time on market','sold-to-list price ratio','year-over-year price change','months of inventory','average sale price'],zh:['平均售出天数','成交价与要价之比','房价同比变化','库存月数','平均成交价']},
+      subline:{en:['Homes priced right are still moving fast.','Inventory is shifting — here\u2019s what it means for sellers.','The right strategy matters more than ever.','Well-prepared homes are setting the pace.'],zh:['定价合理的房源，依然成交迅速。','库存正在变化 — 对卖家意味着什么。','正确的策略，比以往更重要。','准备充分的房源，引领市场节奏。']},
+      source:{en:['Source: TRREB Market Watch','Source: TRREB · peterluo.homes/market'],zh:['数据来源：多伦多地产局 TRREB','数据来源：TRREB · peterluo.homes/market']}},
+    sold:{headline:{en:['JUST SOLD','SOLD','SOLD OVER ASKING','SOLD IN 5 DAYS','SOLD — MULTIPLE OFFERS'],zh:['已 售 出','成 交','高于要价售出','五天闪电成交','多个 Offer 成交']},
+      line1:{en:ADDR,zh:ADDR},
+      line2:{en:['Sold over asking — ask me how','Multiple offers in 48 hours','A record price for this street','Another happy seller','Marketing that moved it fast','Sold while others sat'],zh:['高于要价成交 — 详情请私信','48 小时内收到多个出价','刷新本街区成交纪录','又一位满意的卖家','精准营销，快速成交','别人还在等，我们已成交']}},
+    listed:{headline:{en:['JUST LISTED','NEW LISTING','NOW AVAILABLE','NEW TO MARKET'],zh:['新 上 市','全新房源','诚意推出','重磅上市']},
+      line1:{en:ADDR,zh:ADDR},
+      line2:{en:['4 bed · 3 bath · offers welcome','Move-in ready','Steps to top-ranked schools','Book your private showing','Open house this weekend'],zh:['4 卧 · 3 卫 · 欢迎出价','拎包入住','名校近在咫尺','预约专属看房','本周末开放参观']}},
+    forsale:{headline:{en:['FOR SALE','NOW FOR SALE','OPEN HOUSE','PRICE IMPROVED'],zh:['出 售','正在出售','开放参观','价格更新']},
+      line1:{en:ADDR,zh:ADDR},
+      line2:{en:['Book your private showing','Open house Sat & Sun, 2–4','4 bed · 3 bath · move-in ready','Steps to parks and top schools'],zh:['预约专属看房','周六日 2–4 点开放参观','4 卧 · 3 卫 · 拎包入住','紧邻公园与名校']}},
+    community:{eyebrow:{en:['COMMUNITY SPOTLIGHT','NEIGHBOURHOOD GUIDE','WHY PEOPLE LOVE IT HERE','LIVING IN'],zh:['社区聚焦','社区导览','这里为何受欢迎','生活在这里']},
+      name:{en:COMMUNITIES,zh:COMMUNITIES},
+      tagline:{en:['Markham living, at its most picturesque.','Where families put down roots.','Top schools, parks, and quiet streets.','A community that feels like home.','The neighbourhood everyone\u2019s asking about.','Trails, schools, and Sunday mornings.'],zh:['万锦最美的生活方式。','家庭扎根的好地方。','名校、公园与宁静街道。','让人有归属感的社区。','大家都在打听的社区。','步道、名校与悠闲的周末早晨。']}}
+  };
+  const QUOTES=[
+    {en:{q:'Nature does not hurry, yet everything is accomplished.',a:'— Tao Te Ching',l:'The right buyer comes to the well-prepared home.'},zh:{q:'道常无为，而无不为。',a:'— 道德经',l:'准备充分的房子，自有有缘人。'}},
+    {en:{q:'A journey of a thousand miles begins with a single step.',a:'— Lao Tzu',l:'Every sale starts with one honest conversation.'},zh:{q:'千里之行，始于足下。',a:'— 老子',l:'每一次成交，都始于一次坦诚的交谈。'}},
+    {en:{q:'The soft and gentle overcome the hard and strong.',a:'— Tao Te Ching',l:'Patience in negotiation beats pressure.'},zh:{q:'柔弱胜刚强。',a:'— 道德经',l:'谈判中，耐心胜过施压。'}},
+    {en:{q:'He who knows others is wise; he who knows himself is enlightened.',a:'— Tao Te Ching',l:'Know your home\u2019s true value before you list.'},zh:{q:'知人者智，自知者明。',a:'— 道德经',l:'上市之前，先了解你房子的真实价值。'}},
+    {en:{q:'To know you have enough is to be rich.',a:'— Lao Tzu',l:'The right price, not the highest dream, sells the home.'},zh:{q:'知足者富。',a:'— 老子',l:'卖出房子的，是合理价格，而非最高的幻想。'}},
+    {en:{q:'The most difficult things begin while they are easy.',a:'— Tao Te Ching',l:'A great sale is built on small preparations.'},zh:{q:'天下难事，必作于易。',a:'— 道德经',l:'伟大的成交，建立在细小的准备之上。'}},
+    {en:{q:'Muddy water, let stand, becomes clear.',a:'— Lao Tzu',l:'Give the market time; clarity follows.'},zh:{q:'浑水静，则自清。',a:'— 老子',l:'给市场一点时间，答案自会清晰。'}},
+    {en:{q:'Haste does not bring success.',a:'— Confucius',l:'A steady marketing plan outlasts a frantic one.'},zh:{q:'欲速则不达。',a:'— 孔子',l:'稳健的营销，胜过慌乱的奔忙。'}},
+    {en:{q:'Study the past if you would define the future.',a:'— Confucius',l:'Past sold comps define today\u2019s right price.'},zh:{q:'温故而知新。',a:'— 孔子',l:'过往成交记录，决定今日的合理定价。'}},
+    {en:{q:'When you have faults, do not fear to abandon them.',a:'— Confucius',l:'Fix the small flaws before buyers ever see them.'},zh:{q:'过则勿惮改。',a:'— 孔子',l:'在买家看到之前，先修好那些小瑕疵。'}},
+    {en:{q:'One conversation with a wise man beats ten years of study.',a:'— Chinese proverb',l:'One honest pricing talk can save months on market.'},zh:{q:'听君一席话，胜读十年书。',a:'— 中国谚语',l:'一次坦诚的定价交谈，能省下数月的等待。'}},
+    {en:{q:'Don\u2019t fear going slowly; fear only standing still.',a:'— Chinese proverb',l:'Keep the listing\u2019s momentum going.'},zh:{q:'不怕慢，只怕站。',a:'— 中国谚语',l:'让房源始终保持势头。'}},
+    {en:{q:'Prepare for rain before it comes.',a:'— Chinese proverb',l:'Prepare the home before you need to sell.'},zh:{q:'未雨绸缪。',a:'— 中国谚语',l:'在需要卖之前，先把房子准备好。'}},
+    {en:{q:'The best time to plant a tree was twenty years ago; the next best is now.',a:'— Proverb',l:'The best time to prepare your home is now.'},zh:{q:'种树最好的时间是二十年前，其次是现在。',a:'— 谚语',l:'准备房子最好的时机，就是现在。'}},
+    {en:{q:'When the winds of change blow, some build walls, others build windmills.',a:'— Proverb',l:'A shifting market is an opportunity, not a threat.'},zh:{q:'风起时，有人筑墙，有人造风车。',a:'— 谚语',l:'变化的市场是机会，而非威胁。'}},
+    {en:{q:'True gold fears no fire.',a:'— Chinese proverb',l:'A well-priced home holds up to any scrutiny.'},zh:{q:'真金不怕火炼。',a:'— 中国谚语',l:'定价合理的房子，经得起任何检验。'}},
+    {en:{q:'Stillness is the master of unrest.',a:'— Tao Te Ching',l:'A calm seller negotiates best.'},zh:{q:'静为躁君。',a:'— 道德经',l:'沉得住气的卖家，谈判最有底气。'}},
+    {en:{q:'Everything has beauty, but not everyone sees it.',a:'— Confucius',l:'Great photography helps buyers see the beauty.'},zh:{q:'万物有美，慧眼能识。',a:'— 孔子',l:'出色的摄影，让买家看见房子的美。'}},
+    {en:{q:'Be content with what you have; rejoice in how things are.',a:'— Lao Tzu',l:'The best offer is the one that meets your real needs.'},zh:{q:'知足常乐。',a:'— 老子',l:'最好的出价，是满足你真实需求的那一个。'}},
+    {en:{q:'The old farmer lost his horse \u2014 who could say it wasn\u2019t good fortune?',a:'— Chinese proverb',l:'A deal that falls through often makes room for a better one.'},zh:{q:'塞翁失马，焉知非福。',a:'— 中国谚语',l:'一笔告吹的交易，往往为更好的成交腾出空间。'}},
+    {en:{q:'The superior person is modest in speech but exceeds in action.',a:'— Confucius',l:'Quiet preparation, strong results.'},zh:{q:'君子讷于言而敏于行。',a:'— 孔子',l:'默默准备，成果自现。'}},
+    {en:{q:'The teacher opens the door; you enter by yourself.',a:'— Chinese proverb',l:'I\u2019ll guide the sale \u2014 the decision stays yours.'},zh:{q:'师傅领进门，修行在个人。',a:'— 中国谚语',l:'我引导这次出售，决定权始终在你手中。'}},
+    {en:{q:'Go alone to go fast; go together to go far.',a:'— Proverb',l:'A great sale is a partnership.'},zh:{q:'独行快，众行远。',a:'— 谚语',l:'一次成功的出售，是一场并肩同行。'}},
+    {en:{q:'Govern a great state as you would cook a small fish.',a:'— Tao Te Ching',l:'Handle a big sale with a light, careful touch.'},zh:{q:'治大国若烹小鲜。',a:'— 道德经',l:'再大的交易，也要用细致而轻巧的手法处理。'}},
+    {en:{q:'Learning without thought is labour lost.',a:'— Confucius',l:'Comps without strategy will mislead you.'},zh:{q:'学而不思则罔。',a:'— 孔子',l:'只有数据没有策略，反而会误导你。'}},
+    {en:{q:'The palest ink is better than the best memory.',a:'— Chinese proverb',l:'Get every term in writing.'},zh:{q:'好记性不如烂笔头。',a:'— 中国谚语',l:'每一条条款，都要落在纸面上。'}},
+    {en:{q:'Add flowers to the brocade.',a:'— Chinese proverb',l:'Staging is the finishing touch that lifts the whole.'},zh:{q:'锦上添花。',a:'— 中国谚语',l:'布置陈设，是提升整体的点睛之笔。'}},
+    {en:{q:'He who stands on tiptoe does not stand firm.',a:'— Tao Te Ching',l:'Overpricing never stands for long.'},zh:{q:'企者不立。',a:'— 道德经',l:'定价过高，终究站不住脚。'}},
+    {en:{q:'Smooth seas never made a skilled sailor.',a:'— Proverb',l:'A tricky market is where a good agent proves their worth.'},zh:{q:'平静的海，练不出好水手。',a:'— 谚语',l:'越是复杂的市场，越能见出好经纪的功力。'}},
+    {en:{q:'A fall into a ditch makes you wiser.',a:'— Chinese proverb',l:'Every past sale sharpens the next strategy.'},zh:{q:'吃一堑，长一智。',a:'— 中国谚语',l:'每一次成交的经验，都让下一次更精准。'}},
+    {en:{q:'Better to light a candle than to curse the darkness.',a:'— Proverb',l:'Fix what you can; present the home at its very best.'},zh:{q:'与其抱怨黑暗，不如点亮蜡烛。',a:'— 谚语',l:'能改善的就改善，把房子呈现到最好。'}},
+    {en:{q:'Great wisdom can look like simplicity.',a:'— Chinese proverb',l:'Let the home\u2019s quality speak; don\u2019t oversell.'},zh:{q:'大智若愚。',a:'— 中国谚语',l:'让房子的品质说话，无需过度推销。'}},
+    {en:{q:'Act, but do not cling to the outcome.',a:'— Tao Te Ching',l:'Market fully, then let the right offer come.'},zh:{q:'为而不恃。',a:'— 道德经',l:'全力营销，然后静待有缘的出价。'}},
+    {en:{q:'The cautious seldom err.',a:'— Confucius',l:'Careful pricing avoids costly mistakes.'},zh:{q:'慎者寡过。',a:'— 孔子',l:'谨慎的定价，避免代价高昂的失误。'}},
+    {en:{q:'A small leak will sink a great ship.',a:'— Proverb',l:'Small unaddressed repairs can sink a strong offer.'},zh:{q:'千里之堤，溃于蚁穴。',a:'— 谚语',l:'被忽视的小修小补，能让一个好出价泡汤。'}},
+    {en:{q:'Where there is a will, there is a way.',a:'— Proverb',l:'A motivated seller and a clear plan find the buyer.'},zh:{q:'有志者，事竟成。',a:'— 谚语',l:'有决心的卖家，加上清晰的计划，终会遇见买家。'}},
+    {en:{q:'Carve the wood according to its grain.',a:'— Chinese proverb',l:'Price and market each home to its own strengths.'},zh:{q:'因材施艺。',a:'— 中国谚语',l:'依房子自身的优势来定价与营销。'}},
+    {en:{q:'Opportunity favours the prepared mind.',a:'— Proverb',l:'The prepared listing is the one that catches the wave.'},zh:{q:'机会偏爱有准备的人。',a:'— 谚语',l:'准备充分的房源，才能抓住市场的浪潮。'}}
+  ];
+  const BRAND='PETER LUO   ·   PINNACLE LISTING SYSTEM';
+
+  let cur='stat',lang='en',fmt='9:16',theme='cream';
+  let photos=[]; // {img,z,fx,fy}
+  let cellRects=[];
+  const state=JSON.parse(JSON.stringify(PRESETS));
+
+  function font(w,s,serif,it){const fam=serif?'"Playfair Display","Songti SC","STSong","SimSun",serif':'"DM Sans","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';return (it?'italic ':'')+w+' '+s+'px '+fam;}
+  function spacing(v){try{ctx.letterSpacing=v;}catch(e){}}
+  let W=1080,H=1920;
+  function hexA(hex,a){const n=parseInt(hex.slice(1),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
+  function drawCell(pi,x,y,w,h){
+    const p=photos[pi],img=p.img,s0=Math.max(w/img.width,h/img.height),z=p.z||1;
+    const dw=img.width*s0*z,dh=img.height*s0*z,slackX=dw-w,slackY=dh-h;
+    const ix=x-slackX*p.fx,iy=y-slackY*p.fy;
+    ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.drawImage(img,ix,iy,dw,dh);ctx.restore();
+    cellRects.push({x,y,w,h,pi,slackX,slackY});
+  }
+  function drawPhotos(x,y,w,h){
+    cellRects=[];const n=Math.min(photos.length,4),g=w*0.012;
+    if(n===0){const grd=ctx.createLinearGradient(x,y,x+w,y+h);grd.addColorStop(0,'#22324f');grd.addColorStop(1,'#16243f');ctx.fillStyle=grd;ctx.fillRect(x,y,w,h);
+      ctx.fillStyle=hexA('#f6f2e8',0.4);ctx.textAlign='center';ctx.font=font(500,w*0.04,false,false);spacing('0px');ctx.fillText('Add 1\u20134 photos',x+w/2,y+h/2);return;}
+    if(n===1){drawCell(0,x,y,w,h);}
+    else if(n===2){if(h>=w){const ch=(h-g)/2;drawCell(0,x,y,w,ch);drawCell(1,x,y+ch+g,w,ch);}else{const cw=(w-g)/2;drawCell(0,x,y,cw,h);drawCell(1,x+cw+g,y,cw,h);}}
+    else if(n===3){if(h>=w){const bh=(h-g)*0.62;drawCell(0,x,y,w,bh);const cw=(w-g)/2,by=y+bh+g,ch=h-bh-g;drawCell(1,x,by,cw,ch);drawCell(2,x+cw+g,by,cw,ch);}else{const bw=(w-g)*0.62;drawCell(0,x,y,bw,h);const ch=(h-g)/2,bx=x+bw+g,cw=w-bw-g;drawCell(1,bx,y,cw,ch);drawCell(2,bx,y+ch+g,cw,ch);}}
+    else{const cw=(w-g)/2,ch=(h-g)/2;drawCell(0,x,y,cw,ch);drawCell(1,x+cw+g,y,cw,ch);drawCell(2,x,y+ch+g,cw,ch);drawCell(3,x+cw+g,y+ch+g,cw,ch);}
+  }
+  function wrapLines(text,maxW){const out=[];String(text).split('\n').forEach(para=>{const hasSpace=/\s/.test(para);const toks=hasSpace?para.split(/(\s+)/):[...para];let line='';toks.forEach(t=>{const test=line+t;if(ctx.measureText(test.trim()).width>maxW&&line.trim()!==''){out.push(line.trim());line=t.replace(/^\s+/,'');}else line=test;});if(line.trim())out.push(line.trim());});return out;}
+  function drawWrapped(text,cx,y,maxW,lh,align){const lines=wrapLines(text,maxW);ctx.textAlign=align||'center';lines.forEach((l,i)=>ctx.fillText(l,cx,y+i*lh));return y+lines.length*lh;}
+  function bottomGradient(){const grd=ctx.createLinearGradient(0,H*0.38,0,H);grd.addColorStop(0,hexA('#16243f',0));grd.addColorStop(0.55,hexA('#16243f',0.55));grd.addColorStop(1,hexA('#16243f',0.94));ctx.fillStyle=grd;ctx.fillRect(0,H*0.38,W,H*0.62);}
+  function footer(c){ctx.fillStyle=c;ctx.textAlign='center';ctx.font=font(600,W*0.024,false,false);spacing('3px');ctx.fillText(BRAND,W/2,H*0.945);spacing('0px');}
+  function goldBar(cx,y,w){ctx.fillStyle='#bb9b46';ctx.fillRect(cx-w/2,y,w,W*0.006);}
+
+  function renderStat(d){
+    const navyBg=theme==='navy',bg=navyBg?'#16243f':'#f6f2e8',ink=navyBg?'#f6f2e8':'#16243f',sub=navyBg?'#aeb9cc':'#5a6273';
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle=hexA('#bb9b46',0.55);ctx.lineWidth=W*0.006;ctx.strokeRect(W*0.055,H*0.04,W*0.89,H*0.92);
+    ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.03,false,false);spacing('4px');ctx.fillText((d.eyebrow||'').toUpperCase(),W/2,H*0.18);spacing('0px');
+    ctx.fillStyle='#bb9b46';ctx.font=font(700,W*0.155,true,false);ctx.fillText(d.stat||'',W/2,H*0.40);
+    ctx.fillStyle=ink;ctx.font=font(500,W*0.052,true,true);drawWrapped(d.statLabel||'',W/2,H*0.475,W*0.78,W*0.06,'center');
+    goldBar(W/2,H*0.55,W*0.16);
+    ctx.fillStyle=ink;ctx.font=font(400,W*0.038,false,false);drawWrapped(d.subline||'',W/2,H*0.63,W*0.76,W*0.052,'center');
+    ctx.fillStyle=sub;ctx.font=font(400,W*0.026,false,false);ctx.fillText(d.source||'',W/2,H*0.80);
+    footer('#bb9b46');
+  }
+  function renderHero(d){
+    drawPhotos(0,0,W,H);bottomGradient();
+    ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.105,true,false);spacing('2px');ctx.fillText(d.headline||'',W/2,H*0.755);spacing('0px');
+    ctx.fillStyle='#f6f2e8';ctx.font=font(600,W*0.042,false,false);drawWrapped(d.line1||'',W/2,H*0.82,W*0.84,W*0.05,'center');
+    ctx.fillStyle=hexA('#f6f2e8',0.82);ctx.font=font(400,W*0.034,false,false);drawWrapped(d.line2||'',W/2,H*0.875,W*0.82,W*0.044,'center');
+    footer(hexA('#f6f2e8',0.9));
+  }
+  function renderQuote(d){
+    ctx.fillStyle='#16243f';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=hexA('#bb9b46',0.32);ctx.textAlign='left';ctx.font=font(700,W*0.32,true,false);ctx.fillText('\u201C',W*0.10,H*0.30);
+    ctx.fillStyle='#f6f2e8';ctx.textAlign='center';ctx.font=font(500,W*0.072,true,true);
+    const lines=wrapLines(d.quote||'',W*0.80),lh=W*0.092,startY=H*0.46-(lines.length-1)*lh/2;
+    lines.forEach((l,i)=>ctx.fillText(l,W/2,startY+i*lh));
+    let y=startY+(lines.length-1)*lh+W*0.10;
+    ctx.fillStyle='#bb9b46';ctx.font=font(600,W*0.036,false,false);ctx.fillText(d.attrib||'',W/2,y);y+=W*0.055;
+    goldBar(W/2,y,W*0.14);y+=W*0.07;
+    ctx.fillStyle=hexA('#f6f2e8',0.85);ctx.font=font(400,W*0.036,false,true);drawWrapped(d.lesson||'',W/2,y,W*0.72,W*0.05,'center');
+    footer(hexA('#f6f2e8',0.85));
+  }
+  function renderCommunity(d){
+    drawPhotos(0,0,W,H);bottomGradient();
+    ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.028,false,false);spacing('4px');ctx.fillText((d.eyebrow||'').toUpperCase(),W/2,H*0.70);spacing('0px');
+    ctx.fillStyle='#f6f2e8';ctx.font=font(700,W*0.10,true,false);drawWrapped(d.name||'',W/2,H*0.79,W*0.86,W*0.11,'center');
+    ctx.fillStyle=hexA('#f6f2e8',0.88);ctx.font=font(400,W*0.038,false,false);drawWrapped(d.tagline||'',W/2,H*0.865,W*0.80,W*0.05,'center');
+    footer(hexA('#f6f2e8',0.9));
+  }
+  function render(){
+    const F=FORMATS[fmt];W=F.w;H=F.h;if(cv.width!==W)cv.width=W;if(cv.height!==H)cv.height=H;
+    ctx.clearRect(0,0,W,H);ctx.textBaseline='alphabetic';cellRects=[];
+    const d=state[cur][lang];
+    if(cur==='stat')renderStat(d);
+    else if(cur==='sold'||cur==='listed'||cur==='forsale')renderHero(d);
+    else if(cur==='quote')renderQuote(d);
+    else if(cur==='community')renderCommunity(d);
+    cv.style.cursor=TEMPLATES[cur].photo&&photos.length?'grab':'default';
+    document.getElementById('fmtNote').innerHTML='<b>'+fmt+'</b> · '+F.label;
+  }
+
+  // build template + format pills
+  const tplWrap=document.getElementById('tpls');
+  Object.keys(TEMPLATES).forEach(k=>{const b=document.createElement('button');b.className='pill'+(k===cur?' on':'');b.textContent=TEMPLATES[k].name;b.dataset.k=k;
+    b.onclick=()=>{cur=k;[...tplWrap.children].forEach(c=>c.classList.toggle('on',c.dataset.k===k));buildLib();buildFields();syncCond();render();};tplWrap.appendChild(b);});
+  const fmtWrap=document.getElementById('fmts');
+  Object.keys(FORMATS).forEach(k=>{const b=document.createElement('button');b.className='pill'+(k===fmt?' on':'');b.dataset.k=k;
+    b.innerHTML=k+'<span class="sz">'+(k==='9:16'?'1080×1920':k==='4:5'?'1080×1350':'1080×1080')+'</span>';
+    b.onclick=()=>{fmt=k;[...fmtWrap.children].forEach(c=>c.classList.toggle('on',c.dataset.k===k));render();};fmtWrap.appendChild(b);});
+  document.querySelectorAll('.pill.lang').forEach(b=>{b.onclick=()=>{lang=b.dataset.lang;document.querySelectorAll('.pill.lang').forEach(x=>x.classList.toggle('on',x===b));buildLib();buildFields();render();};});
+  document.querySelectorAll('.pill.theme').forEach(b=>{b.onclick=()=>{theme=b.dataset.theme;document.querySelectorAll('.pill.theme').forEach(x=>x.classList.toggle('on',x===b));render();};});
+
+  function buildLib(){
+    const wrap=document.getElementById('libWrap');wrap.innerHTML='';
+    if(cur!=='quote')return;
+    const sel=document.createElement('select');sel.className='libsel';
+    sel.innerHTML='<option value="">\u2014 Quote library ('+QUOTES.length+') \u2014</option>'+QUOTES.map((qq,i)=>'<option value="'+i+'">'+qq.en.q.slice(0,46)+(qq.en.q.length>46?'\u2026':'')+'</option>').join('');
+    sel.onchange=()=>{const i=sel.value;if(i==='')return;const Q=QUOTES[i];
+      state.quote.en={quote:Q.en.q,attrib:Q.en.a,lesson:Q.en.l};state.quote.zh={quote:Q.zh.q,attrib:Q.zh.a,lesson:Q.zh.l};
+      buildFields();render();sel.value='';};
+    wrap.appendChild(sel);
+  }
+  function buildFields(){
+    const wrap=document.getElementById('fields');wrap.innerHTML='';
+    TEMPLATES[cur].fields.forEach(([k,labelTxt,type])=>{
+      const f=document.createElement('div');f.className='fld';
+      const l=document.createElement('label');l.textContent=labelTxt;f.appendChild(l);
+      const row=document.createElement('div');row.className='row';
+      const inp=document.createElement(type==='area'?'textarea':'input');inp.value=state[cur][lang][k]||'';
+      inp.oninput=()=>{state[cur][lang][k]=inp.value;render();};
+      const opts=OPTIONS[cur]&&OPTIONS[cur][k]?OPTIONS[cur][k][lang]:null;
+      if(opts){const sel=document.createElement('select');sel.className='preset';sel.title='Pick a preset';
+        sel.innerHTML='<option value="">\u25be</option>'+opts.map((o,i)=>'<option value="'+i+'">'+o+'</option>').join('');
+        sel.onchange=()=>{if(sel.value==='')return;inp.value=opts[sel.value];state[cur][lang][k]=opts[sel.value];render();sel.value='';};
+        row.appendChild(sel);}
+      row.appendChild(inp);f.appendChild(row);wrap.appendChild(f);
+    });
+  }
+  function syncCond(){document.getElementById('themeGrp').style.display=TEMPLATES[cur].theme?'block':'none';document.getElementById('photoGrp').style.display=TEMPLATES[cur].photo?'block':'none';}
+
+  // photos
+  const pin=document.getElementById('photoInput');
+  document.getElementById('addPhoto').onclick=()=>pin.click();
+  document.getElementById('clearPhoto').onclick=()=>{photos=[];drawThumbs();render();};
+  pin.onchange=e=>{const files=[...e.target.files];let left=files.length;files.forEach(file=>{const r=new FileReader();r.onload=ev=>{const img=new Image();img.onload=()=>{photos.push({img,z:1,fx:0.5,fy:0.5});if(photos.length>4)photos=photos.slice(-4);if(--left<=0){drawThumbs();render();}};img.src=ev.target.result;};r.readAsDataURL(file);});pin.value='';};
+  function drawThumbs(){const t=document.getElementById('thumbs');t.innerHTML='';photos.forEach((p,i)=>{
+    const c=document.createElement('div');c.className='tcard';
+    const im=document.createElement('img');im.src=p.img.src;c.appendChild(im);
+    const z=document.createElement('input');z.type='range';z.min='1';z.max='3';z.step='0.02';z.value=p.z;z.oninput=()=>{p.z=parseFloat(z.value);render();};c.appendChild(z);
+    const x=document.createElement('button');x.className='x';x.textContent='remove';x.onclick=()=>{photos.splice(i,1);drawThumbs();render();};c.appendChild(x);
+    t.appendChild(c);});}
+
+  // pan + zoom on canvas
+  function toCanvas(e){const r=cv.getBoundingClientRect();return {px:(e.clientX-r.left)*(cv.width/r.width),py:(e.clientY-r.top)*(cv.height/r.height)};}
+  function cellAt(px,py){for(let i=cellRects.length-1;i>=0;i--){const c=cellRects[i];if(px>=c.x&&px<=c.x+c.w&&py>=c.y&&py<=c.y+c.h)return c;}return null;}
+  let drag=null;
+  cv.addEventListener('pointerdown',e=>{const {px,py}=toCanvas(e);const c=cellAt(px,py);if(!c)return;drag={pi:c.pi,x0:px,y0:py,fx0:photos[c.pi].fx,fy0:photos[c.pi].fy,sx:c.slackX,sy:c.slackY};cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing';});
+  cv.addEventListener('pointermove',e=>{if(!drag)return;const {px,py}=toCanvas(e);const p=photos[drag.pi];if(drag.sx>0)p.fx=clamp(drag.fx0-(px-drag.x0)/drag.sx,0,1);if(drag.sy>0)p.fy=clamp(drag.fy0-(py-drag.y0)/drag.sy,0,1);render();});
+  function endDrag(){drag=null;if(cv.style.cursor==='grabbing')cv.style.cursor='grab';}
+  cv.addEventListener('pointerup',endDrag);cv.addEventListener('pointercancel',endDrag);
+  cv.addEventListener('wheel',e=>{const {px,py}=toCanvas(e);const c=cellAt(px,py);if(!c)return;e.preventDefault();const p=photos[c.pi];p.z=clamp((p.z||1)-e.deltaY*0.0015,1,3);render();drawThumbs();},{passive:false});
+
+  document.getElementById('download').onclick=()=>{cv.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='peterluo_'+cur+'_'+lang+'_'+fmt.replace(':','x')+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);},'image/png');};
+
+  buildLib();buildFields();syncCond();
+  if(document.fonts&&document.fonts.ready){Promise.all([document.fonts.load('700 80px "Playfair Display"'),document.fonts.load('italic 500 60px "Playfair Display"'),document.fonts.load('600 40px "DM Sans"'),document.fonts.load('400 40px "DM Sans"')]).then(render).catch(render);document.fonts.ready.then(render);}
+  render();
+})();
+</script>
+</body>
+</html>
