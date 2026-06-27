@@ -73,6 +73,41 @@
   .plat li::before{content:"";position:absolute;left:0;top:11px;width:5px;height:5px;border-radius:50%;background:var(--gold)}
   .plat .freq{margin-top:11px;font-size:.82rem;font-weight:600;color:var(--navy);background:var(--cream);border-radius:8px;padding:6px 10px;display:inline-block}
 
+  /* media-type legend */
+  .legend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;padding:11px 14px;background:var(--navy);border-radius:12px;border:1px solid var(--gold)}
+  .legend .lg{font-size:.74rem;font-weight:700;padding:4px 10px;border-radius:999px;color:#fff}
+  .legend .lg-img{background:#2f6f7d}.legend .lg-vid{background:#9a5b2f}.legend .lg-txt{background:#4a5a8a}.legend .lg-eph{background:#7a5a8a}
+  .legend .lgnote{font-size:.76rem;color:#cdd5e3;margin-left:auto;font-style:italic}
+  /* surface tags inside platform cards */
+  .plat ul.surf li{padding-left:0}
+  .plat ul.surf li::before{display:none}
+  .plat ul.surf li{font-size:.86rem;padding:5px 0;border-bottom:1px solid #f0ece0;line-height:1.4}
+  .plat ul.surf li:last-child{border-bottom:none}
+  .plat ul.surf b{color:var(--navy)}
+  .plat .t{display:inline-block;font-size:.7rem;padding:0 2px;border-radius:5px;vertical-align:middle;margin:0 1px}
+  @media (max-width:560px){.legend .lgnote{margin-left:0;width:100%}}
+
+  /* execution week — day cards */
+  .weekflow{display:flex;flex-direction:column;gap:10px}
+  .dayc{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 16px;box-shadow:var(--shadow);border-left:5px solid var(--gold)}
+  .dayc.img{border-left-color:#2f6f7d}
+  .dayc.vid{border-left-color:#9a5b2f}
+  .dtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px}
+  .dtop .dname{font-family:"Playfair Display",serif;font-size:1.12rem;font-weight:600;color:var(--navy);min-width:42px}
+  .dtop .dtheme{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--gold-deep)}
+  .dmedia{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:999px;color:#fff;margin-left:auto}
+  .dmedia.mi{background:#2f6f7d}.dmedia.mv{background:#9a5b2f}.dmedia.mt{background:#4a5a8a;margin-left:6px}
+  .dayc.txt2 .dmedia.mt{margin-left:6px}
+  .dayc .make{font-size:.88rem;color:#2c3447;margin-bottom:8px;line-height:1.45}
+  .dayc .make b{color:var(--navy)}
+  .dayc .goes{font-size:.84rem;color:#3c455a}
+  .dayc .goes b{color:var(--navy);margin-right:4px}
+  .dayc .goes .s{display:inline-block;font-size:.72rem;font-weight:600;background:var(--cream);border:1px solid var(--line);color:var(--navy-soft);border-radius:999px;padding:2px 9px;margin:3px 4px 0 0}
+  .dayc .goes .s.lp{background:rgba(187,155,70,.16);border-color:var(--gold);color:var(--gold-deep)}
+  .weeknote{margin-top:14px;background:var(--navy);color:#dbe1ec;border:1px solid var(--gold);border-radius:12px;padding:14px 18px;font-size:.88rem;line-height:1.55}
+  .weeknote b{color:var(--gold)}
+  .weeknote p{margin:0}
+
   .legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}
   .fmt{border:1px solid var(--line);border-radius:11px;padding:11px 13px;background:var(--cream-2)}
   .fmt .tag{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px;margin-bottom:7px;background:var(--navy);color:var(--cream)}
@@ -286,7 +321,7 @@
   <section>
     <div class="sec-head"><span class="sec-num">i.</span><div><h2>Every platform does one of four jobs</h2><p class="lead">Adding a platform only helps when it fills a job you don't already cover. These are the eleven you've considered, sorted.</p></div></div>
     <div class="jobs">
-      <div class="job"><div class="jt">Content · Reach</div><b>7 platforms</b><p>Instagram, Facebook, WeChat, 小红书, YouTube, Threads, LinkedIn. The daily grid below.</p></div>
+      <div class="job"><div class="jt">Content · Reach</div><b>10 apps</b><p>WeChat, 小红书, Instagram, Facebook, YouTube, LinkedIn, Telegram, WhatsApp, Nextdoor, Pinterest — with their surfaces in Section iii.</p></div>
       <div class="job"><div class="jt">Trust · Local</div><b>Nextdoor</b><p>Verified English-speaking homeowners in your farm. The complement to WeChat.</p></div>
       <div class="job"><div class="jt">Conversion · Nurture</div><b>WhatsApp · Telegram</b><p>Where conversations land and past clients stay warm. Not posting channels.</p></div>
       <div class="job"><div class="jt">Listen · Skip</div><b>Reddit / Pinterest / Discord</b><p>Reddit to research, Pinterest to automate-or-skip, Discord only if a community appears.</p></div>
@@ -307,15 +342,88 @@
 
   <!-- PLATFORM ROLES -->
   <section>
-    <div class="sec-head"><span class="sec-num">iii.</span><div><h2>The seven content platforms</h2><p class="lead">Weighted to your seller-side, bilingual GTA audience. Trust and conversion platforms are in Section vi.</p></div></div>
+    <div class="sec-head"><span class="sec-num">iii.</span><div><h2>The platforms &amp; their surfaces</h2><p class="lead">Grouped by app, with every surface you actually post to. The colored tags show what <b>kind</b> of content each surface takes — so when you make one picture, one video, or one text, you already know every slot it belongs in.</p></div></div>
+
+    <div class="legend">
+      <span class="lg lg-img">📷 Picture</span>
+      <span class="lg lg-vid">🎬 Video</span>
+      <span class="lg lg-txt">📝 Text</span>
+      <span class="lg lg-eph">⏱ Ephemeral 24h</span>
+      <span class="lgnote">One picture fills every 📷 slot · one video fills every 🎬 slot · one text fills every 📝 slot.</span>
+    </div>
+
     <div class="platforms">
-      <div class="plat"><h3>Instagram <span class="lang">EN + 中文</span></h3><div class="role">Your anchor — every format lives here.</div><ul><li>Reels for reach, carousels for depth, Stories daily</li><li>Younger move-up buyers; sellers vetting you</li><li>Feed can't hold links — use bio + Story stickers</li></ul><div class="freq">~6 feed/Reels + Stories most days</div></div>
-      <div class="plat"><h3>Facebook <span class="lang">EN + 中文</span></h3><div class="role">Where your existing network lives.</div><ul><li>Past clients see you even without engaging</li><li>Chinese GTA groups for listing reach</li><li>Home of your ?img= OG-preview Just Sold posts</li></ul><div class="freq">~6 posts / week</div></div>
-      <div class="plat"><h3>WeChat 朋友圈 <span class="lang">中文</span></h3><div class="role">Highest-trust channel for Chinese buyers.</div><ul><li>Moments — low-friction, post almost daily</li><li>Lifestyle, listings, Just Sold, market notes</li><li>公众号 for the monthly market article</li></ul><div class="freq">~6 Moments / week</div></div>
-      <div class="plat"><h3>小红书 RED <span class="lang">中文</span></h3><div class="role">Where Chinese buyers research.</div><ul><li>Community + lifestyle is the native winner</li><li>Image notes with text overlay + short video</li><li>Soft authority — RECO + platform rules apply</li></ul><div class="freq">~3 notes / week</div></div>
-      <div class="plat"><h3>YouTube <span class="lang">EN +字幕</span></h3><div class="role">The searchable archive that keeps working.</div><ul><li>Long community guides + full tours live for years</li><li>Biggest untapped channel — most agents skip it</li><li>Source footage for the week's Reels</li></ul><div class="freq">1 long + 1 Short / week</div></div>
-      <div class="plat"><h3>Threads <span class="lang">EN</span></h3><div class="role">Text commentary — runs off your IG.</div><ul><li>Near-zero setup; shares your Instagram login</li><li>Your market takes as 2–3 line text posts</li><li>Repurpose, don't create — no filming needed</li></ul><div class="freq">~3 text posts / week</div></div>
-      <div class="plat"><h3>LinkedIn <span class="lang">EN</span></h3><div class="role">Optional — investors & referrals.</div><ul><li>Repurpose Monday market + Friday wins</li><li>Thought-leadership angle, not lifestyle</li><li>Skip when the week is full</li></ul><div class="freq">1–2 / week (repurposed)</div></div>
+
+      <div class="plat"><h3>WeChat <span class="lang">中文</span></h3><div class="role">Your highest-trust Chinese channel — three different surfaces in one app.</div>
+        <ul class="surf">
+          <li><b>Moments 朋友圈</b> <span class="t t-img">📷</span><span class="t t-txt">📝</span> — personal feed, almost daily. Listings, Just Sold, lifestyle, market notes.</li>
+          <li><b>Channels 视频号</b> <span class="t t-vid">🎬</span> — video feed that reaches <i>beyond</i> your contacts. Discovery engine.</li>
+          <li><b>Official Account 公众号</b> <span class="t t-txt">📝</span> — long-form authority articles (monthly market piece). Needs setup.</li>
+        </ul>
+        <div class="freq">Moments ~daily · 视频号 when you have video · 公众号 monthly</div></div>
+
+      <div class="plat"><h3>小红书 RED <span class="lang">中文</span></h3><div class="role">Where Chinese buyers research before they decide.</div>
+        <ul class="surf">
+          <li><b>Image notes</b> <span class="t t-img">📷</span> — image + text-overlay, the native winner.</li>
+          <li><b>Video notes</b> <span class="t t-vid">🎬</span> — short vertical video.</li>
+        </ul>
+        <div class="freq">~3 notes / week · soft authority, platform rules apply</div></div>
+
+      <div class="plat"><h3>Instagram <span class="lang">EN + 中文</span></h3><div class="role">Your Western anchor — all three surfaces live here.</div>
+        <ul class="surf">
+          <li><b>Feed</b> <span class="t t-img">📷</span> — branded graphics, carousels.</li>
+          <li><b>Stories</b> <span class="t t-img">📷</span><span class="t t-eph">⏱</span> — same image, daily 24h touch.</li>
+          <li><b>Reels</b> <span class="t t-vid">🎬</span> — vertical video, the reach engine.</li>
+        </ul>
+        <div class="freq">Feed most days · Stories daily · Reels when you have video</div></div>
+
+      <div class="plat"><h3>Facebook <span class="lang">EN + 中文</span></h3><div class="role">Where your existing network &amp; past clients see you.</div>
+        <ul class="surf">
+          <li><b>Feed</b> <span class="t t-img">📷</span><span class="t t-txt">📝</span> — graphics + the ?img= Just Sold posts.</li>
+          <li><b>Stories</b> <span class="t t-img">📷</span><span class="t t-eph">⏱</span> — mirror your IG story.</li>
+          <li><b>Reels</b> <span class="t t-vid">🎬</span> — same video as IG Reel.</li>
+        </ul>
+        <div class="freq">Feed most days · Stories daily · Reels with video</div></div>
+
+      <div class="plat"><h3>YouTube <span class="lang">EN + 字幕</span></h3><div class="role">The searchable, evergreen archive that works for years — most agents skip it.</div>
+        <ul class="surf">
+          <li><b>Long-form</b> <span class="t t-vid">🎬</span> — community guides &amp; full tours. Higher effort, lives forever, source footage for Reels.</li>
+          <li><b>Shorts</b> <span class="t t-vid">🎬</span> — your same vertical Reel/视频号 video, reposted. Near-zero extra effort.</li>
+        </ul>
+        <div class="freq">1 long when you can · Shorts free off your Reels</div></div>
+
+      <div class="plat"><h3>LinkedIn <span class="lang">EN</span></h3><div class="role">Professional angle — referrals, investors, credibility.</div>
+        <ul class="surf">
+          <li><b>Posts</b> <span class="t t-img">📷</span><span class="t t-txt">📝</span> — repurpose Monday market &amp; Friday wins, thought-leadership tone, not lifestyle.</li>
+        </ul>
+        <div class="freq">1–2 / week, repurposed · skip when the week is full</div></div>
+
+      <div class="plat"><h3>Telegram <span class="lang">EN + 中文</span></h3><div class="role">Your owned broadcast channel — and the one surface that auto-posts.</div>
+        <ul class="surf">
+          <li><b>Channel posts</b> <span class="t t-img">📷</span><span class="t t-vid">🎬</span><span class="t t-txt">📝</span> — anything. Auto-posts from your scheduler.</li>
+          <li><b>Stories</b> <span class="t t-img">📷</span><span class="t t-eph">⏱</span> — quick 24h touch (post by hand).</li>
+        </ul>
+        <div class="freq">Channel auto · Stories optional</div></div>
+
+      <div class="plat"><h3>WhatsApp <span class="lang">EN + 中文</span></h3><div class="role">Reaches the WhatsApp-heavy GTA communities WeChat doesn't.</div>
+        <ul class="surf">
+          <li><b>Channel</b> <span class="t t-img">📷</span><span class="t t-vid">🎬</span><span class="t t-txt">📝</span> — one-way broadcast feed, like a Telegram channel.</li>
+          <li><b>Status</b> <span class="t t-img">📷</span><span class="t t-eph">⏱</span> — 24h ephemeral, like a story.</li>
+        </ul>
+        <div class="freq">Channel for updates · Status for quick touches</div></div>
+
+      <div class="plat"><h3>Nextdoor <span class="lang">EN</span></h3><div class="role">Hyper-local — the actual neighbours around a listing.</div>
+        <ul class="surf">
+          <li><b>Posts</b> <span class="t t-img">📷</span><span class="t t-txt">📝</span> — Just Sold &amp; local market notes to the immediate area.</li>
+        </ul>
+        <div class="freq">Around listings &amp; solds</div></div>
+
+      <div class="plat"><h3>Pinterest <span class="lang">EN</span></h3><div class="role">Evergreen authority, <i>not</i> local leads — national/topic reach, no geo-targeting.</div>
+        <ul class="surf">
+          <li><b>Pins</b> <span class="t t-img">📷</span> — "home staging / prep to sell" graphics that link back to peterluo.homes. Makes you look credible when found.</li>
+        </ul>
+        <div class="freq">Occasional, evergreen · brand not leads</div></div>
+
     </div>
   </section>
 
@@ -471,118 +579,133 @@
 
   <!-- EXECUTION GRID -->
   <section>
-    <div class="sec-head"><span class="sec-num">v.</span><div><h2>The execution grid</h2><p class="lead">The do-it-without-thinking view. Read down a platform or across a day. Swipe sideways on mobile — the platform column stays put.</p></div></div>
+    <div class="sec-head"><span class="sec-num">v.</span><div><h2>The execution week</h2><p class="lead">One media type per day. <b>Make it once, deploy to every matching surface.</b> You never decide format on the fly — the day tells you what to make, and the row tells you everywhere it goes. Picture days are light; video days are the heavier lift.</p></div></div>
+
     <div class="gridnote">
       <span class="k"><span class="swatch lps"></span> Gold cell = a link goes out (first comment / bio / sticker)</span>
-      <span class="k"><span class="swatch rests"></span> Pill = format</span>
-      <span class="k">— = rest, don't force filler</span>
+      <span class="k"><span class="swatch rests"></span> Pill = format · — = rest, don't force filler</span>
+      <span class="k">📷 picture day · 🎬 video day — the column's media type is consistent down every surface</span>
     </div>
     <div class="gridwrap">
       <table class="grid">
         <thead>
           <tr>
-            <th>Platform</th>
-            <th>Mon<span class="sub">Market</span></th>
-            <th>Tue<span class="sub">Community</span></th>
-            <th>Wed<span class="sub">Listing</span></th>
-            <th>Thu<span class="sub">Behind-scenes</span></th>
-            <th>Fri<span class="sub">Just Sold</span></th>
-            <th>Sat<span class="sub">Open house</span></th>
-            <th>Sun<span class="sub">Long-form</span></th>
+            <th>Surface</th>
+            <th>Mon<span class="sub">📷 Market</span></th>
+            <th>Tue<span class="sub">🎬 Community</span></th>
+            <th>Wed<span class="sub">📷 Listing</span></th>
+            <th>Thu<span class="sub">🎬 Behind-scenes</span></th>
+            <th>Fri<span class="sub">📷 Just Sold</span></th>
+            <th>Sat<span class="sub">🎬 Open house</span></th>
+            <th>Sun<span class="sub">🎬📝 Long-form</span></th>
           </tr>
         </thead>
         <tbody>
 
           <tr>
-            <td>Instagram<small>feed / Reels · 6–7/wk</small></td>
-            <td><div class="gc"><span class="gp">Text-on-image</span><span class="gl">1 image</span><span class="gx">Save · "DM REPORT"</span></div></td>
-            <td><div class="gc"><span class="gp vid">Short video</span><span class="gl">45–60s</span><span class="gx">"Which community next?"</span></div></td>
-            <td><div class="gc"><span class="gp">Carousel</span><span class="gl">5–8 slides</span><span class="gx">"DM for full tour"</span></div></td>
-            <td><div class="gc"><span class="gp vid">Mid video</span><span class="gl">60–90s</span><span class="gx">"Comment if you agree"</span></div></td>
-            <td><div class="gc"><span class="gp">Carousel</span><span class="gl">3–4 slides</span><span class="gx">"Comment SOLD" · link in bio</span></div></td>
-            <td><div class="gc"><span class="gp vid">Short video</span><span class="gl">20–30s</span><span class="gx">"Open 2–4 — address below"</span></div></td>
-            <td><div class="gc"><span class="gp vid">Short video</span><span class="gl">30s teaser</span><span class="gx">"Full tour on YouTube → bio"</span></div></td>
+            <td>WeChat Moments 朋友圈<small>📷📝 · 中文</small></td>
+            <td><div class="gc"><span class="gp">Text-on-image</span><span class="gl">1 图</span><span class="gx">市场数据 · 私信 REPORT</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Carousel</span><span class="gl">看房图文</span><span class="gx">私信看房 (附链接)</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Single image</span><span class="gl">已售 · 1 图</span><span class="gx">私信估价 (附链接)</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Text</span><span class="gl">随笔</span><span class="gx">personal 随笔 · 无 CTA</span></div></td>
           </tr>
 
           <tr>
-            <td>IG Stories<small>most days</small></td>
-            <td><div class="gc"><span class="gp story">Story</span><span class="gl">2–3 frames</span><span class="gx">Stat + poll · "DM REPORT"</span></div></td>
-            <td><div class="gc"><span class="gp story">Story</span><span class="gl">1–2 frames</span><span class="gx">Community clip + question</span></div></td>
-            <td><div class="gc"><span class="gp story">Story</span><span class="gl">2–3 frames</span><span class="gx">Listing peek · "DM"</span></div></td>
-            <td><div class="gc"><span class="gp story">Story</span><span class="gl">1–2 frames</span><span class="gx">Staging BTS</span></div></td>
-            <td><div class="gc"><span class="gp story">Story</span><span class="gl">2–3 frames</span><span class="gx">Just Sold · "DM VALUE"</span></div></td>
-            <td><div class="gc lp"><span class="gp story">Story</span><span class="gl">6–8 frames · live</span><span class="gx">Open house all day</span><span class="lpbadge">LINK → register</span></div></td>
-            <td><div class="gc lp"><span class="gp story">Story</span><span class="gl">1–2 frames</span><span class="gx">New video out</span><span class="lpbadge">LINK → YouTube</span></div></td>
+            <td>WeChat Channels 视频号<small>🎬 · 中文</small></td>
+            <td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Short video</span><span class="gl">45–60s</span><span class="gx">社区介绍</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Mid video</span><span class="gl">60–90s</span><span class="gx">幕后准备</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Short video</span><span class="gl">实时</span><span class="gx">今天开放参观</span></div></td><td><div class="gc"><span class="gp vid">Long → clip</span><span class="gl">视频号版</span><span class="gx">完整导览片段</span></div></td>
           </tr>
 
           <tr>
-            <td>Facebook<small>6/wk</small></td>
-            <td><div class="gc"><span class="gp">Text-on-image</span><span class="gl">1 image</span><span class="gx">Save · "DM REPORT"</span></div></td>
-            <td><div class="gc"><span class="gp vid">Short video</span><span class="gl">45–60s</span><span class="gx">Share Tue Reel</span></div></td>
-            <td><div class="gc lp"><span class="gp">Carousel</span><span class="gl">active listing</span><span class="gx">"Book a showing"</span><span class="lpbadge">LINK → listing (1st comment)</span></div></td>
-            <td><div class="gc vid"><span class="gp vid">Mid video</span><span class="gl">60–90s</span><span class="gx">"This is real marketing"</span></div></td>
-            <td><div class="gc lp"><span class="gp">Single image</span><span class="gl">Just Sold · ?img= OG</span><span class="gx">"DM VALUE"</span><span class="lpbadge">LINK → valuation (1st comment)</span></div></td>
-            <td><div class="gc"><span class="gp vid">Short video</span><span class="gl">20–30s</span><span class="gx">"Open today — address in comments"</span></div></td>
-            <td><div class="gc"><span class="gp vid">Long video</span><span class="gl">share YT</span><span class="gx">"Watch + comment"</span></div></td>
+            <td>WeChat 公众号<small>📝 · 中文 · 月度</small></td>
+            <td><div class="gc"><span class="gp">Article</span><span class="gl">monthly</span><span class="gx">月度市场长文 (Week-1 数据)</span></div></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td>
           </tr>
 
           <tr>
-            <td>WeChat 朋友圈<small>6/wk · 中文</small></td>
-            <td><div class="gc"><span class="gp">Text-on-image</span><span class="gl">1 图</span><span class="gx">私信 REPORT</span></div></td>
-            <td><div class="gc"><span class="gp vid">Short video</span><span class="gl">45–60s</span><span class="gx">评论社区</span></div></td>
-            <td><div class="gc"><span class="gp">Carousel</span><span class="gl">看房图文</span><span class="gx">私信看房 (附链接)</span></div></td>
-            <td><div class="gc vid"><span class="gp vid">Mid video</span><span class="gl">60–90s</span><span class="gx">幕后准备 · 评论</span></div></td>
-            <td><div class="gc"><span class="gp">Single image</span><span class="gl">已售 · 1 图</span><span class="gx">私信估价 (附链接)</span></div></td>
-            <td><div class="gc"><span class="gp story">Story/clip</span><span class="gl">实时</span><span class="gx">今天开放参观</span></div></td>
-            <td><div class="gc"><span class="gp">Text-on-image</span><span class="gl">personal</span><span class="gx">随笔 · 无 CTA (建立温度)</span></div></td>
+            <td>小红书 RED · image<small>📷 · 中文</small></td>
+            <td><div class="gc"><span class="gp">Text-on-image</span><span class="gl">数据笔记</span><span class="gx">收藏 (选发)</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">图文 note</span><span class="gl">图文笔记</span><span class="gx">看房笔记 · 收藏</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Single image</span><span class="gl">已售笔记</span><span class="gx">估价 · 收藏</span></div></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td>
           </tr>
 
           <tr>
-            <td>小红书 RED<small>3/wk · 中文</small></td>
-            <td><div class="gc"><span class="gp">Text-on-image</span><span class="gl">数据笔记</span><span class="gx">收藏 (选发)</span></div></td>
-            <td><div class="gc"><span class="gp">Carousel</span><span class="gl">图文笔记</span><span class="gx">"在Markham的一天" · 收藏+评论</span></div></td>
-            <td><span class="rest">—</span></td>
-            <td><span class="rest">—</span></td>
-            <td><span class="rest">—</span></td>
-            <td><div class="gc"><span class="gp vid">Short video</span><span class="gl">30–45s</span><span class="gx">今天开放 · 评论看地址</span></div></td>
-            <td><span class="rest">—</span></td>
+            <td>小红书 RED · video<small>🎬 · 中文</small></td>
+            <td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Short video</span><span class="gl">30–45s</span><span class="gx">"在Markham的一天" · 评论</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Short video</span><span class="gl">30–45s</span><span class="gx">幕后 · 评论</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Short video</span><span class="gl">30–45s</span><span class="gx">今天开放 · 评论看地址</span></div></td><td><span class="rest">—</span></td>
           </tr>
 
           <tr>
-            <td>YouTube<small>1 long + 1 Short</small></td>
-            <td><span class="rest">—</span></td>
-            <td><span class="rest">—</span></td>
-            <td><span class="rest">—</span></td>
-            <td><div class="gc vid"><span class="gp vid">Short</span><span class="gl">30–60s</span><span class="gx">Cut from footage · subscribe</span></div></td>
-            <td><span class="rest">—</span></td>
-            <td><span class="rest">—</span></td>
-            <td><div class="gc vid"><span class="gp vid">Long video</span><span class="gl">3–10 min</span><span class="gx">Tour / community · subscribe + DM</span></div></td>
+            <td>Instagram Feed<small>📷 · EN+中文</small></td>
+            <td><div class="gc"><span class="gp">Text-on-image</span><span class="gl">1 image</span><span class="gx">Save · "DM REPORT"</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Carousel</span><span class="gl">5–8 slides</span><span class="gx">"DM for full tour"</span></div></td><td><span class="rest">—</span></td><td><div class="gc lp"><span class="gp">Single/carousel</span><span class="gl">Just Sold</span><span class="gx">"Comment SOLD" · link in bio</span><span class="lpbadge">LINK → bio</span></div></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td>
           </tr>
 
           <tr>
-            <td>Threads<small>3/wk · EN</small></td>
-            <td><div class="gc"><span class="gp">Text post</span><span class="gl">2–3 lines</span><span class="gx">Market take · reply/DM</span></div></td>
-            <td><span class="rest">—</span></td>
-            <td><div class="gc"><span class="gp">Text post</span><span class="gl">2–3 lines</span><span class="gx">Listing thought / question</span></div></td>
-            <td><span class="rest">—</span></td>
-            <td><div class="gc"><span class="gp">Text post</span><span class="gl">2–3 lines</span><span class="gx">Win reflection · reply</span></div></td>
-            <td><span class="rest">—</span></td>
-            <td><span class="rest">—</span></td>
+            <td>Instagram Stories<small>📷 · daily</small></td>
+            <td><div class="gc"><span class="gp story">Story</span><span class="gl">2–3 frames</span><span class="gx">Stat + poll · "DM REPORT"</span></div></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">1–2 frames</span><span class="gx">Community clip + question</span></div></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">2–3 frames</span><span class="gx">Listing peek · "DM"</span></div></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">1–2 frames</span><span class="gx">Staging BTS</span></div></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">2–3 frames</span><span class="gx">Just Sold · "DM VALUE"</span></div></td><td><div class="gc lp"><span class="gp story">Story</span><span class="gl">6–8 · live</span><span class="gx">Open house all day</span><span class="lpbadge">LINK → register</span></div></td><td><div class="gc lp"><span class="gp story">Story</span><span class="gl">1–2 frames</span><span class="gx">New video out</span><span class="lpbadge">LINK → YouTube</span></div></td>
           </tr>
 
           <tr>
-            <td>LinkedIn<small>1–2/wk · EN</small></td>
-            <td><div class="gc"><span class="gp">Text + image</span><span class="gl">repurposed</span><span class="gx">Market take · comment</span></div></td>
-            <td><span class="rest">—</span></td>
-            <td><span class="rest">—</span></td>
-            <td><span class="rest">—</span></td>
-            <td><div class="gc"><span class="gp">Text + image</span><span class="gl">repurposed</span><span class="gx">Client win · DM/connect</span></div></td>
-            <td><span class="rest">—</span></td>
-            <td><span class="rest">—</span></td>
+            <td>Instagram Reels<small>🎬 · EN+中文</small></td>
+            <td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Reel</span><span class="gl">45–60s</span><span class="gx">"Which community next?"</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Reel</span><span class="gl">60–90s</span><span class="gx">"Comment if you agree"</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Reel</span><span class="gl">20–30s</span><span class="gx">"Open 2–4 — address below"</span></div></td><td><div class="gc"><span class="gp vid">Reel</span><span class="gl">30s teaser</span><span class="gx">"Full tour on YouTube → bio"</span></div></td>
           </tr>
 
+          <tr>
+            <td>Facebook Feed<small>📷📝 · EN+中文</small></td>
+            <td><div class="gc"><span class="gp">Text-on-image</span><span class="gl">1 image</span><span class="gx">Save · "DM REPORT"</span></div></td><td><span class="rest">—</span></td><td><div class="gc lp"><span class="gp">Carousel</span><span class="gl">active listing</span><span class="gx">"Book a showing"</span><span class="lpbadge">LINK → listing (1st comment)</span></div></td><td><span class="rest">—</span></td><td><div class="gc lp"><span class="gp">Single image</span><span class="gl">Just Sold · ?img= OG</span><span class="gx">"DM VALUE"</span><span class="lpbadge">LINK → valuation (1st comment)</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Text</span><span class="gl">share YT</span><span class="gx">"Watch + comment"</span></div></td>
+          </tr>
+
+          <tr>
+            <td>Facebook Stories<small>📷 · daily</small></td>
+            <td><div class="gc"><span class="gp story">Story</span><span class="gl">1–2 frames</span><span class="gx">Stat peek</span></div></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">1 frame</span><span class="gx">Community clip</span></div></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">1–2 frames</span><span class="gx">Listing peek</span></div></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">1 frame</span><span class="gx">Staging BTS</span></div></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">1–2 frames</span><span class="gx">Just Sold</span></div></td><td><div class="gc lp"><span class="gp story">Story</span><span class="gl">live</span><span class="gx">Open house today</span><span class="lpbadge">LINK → register</span></div></td><td><span class="rest">—</span></td>
+          </tr>
+
+          <tr>
+            <td>Facebook Reels<small>🎬 · EN+中文</small></td>
+            <td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Reel</span><span class="gl">45–60s</span><span class="gx">share Tue Reel</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Reel</span><span class="gl">60–90s</span><span class="gx">"This is real marketing"</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Reel</span><span class="gl">20–30s</span><span class="gx">"Open today — address in comments"</span></div></td><td><div class="gc"><span class="gp vid">Reel</span><span class="gl">share</span><span class="gx">"Watch + comment"</span></div></td>
+          </tr>
+
+          <tr>
+            <td>YouTube long-form<small>🎬 · EN+字幕</small></td>
+            <td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Long video</span><span class="gl">3–10 min</span><span class="gx">Tour / community · subscribe + DM</span></div></td>
+          </tr>
+
+          <tr>
+            <td>YouTube Shorts<small>🎬</small></td>
+            <td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Short</span><span class="gl">30–60s</span><span class="gx">Cut from Tue footage</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Short</span><span class="gl">30–60s</span><span class="gx">Cut from Thu footage</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp vid">Short</span><span class="gl">30–60s</span><span class="gx">Open house cut</span></div></td><td><div class="gc"><span class="gp vid">Short</span><span class="gl">30–60s</span><span class="gx">Teaser cut</span></div></td>
+          </tr>
+
+          <tr>
+            <td>LinkedIn<small>📷📝 · EN</small></td>
+            <td><div class="gc"><span class="gp">Text + image</span><span class="gl">repurposed</span><span class="gx">Market take · comment</span></div></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Text + image</span><span class="gl">repurposed</span><span class="gx">Client win · DM/connect</span></div></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td>
+          </tr>
+
+          <tr>
+            <td>Telegram Channel<small>📷🎬📝 · auto</small></td>
+            <td><div class="gc"><span class="gp">Auto post</span><span class="gl">image</span><span class="gx">市场图 + caption</span></div></td><td><div class="gc"><span class="gp">Auto post</span><span class="gl">video</span><span class="gx">community clip</span></div></td><td><div class="gc"><span class="gp">Auto post</span><span class="gl">image</span><span class="gx">listing</span></div></td><td><div class="gc"><span class="gp">Auto post</span><span class="gl">video</span><span class="gx">BTS clip</span></div></td><td><div class="gc"><span class="gp">Auto post</span><span class="gl">image</span><span class="gx">Just Sold</span></div></td><td><div class="gc"><span class="gp">Auto post</span><span class="gl">video</span><span class="gx">open house</span></div></td><td><div class="gc"><span class="gp">Auto post</span><span class="gl">video/text</span><span class="gx">tour + 随笔</span></div></td>
+          </tr>
+
+          <tr>
+            <td>Telegram Stories<small>📷 · optional</small></td>
+            <td><div class="gc"><span class="gp story">Story</span><span class="gl">1 frame</span><span class="gx">stat</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">1 frame</span><span class="gx">listing peek</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">1 frame</span><span class="gx">Just Sold</span></div></td><td><div class="gc"><span class="gp story">Story</span><span class="gl">live</span><span class="gx">open house</span></div></td><td><span class="rest">—</span></td>
+          </tr>
+
+          <tr>
+            <td>WhatsApp Channel<small>📷🎬📝</small></td>
+            <td><div class="gc"><span class="gp">Broadcast</span><span class="gl">image</span><span class="gx">market stat</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Broadcast</span><span class="gl">image</span><span class="gx">new listing</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Broadcast</span><span class="gl">image</span><span class="gx">Just Sold</span></div></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td>
+          </tr>
+
+          <tr>
+            <td>WhatsApp Status<small>📷 · daily</small></td>
+            <td><div class="gc"><span class="gp story">Status</span><span class="gl">image</span><span class="gx">stat</span></div></td><td><div class="gc"><span class="gp story">Status</span><span class="gl">clip</span><span class="gx">community</span></div></td><td><div class="gc"><span class="gp story">Status</span><span class="gl">image</span><span class="gx">listing</span></div></td><td><div class="gc"><span class="gp story">Status</span><span class="gl">clip</span><span class="gx">BTS</span></div></td><td><div class="gc"><span class="gp story">Status</span><span class="gl">image</span><span class="gx">Just Sold</span></div></td><td><div class="gc"><span class="gp story">Status</span><span class="gl">live</span><span class="gx">open house</span></div></td><td><span class="rest">—</span></td>
+          </tr>
+
+          <tr>
+            <td>Nextdoor<small>📷📝 · EN · local</small></td>
+            <td><div class="gc"><span class="gp">Post</span><span class="gl">market note</span><span class="gx">local stat</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Post</span><span class="gl">listing</span><span class="gx">new in the neighbourhood</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Post</span><span class="gl">Just Sold</span><span class="gx">"sold near you"</span></div></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td>
+          </tr>
+
+          <tr>
+            <td>Pinterest<small>📷 · evergreen</small></td>
+            <td><div class="gc"><span class="gp">Pin</span><span class="gl">staging tip</span><span class="gx">→ peterluo.homes</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Pin</span><span class="gl">listing image</span><span class="gx">→ listing page</span></div></td><td><span class="rest">—</span></td><td><div class="gc"><span class="gp">Pin</span><span class="gl">"prep to sell"</span><span class="gx">→ valuation</span></div></td><td><span class="rest">—</span></td><td><span class="rest">—</span></td>
+          </tr>
         </tbody>
       </table>
+    </div>
+    <div class="weeknote">
+      <p><b>How to read it:</b> each <b>day column</b> has one media type — make that <b>one</b> asset, then run <b>down the column</b> posting it to every surface that lights up. 📷 days you make a picture; 🎬 days you shoot one video that feeds every video surface. <b>Telegram auto-posts</b> its column from your scheduler; the WeChat <b>公众号</b> article is monthly, not daily. Everything else is a copy-caption + open-app sweep from the manual page.</p>
     </div>
   </section>
 

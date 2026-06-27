@@ -85,7 +85,147 @@
   .tg .ok{color:var(--auto);font-weight:800}.tg .no{color:#a33;font-weight:800}.tg .wait{color:var(--assist);font-weight:800}
   #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:var(--cream);padding:11px 18px;border-radius:10px;font-size:.86rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.25s;z-index:50;border:1px solid var(--gold)}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  @media (max-width:880px){.cols{grid-template-columns:1fr}}
+  /* ---------- weekly plan panel ---------- */
+  .week{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:20px;box-shadow:var(--shadow)}
+  .week .wh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .week .wh h2{font-family:"Playfair Display",serif;font-weight:600;font-size:1.2rem;color:var(--navy);margin:0}
+  .week .wh .collapse{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;font-family:inherit}
+  .weekbar{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+  .weekbar .wf{display:flex;flex-direction:column;gap:4px}
+  .weekbar label{font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-deep)}
+  .weekbar input{border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:.86rem}
+  .weekbar .gen{background:var(--gold);color:var(--navy);border:1px solid var(--gold-deep);border-radius:9px;padding:9px 16px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit}
+  .weekbar .gen:hover{background:#cba954}
+  .weekbar .tpl{background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 13px;font-size:.84rem;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit}
+  .weekbar .tpl:hover{border-color:var(--gold)}
+  .weekgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}
+  /* stacked layout: compose (middle, compressed) + queue (bottom, timeline) */
+  .stack{display:flex;flex-direction:column;gap:20px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .compose-compact h2{margin-bottom:12px}
+  .compose-compact textarea{min-height:66px}
+  .compose-compact #media{min-height:54px}
+  .compose-compact .langblock{margin:0}
+  .qtimeline{display:flex;gap:9px;overflow-x:auto;padding:4px 2px 10px}
+  .qtimeline .empty{padding:14px 4px}
+  .qchip{flex:0 0 auto;width:152px;border:1px solid var(--line);border-radius:11px;padding:9px 11px;background:#fff;cursor:pointer;position:relative;display:flex;flex-direction:column;gap:4px}
+  .qchip:hover{border-color:var(--gold)}
+  .qchip.due{border-color:var(--assist);background:#fffaf0}
+  .qchip .qt{font-weight:700;font-size:.74rem;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:14px}
+  .qchip .qw{font-size:.62rem;color:var(--muted);font-weight:600}
+  .qchip .qs{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+  .qchip .qx{position:absolute;top:6px;right:7px;border:none;background:none;color:#b9c0cc;cursor:pointer;font-size:.74rem;line-height:1;padding:2px}
+  .qchip .qx:hover{color:#b4503f}
+  @media (max-width:640px){.grid2{grid-template-columns:1fr}}
+  .btn.primary{background:var(--gold);color:var(--navy);border-color:var(--gold-deep);font-weight:700}
+  .btn.primary:hover{background:#cba954}
+  .qmore{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);width:100%}
+  .qmore[hidden]{display:none}
+  .adhoc{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--gold-deep);background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:1px 6px;margin-left:6px}
+  /* weekly status matrix */
+  .wkgrid{display:grid;grid-template-columns:minmax(116px,150px) repeat(7,minmax(118px,1fr));border:1px solid var(--line);border-radius:12px;overflow-x:auto;background:#fff}
+  .wkgrid>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 8px;min-width:0}
+  .wk-corner{position:sticky;left:0;z-index:3;background:var(--navy);color:var(--cream);font-weight:700;font-size:.6rem;display:flex;align-items:flex-end}
+  .wk-day{background:var(--cream-2);cursor:pointer;display:flex;flex-direction:column;gap:2px}
+  .wk-day:hover{background:var(--cream)}
+  .wk-dn{font-weight:800;color:var(--navy);font-size:.74rem}
+  .wk-bt{display:flex;align-items:center;gap:4px}.wk-bt .b{font-size:.9rem}
+  .wk-th{font-weight:700;color:var(--navy);font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wk-tm{font-size:.6rem;color:var(--muted);font-weight:600}
+  .wk-st{font-size:.56rem;font-weight:800;padding:1px 6px;border-radius:999px;align-self:flex-start;text-transform:uppercase;letter-spacing:.03em}
+  .wk-st.ready{background:rgba(47,125,87,.13);color:var(--auto)}.wk-st.needs{background:rgba(166,121,42,.15);color:var(--assist)}.wk-st.empty{background:#eef0f4;color:var(--muted)}
+  .wk-prop{width:100%;border:1px dashed var(--gold);border-radius:6px;padding:2px 5px;font-family:ui-monospace,monospace;font-size:.58rem;background:#fffdf7;color:var(--navy)}
+  .wk-cap{font-size:.62rem;color:#3f495c;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .wk-cap.zh{color:#5a6275}
+  .wk-surf{position:sticky;left:0;z-index:1;background:#fff;font-weight:700;color:var(--navy);font-size:.7rem;display:flex;align-items:center;gap:4px;justify-content:space-between}
+  .wk-surf.auto{border-left:3px solid var(--auto)}
+  .wk-surf .ti{font-size:.5rem;font-weight:800;color:var(--auto)}
+  .wk-cell{display:flex;align-items:center;justify-content:center;font-size:.95rem;min-height:30px;background:#fff}
+  .wk-cell.posted{background:rgba(47,125,87,.14);color:var(--auto)}
+  .wk-cell.due{background:rgba(166,121,42,.16);color:var(--assist)}
+  .wk-cell.sched{color:#9aa3b2}.wk-cell.none{color:#dde1e8}.wk-cell.failed{background:rgba(180,80,63,.12);color:#b4503f}
+  .wklegend{display:flex;gap:14px;flex-wrap:wrap;font-size:.66rem;color:var(--muted);margin-top:10px}
+  .wklegend span{display:flex;align-items:center;gap:4px}
+  .daycard{border:1px solid var(--line);border-radius:11px;padding:10px;background:var(--cream-2);display:flex;flex-direction:column;gap:7px;min-height:140px;cursor:pointer;transition:.12s}
+  .daycard:hover{border-color:var(--gold)}
+  .daycard .dn{display:flex;align-items:baseline;justify-content:space-between;gap:4px}
+  .daycard .dname{font-weight:800;color:var(--navy);font-size:.82rem;letter-spacing:.02em}
+  .daycard .dbadge{font-size:.92rem}
+  .daycard .dtheme{font-size:.74rem;font-weight:700;color:var(--gold-deep);text-transform:uppercase;letter-spacing:.03em}
+  .daycard .dtime{font-size:.72rem;color:var(--muted);font-weight:600}
+  .daycard .dfolder{font-size:.66rem;color:var(--muted);font-family:ui-monospace,monospace;word-break:break-all}
+  .daycard .dprop{width:100%;border:1px dashed var(--gold);border-radius:7px;padding:4px 7px;font-family:ui-monospace,monospace;font-size:.66rem;background:#fffdf7;color:var(--navy);margin-top:2px}
+  .daycard .dcapmode{font-size:.62rem;color:var(--muted);font-weight:600}
+  .daycard .dprop:focus{outline:none;border-style:solid}
+  .daycard .dtargets{font-size:.66rem;color:var(--muted);margin-top:auto}
+  .daycard .dsurf{display:flex;flex-wrap:wrap;gap:3px;margin-top:2px}
+  .daycard .schip{font-size:.6rem;font-weight:700;padding:1px 5px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--navy);white-space:nowrap}
+  .daycard .schip.auto{background:rgba(47,125,87,.12);border-color:rgba(47,125,87,.35);color:var(--auto)}
+  .daycard .schip.assist{background:var(--cream);border-color:var(--line);color:#5a6275}
+  .daycard .dcap{font-size:.7rem;color:#475066;line-height:1.35;max-height:46px;overflow:hidden;white-space:pre-wrap}
+  .daycard.filled{background:#fff;border-color:var(--gold)}
+  .daycard.filled .dname{color:var(--navy)}
+  .daycard .dstate{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:999px}
+  .daycard .dstate.ready{background:rgba(47,125,87,.13);color:var(--auto)}
+  .daycard .dstate.needs{background:rgba(166,121,42,.15);color:var(--assist)}
+  /* template editor */
+  /* template editor — full-screen matrix */
+  #tplDlg{max-width:96vw;width:96vw}
+  #tplDlg .db{max-height:82vh;overflow:hidden;padding-bottom:8px}
+  .tplgrid{display:grid;grid-template-columns:minmax(112px,150px) repeat(7,minmax(96px,1fr));border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:72vh}
+  .tplgrid>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px 7px}
+  .tg-corner{position:sticky;left:0;top:0;z-index:4;background:var(--navy);color:var(--cream);font-weight:700;font-size:.66rem;display:flex;align-items:flex-end}
+  .tg-day{position:sticky;top:0;z-index:2;background:var(--cream-2);display:flex;flex-direction:column;gap:3px;cursor:pointer}
+  .tg-day:hover{background:var(--cream)}
+  .tg-dn{font-weight:800;color:var(--navy);font-size:.82rem;letter-spacing:.02em}
+  .tg-sum{display:flex;align-items:center;gap:5px;min-width:0}
+  .tg-badge{font-size:.95rem}
+  .tg-th{font-weight:700;color:var(--navy);font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tg-meta{font-size:.64rem;color:var(--muted);font-weight:600}
+  .tg-fold{font-size:.58rem;color:var(--muted);font-family:ui-monospace,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tg-editbtn{font-size:.6rem;color:var(--gold-deep);font-weight:800;letter-spacing:.02em}
+  .tg-surf{position:sticky;left:0;z-index:1;background:#fff;font-weight:700;color:var(--navy);font-size:.74rem;display:flex;align-items:center;gap:5px;justify-content:space-between}
+  .tg-surf.auto{border-left:3px solid var(--auto)}
+  .tg-surf .ti{font-size:.54rem;font-weight:800;letter-spacing:.04em;color:var(--auto)}
+  .tg-cell{display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;color:var(--auto);background:#fff;min-height:32px;user-select:none}
+  .tg-cell.on{background:rgba(47,125,87,.13)}
+  .tg-cell:hover{background:var(--cream)}
+  #dayDlg{max-width:420px;width:92%}
+  #dayDlg .frow{display:flex;gap:10px}#dayDlg .frow .f{flex:1}
+  #dayDlg .db .f{margin-bottom:12px}
+  #dayDlg .db label{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--gold-deep);margin-bottom:5px}
+  #dayDlg .db input,#dayDlg .db select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:.86rem}
+  .tplrow{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:9px;background:var(--cream-2)}
+  .tplrow .tr1{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+  .tplrow .dn2{font-weight:800;color:var(--navy);font-size:.82rem;min-width:34px}
+  .tplrow input,.tplrow select{border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-family:inherit;font-size:.8rem;background:#fff}
+  .tplrow .theme{width:120px}.tplrow .time{width:92px}.tplrow .badge{width:74px}.tplrow .grp{width:130px}.tplrow .fold{flex:1;min-width:130px;font-family:ui-monospace,monospace;font-size:.74rem}
+  .tplrow .tchips{display:flex;gap:5px;flex-wrap:wrap}
+  .tplrow .tr2{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .tplrow .tr2 .cl{font-size:.66rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-deep)}
+  .tplrow .pin{flex:1;min-width:180px;font-size:.78rem}
+  .tplrow .tchip{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:3px 9px;font-size:.7rem;font-weight:600;cursor:pointer}
+  .tplrow .tchip.on{background:var(--navy);color:var(--cream);border-color:var(--navy)}
+  .tplrow .tchip.on.auto{background:var(--auto);border-color:var(--auto)}
+  .tplrow .tchip.on.assist{background:var(--assist);border-color:var(--assist)}
+  #tplDlg .db{max-height:62vh;overflow:auto}
+  /* bank editor */
+  #bankDlg{max-width:760px}
+  #bankDlg .db{max-height:64vh;overflow:auto}
+  .tabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+  .tabs button{background:none;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-family:inherit;font-size:.86rem;font-weight:700;color:var(--muted);cursor:pointer}
+  .tabs button.on{color:var(--navy);border-bottom-color:var(--gold)}
+  .brow{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:9px;background:var(--cream-2)}
+  .brow .br1{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+  .brow input,.brow select,.brow textarea{border:1px solid var(--line);border-radius:7px;padding:6px 9px;font-family:inherit;font-size:.82rem;background:#fff}
+  .brow .bgrp{width:150px}.brow .blabel{flex:1}
+  .brow textarea{width:100%;resize:vertical;min-height:38px;margin-bottom:6px}
+  .brow .del{margin-left:auto;background:none;border:none;color:#b4503f;cursor:pointer;font-size:1rem;font-family:inherit}
+  .brow .pf{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+  .brow .pchip{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:3px 9px;font-size:.68rem;font-weight:600;cursor:pointer}
+  .brow .pchip.on{background:var(--navy);color:var(--cream);border-color:var(--navy)}
+  .addrow{background:#fff;border:1px dashed var(--gold);border-radius:9px;padding:9px;font-size:.82rem;font-weight:700;color:var(--gold-deep);cursor:pointer;width:100%;font-family:inherit;margin-bottom:6px}
+  @media (max-width:880px){.cols{grid-template-columns:1fr}.weekgrid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -98,42 +238,63 @@
 
   <div class="settings">
     <label>Media base URL</label>
-    <input id="baseUrl" placeholder="https://peterluo.homes/social/">
+    <input id="baseUrl" placeholder="https://media.peterluo.homes/">
     <p class="hint">Where you commit your images/videos so auto-posting (Instagram/Facebook) can read them by public URL. A filename below becomes base + filename. Lines starting with http are used as-is.</p>
   </div>
 
-  <div class="cols">
+  <!-- WEEKLY PLAN -->
+  <div class="week" id="weekPanel">
+    <div class="wh">
+      <h2>Weekly plan</h2>
+      <button class="collapse" id="weekCollapse" title="Collapse">▾</button>
+    </div>
+    <div id="weekBody">
+      <div class="weekbar">
+        <div class="wf"><label>Week of (Monday)</label><input type="date" id="weekStart"></div>
+        <div class="wf"><label>Active property (slug)</label><input id="activeProp" list="propList" placeholder="18-hayfield-cres"><datalist id="propList"><option value="18-hayfield-cres"><option value="217-eastcourt-rd"></datalist></div>
+        <button class="gen" id="genWeek">⚡ Generate this week</button>
+        <button class="tpl" id="editTpl">✎ Edit pattern</button>
+      </div>
+      <div id="weekGrid"></div>
+    </div>
+  </div>
 
-    <!-- COMPOSE -->
-    <div class="card">
+
+  <div class="stack">
+
+    <!-- COMPOSE (compressed) -->
+    <div class="card compose-compact">
       <h2 id="formTitle">New post</h2>
 
-      <div class="f"><label>Title <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(for your reference)</span></label>
-        <input id="title" placeholder="e.g. Friday Just Sold — Hayfield"></div>
-
-      <div class="f"><label>Schedule (your local time)</label>
-        <input type="datetime-local" id="when"></div>
-
-      <div class="f"><label>Media filenames / URLs (one per line)</label>
-        <textarea id="media" placeholder="peterluo_sold_en_9x16.png&#10;peterluo_sold_zh_9x16.png"></textarea>
-        <div class="media-prev" id="mediaPrev"></div></div>
-
-      <!-- EN -->
-      <div class="langblock">
-        <div class="lt"><span class="flag">English</span>
-          <select class="bank" id="bankEn"><option value="">+ insert angle…</option></select></div>
-        <textarea id="capEn" placeholder="English caption…" oninput="cc('En')"></textarea>
-        <div class="charcount" id="ccEn">0</div>
-        <input id="linkEn" placeholder="Comment link (first-comment CTA), optional" style="margin-top:8px;width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:.86rem">
+      <div class="grid2">
+        <div class="f"><label>Title <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(for your reference)</span></label>
+          <input id="title" placeholder="e.g. Friday Just Sold — Hayfield"></div>
+        <div class="f"><label>Schedule (your local time)</label>
+          <input type="datetime-local" id="when"></div>
       </div>
 
-      <!-- ZH -->
-      <div class="langblock">
-        <div class="lt"><span class="flag">中文</span>
-          <select class="bank" id="bankZh"><option value="">+ 插入角度…</option></select></div>
-        <textarea id="capZh" placeholder="中文文案…" oninput="cc('Zh')"></textarea>
-        <div class="charcount" id="ccZh">0</div>
-        <input id="linkZh" placeholder="评论区链接（首条评论 CTA），可选" style="margin-top:8px;width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:.86rem">
+      <div class="f"><label>Media filenames / URLs (one per line)</label>
+        <textarea id="media" placeholder="18-hayfield-cres/sold/front.png"></textarea>
+        <div class="media-prev" id="mediaPrev"></div></div>
+
+      <div class="grid2">
+        <!-- EN -->
+        <div class="langblock">
+          <div class="lt"><span class="flag">English</span>
+            <select class="bank" id="bankEn"><option value="">+ insert angle…</option></select>
+            <button type="button" id="editBank" style="margin-left:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:.74rem;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit">✎ Bank</button></div>
+          <textarea id="capEn" placeholder="English caption…" oninput="cc('En')"></textarea>
+          <div class="charcount" id="ccEn">0</div>
+          <input id="linkEn" placeholder="Comment link (CTA), optional" style="margin-top:8px;width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:.86rem">
+        </div>
+        <!-- ZH -->
+        <div class="langblock">
+          <div class="lt"><span class="flag">中文</span>
+            <select class="bank" id="bankZh"><option value="">+ 插入角度…</option></select></div>
+          <textarea id="capZh" placeholder="中文文案…" oninput="cc('Zh')"></textarea>
+          <div class="charcount" id="ccZh">0</div>
+          <input id="linkZh" placeholder="评论区链接（CTA），可选" style="margin-top:8px;width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:.86rem">
+        </div>
       </div>
 
       <div class="f"><label>Platforms</label>
@@ -142,19 +303,21 @@
       <button class="addbtn" id="addBtn">Add to queue</button>
     </div>
 
-    <!-- QUEUE -->
+    <!-- QUEUE (light timeline) -->
     <div class="card">
       <div class="qhead"><h2>Queue (<span id="qcount">0</span>)</h2>
         <div class="qbtns">
-          <button class="btn" id="pushBtn">⬆ Push</button>
-          <button class="btn" id="pullBtn">⬇ Pull</button>
-          <button class="btn" id="statusBtn">↻ Status</button>
-          <button class="btn" id="exportBtn">Export</button>
-          <button class="btn" id="copyBtn">Copy</button>
-          <button class="btn ghost" id="importBtn">Import</button>
-          <button class="btn ghost" id="ghBtn">⚙ Sync</button>
+          <button class="btn primary" id="pushBtn">⬆ Push</button>
+          <button class="btn ghost" id="moreBtn">⋯ More</button>
+          <div class="qmore" id="qmore" hidden>
+            <button class="btn ghost" id="pullBtn">⬇ Pull</button>
+            <button class="btn ghost" id="statusBtn">↻ Status</button>
+            <button class="btn ghost" id="exportBtn">Export</button>
+            <button class="btn ghost" id="importBtn">Import</button>
+            <button class="btn ghost" id="ghBtn">⚙ Sync</button>
+          </div>
         </div></div>
-      <div id="queue"><div class="empty">No posts yet. Build one on the left.</div></div>
+      <div id="queue" class="qtimeline"><div class="empty">No posts yet — generate a week or add a one-off above.</div></div>
     </div>
 
   </div>
@@ -171,6 +334,8 @@
   <div class="db">
     <div class="f"><label>Owner / repo</label><input id="ghRepo" placeholder="peterluohomes/social-scheduler"></div>
     <div class="f"><label>Queue path</label><input id="ghPath" placeholder="queue.json"></div>
+    <div class="f"><label>Template path</label><input id="ghTpl" placeholder="template.json"></div>
+    <div class="f"><label>Bank path</label><input id="ghBank" placeholder="bank.json"></div>
     <div class="f"><label>status.json URL (public, read-only)</label><input id="ghStatus" placeholder="https://peterluo.homes/status.json"></div>
     <div class="f"><label>Fine-grained token — Contents: read &amp; write, this repo only</label><input id="ghToken" type="password" placeholder="github_pat_..."></div>
     <p style="font-size:.76rem;color:var(--muted);margin:0">Stored only in this browser, on this machine — never committed to the repo. The composer only ever writes queue.json; it reads status.json but never writes it.</p>
@@ -178,14 +343,47 @@
   <div class="da"><button class="btn" id="ghSave">Save</button><button class="btn ghost" id="ghCancel">Close</button></div>
 </dialog>
 
+<dialog id="tplDlg">
+  <div class="dh">Weekly pattern — set once, generate every week</div>
+  <div class="db">
+    <p style="font-size:.78rem;color:var(--muted);margin:0 0 10px">Days across the top, surfaces down the left. Tap a cell to toggle whether that surface posts that day. Each day's theme, media, time, caption, and R2 folder sit in its column header. Use <code>{property}</code> in a folder to fill the active listing at generate time.</p>
+    <div id="tplRows"></div>
+  </div>
+  <div class="da"><button class="btn" id="tplSave">Save pattern</button><button class="btn ghost" id="tplReset">Reset to default</button><button class="btn ghost" id="tplCancel">Close</button></div>
+</dialog>
+
+<dialog id="dayDlg">
+  <div class="dh" id="dayTitle">Day</div>
+  <div class="db" id="dayBody"></div>
+  <div class="da"><button class="btn" id="dayDone">Done</button></div>
+</dialog>
+
+<dialog id="bankDlg">
+  <div class="dh">Caption bank</div>
+  <div class="db">
+    <div class="tabs"><button id="tabCap" class="on">Captions</button><button id="tabSnip">Hashtags / CTAs</button></div>
+    <div id="capPane">
+      <p style="font-size:.78rem;color:var(--muted);margin:0 0 10px">Starter captions by angle. The <b>first</b> caption in a group is used when generating that day. Add a new <b>group</b> name to create a new angle option.</p>
+      <button class="addrow" id="addCap">+ Add caption</button>
+      <div id="capRows"></div>
+    </div>
+    <div id="snipPane" style="display:none">
+      <p style="font-size:.78rem;color:var(--muted);margin:0 0 10px">Reusable hashtag sets and CTAs. Tick the <b>platforms</b> each one belongs to — Post Sweep will auto-append it only when you post to those platforms (e.g. hashtags on Instagram only).</p>
+      <button class="addrow" id="addSnip">+ Add snippet</button>
+      <div id="snipRows"></div>
+    </div>
+  </div>
+  <div class="da"><button class="btn" id="bankSave">Save bank</button><button class="btn ghost" id="bankReset">Reset to default</button><button class="btn ghost" id="bankCancel">Close</button></div>
+</dialog>
+
 <script>
 (function(){
   // ---------- platforms ----------
   const PLATFORMS=[
     {key:'telegram',label:'Telegram',lang:'en',tier:'auto'},
-    {key:'email',label:'Email',lang:'en',tier:'auto'},
     {key:'youtube',label:'YouTube',lang:'en',tier:'auto'},
     {key:'threads',label:'Threads',lang:'en',tier:'auto'},
+    {key:'email',label:'Email',lang:'en',tier:'assist'},
     {key:'facebook_en',label:'Facebook',lang:'en',tier:'assist'},
     {key:'instagram_en',label:'Instagram',lang:'en',tier:'assist'},
     {key:'linkedin',label:'LinkedIn',lang:'en',tier:'assist'},
@@ -198,40 +396,141 @@
   ];
   const PMAP={};PLATFORMS.forEach(p=>PMAP[p.key]=p);
 
-  // ---------- caption bank (bilingual angles, from the content pillars) ----------
-  const BANK=[
+  // ---------- weekly template (the permanent 7-day pattern) ----------
+  const DAYS=[
+    {key:'mon',name:'Mon',offset:0},{key:'tue',name:'Tue',offset:1},
+    {key:'wed',name:'Wed',offset:2},{key:'thu',name:'Thu',offset:3},
+    {key:'fri',name:'Fri',offset:4},{key:'sat',name:'Sat',offset:5},
+    {key:'sun',name:'Sun',offset:6}
+  ];
+  const DEFAULT_TPL={version:1,days:{
+    mon:{theme:'Market',media:'📷',time:'09:00',group:'Market',folder:'images/news/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','linkedin','whatsapp','nextdoor','threads']},
+    tue:{theme:'Community',media:'🎬',time:'18:30',group:'Neighbourhood',folder:'images/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','youtube','whatsapp']},
+    wed:{theme:'Listing',media:'📷',time:'12:00',group:'First impression',folder:'{property}/listing/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','whatsapp','nextdoor','threads']},
+    thu:{theme:'Behind-scenes',media:'🎬',time:'18:30',group:'Preparation',folder:'{property}/preparing/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','youtube','linkedin','whatsapp']},
+    fri:{theme:'Just Sold',media:'📷',time:'12:00',group:'Success',folder:'{property}/sold/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','linkedin','whatsapp','nextdoor','threads']},
+    sat:{theme:'Open house',media:'🎬',time:'10:00',group:'Activity',folder:'{property}/listing/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','whatsapp','youtube']},
+    sun:{theme:'Long-form',media:'🎬📝',time:'19:00',group:'Story',folder:'images/',targets:['telegram','youtube','wechat','facebook_en','facebook_zh','instagram_en','instagram_zh']}
+  }};
+  let template=JSON.parse(JSON.stringify(DEFAULT_TPL));
+  let dayProps={}; // { weekStart: { dayKey: propertySlug } } — per-day listing overrides
+  // ---------- caption bank (bilingual angles + platform-tagged snippets) ----------
+  const DEFAULT_CAPTIONS=[
     {g:'Preparation',en:'The journey before it goes live.',zh:'上市前的精心准备。'},
     {g:'Preparation',en:'Staging day — watch it become a home.',zh:'布置日 — 见证空房变成家。'},
     {g:'Preparation',en:'What buyers never see: the work behind the listing.',zh:'买家看不到的，是房源背后的功夫。'},
+    {g:'Preparation',en:'Decluttering today so it photographs beautifully tomorrow.',zh:'今天整理收纳，明天拍出美照。'},
+    {g:'Preparation',en:'Small fixes, big difference before we list.',zh:'上市前的小修小补，效果大不同。'},
+    {g:'Preparation',en:'Prepping every room to show its best.',zh:'让每个房间展现最好的一面。'},
+    {g:'Preparation',en:'Fresh paint, clean lines, ready for buyers.',zh:'焕新油漆，干净利落，迎接买家。'},
+    {g:'Preparation',en:'Behind every great listing is a great prep week.',zh:'每个出色房源背后，都有一周的精心筹备。'},
+    {g:'Preparation',en:'Getting the light right before photo day.',zh:'拍摄日前，先把光线调到最好。'},
+    {g:'Preparation',en:'First we prepare. Then we launch.',zh:'先准备，再上市。'},
+    {g:'Preparation',en:'The checklist that gets you top dollar.',zh:'让你卖出好价钱的准备清单。'},
     {g:'First impression',en:'The kind of home that makes you smile before you even walk in.',zh:'还没进门，就让你会心一笑的家。'},
+    {g:'First impression',en:'Curb appeal that stops you in your tracks.',zh:'让人驻足的门面魅力。'},
+    {g:'First impression',en:'The first three seconds decide everything.',zh:'头三秒，决定一切。'},
+    {g:'First impression',en:'Walk in. Take a breath. You\u2019re home.',zh:'走进来，深呼吸，到家了。'},
+    {g:'First impression',en:'That feeling when the front door opens.',zh:'推开大门那一刻的感觉。'},
+    {g:'First impression',en:'A welcome that sets the tone.',zh:'一进门，就定了基调。'},
+    {g:'First impression',en:'Light, space, and a warm hello.',zh:'采光、空间，与温暖的问候。'},
+    {g:'First impression',en:'You\u2019ll know it in the foyer.',zh:'在门厅，你就会知道。'},
+    {g:'First impression',en:'Some homes just feel right.',zh:'有些家，就是对的感觉。'},
+    {g:'First impression',en:'The entrance that makes a promise.',zh:'一个许下承诺的入口。'},
     {g:'Lifestyle',en:'Morning here: sunrise, coffee, quiet.',zh:'这里的清晨：日出、咖啡、宁静。'},
     {g:'Lifestyle',en:'Summer here: backyard, BBQ, long evenings.',zh:'这里的夏天：后院、烧烤、悠长的傍晚。'},
     {g:'Lifestyle',en:'Winter here: fireplace, warmth, calm.',zh:'这里的冬天：壁炉、温暖、安宁。'},
     {g:'Lifestyle',en:'Imagine welcoming friends here on a summer evening.',zh:'想象夏夜在这里招待朋友。'},
+    {g:'Lifestyle',en:'Weekends were made for this backyard.',zh:'周末，就是为这个后院而生。'},
+    {g:'Lifestyle',en:'Coffee on the deck, birds in the trees.',zh:'露台上的咖啡，树梢的鸟鸣。'},
+    {g:'Lifestyle',en:'Where busy days come home to quiet nights.',zh:'忙碌的白天，回到宁静的夜晚。'},
+    {g:'Lifestyle',en:'Room to gather, space to breathe.',zh:'有相聚的地方，也有呼吸的空间。'},
+    {g:'Lifestyle',en:'The life you picture starts at this address.',zh:'你想象中的生活，从这个地址开始。'},
+    {g:'Lifestyle',en:'Sunday slow mornings, right here.',zh:'周日慵懒的早晨，就在这里。'},
     {g:'Room',en:'A kitchen where the whole family ends up.',zh:'全家人最后都会聚到的厨房。'},
     {g:'Room',en:'The owner\u2019s retreat — your hotel at home.',zh:'主人的私享空间 — 家中的酒店套房。'},
     {g:'Room',en:'Movie nights start here.',zh:'电影之夜，从这里开始。'},
+    {g:'Room',en:'The island everyone gathers around.',zh:'大家都爱围着的中岛。'},
+    {g:'Room',en:'A spa bath to end the day.',zh:'结束一天的水疗浴室。'},
+    {g:'Room',en:'Sunlit and ready for slow mornings.',zh:'阳光满室，适合慵懒的早晨。'},
+    {g:'Room',en:'Storage you\u2019ll actually love.',zh:'让你真心喜欢的收纳空间。'},
+    {g:'Room',en:'The home office that works as hard as you.',zh:'和你一样努力的居家办公室。'},
+    {g:'Room',en:'A dining room made for long dinners.',zh:'为长长晚餐而生的餐厅。'},
+    {g:'Room',en:'Where the kids will never want to leave.',zh:'孩子们舍不得离开的地方。'},
     {g:'Neighbourhood',en:'Why families move to this community.',zh:'家庭为何选择这个社区。'},
     {g:'Neighbourhood',en:'Top schools, parks, and quiet streets.',zh:'名校、公园与宁静的街道。'},
     {g:'Neighbourhood',en:'The hidden gems the locals love.',zh:'本地人钟爱的隐藏宝藏。'},
     {g:'Neighbourhood',en:'Steps to trails and slow weekend mornings.',zh:'步行即达步道，享受悠闲的周末早晨。'},
+    {g:'Neighbourhood',en:'Coffee shops, groceries, everything close.',zh:'咖啡馆、超市，一切都在身边。'},
+    {g:'Neighbourhood',en:'A street where neighbours still wave.',zh:'邻里还会互相招手的街道。'},
+    {g:'Neighbourhood',en:'Minutes to transit, easy to everywhere.',zh:'几分钟到公共交通，去哪都方便。'},
+    {g:'Neighbourhood',en:'The community you\u2019ve been looking for.',zh:'你一直在找的社区。'},
+    {g:'Neighbourhood',en:'Green space at your doorstep.',zh:'绿意就在家门口。'},
+    {g:'Neighbourhood',en:'Where location does half the work.',zh:'地段，已成就了一半。'},
     {g:'Market',en:'Why this home is priced where it is.',zh:'这套房子为何如此定价。'},
     {g:'Market',en:'What this month\u2019s numbers mean for sellers.',zh:'本月数据，对卖家意味着什么。'},
     {g:'Market',en:'For every 100 homes listed, here\u2019s what actually sold.',zh:'每上市 100 套房，真正成交的是这些。'},
+    {g:'Market',en:'Days on market: what the trend is telling us.',zh:'房屋在售天数：趋势在说什么。'},
+    {g:'Market',en:'Pricing right beats pricing high — here\u2019s why.',zh:'定价合理胜过定价过高 — 原因在此。'},
+    {g:'Market',en:'The numbers behind a smart listing strategy.',zh:'聪明上市策略背后的数据。'},
+    {g:'Market',en:'What buyers are paying right now.',zh:'买家现在愿意出的价。'},
+    {g:'Market',en:'Inventory is shifting. Here\u2019s the read.',zh:'库存在变化，这是我的解读。'},
+    {g:'Market',en:'A clear look at this month\u2019s market.',zh:'本月市场，看得明明白白。'},
+    {g:'Market',en:'Data first, decisions second.',zh:'先看数据，再做决定。'},
     {g:'Activity',en:'Open house this weekend — come by.',zh:'本周末开放参观 — 欢迎到访。'},
     {g:'Activity',en:'Busy showing day. Strong interest.',zh:'看房不断，反响热烈。'},
     {g:'Activity',en:'Offer night — here\u2019s how it went.',zh:'Offer 之夜 — 结果如何。'},
+    {g:'Activity',en:'The door\u2019s open this Saturday.',zh:'本周六，大门为你敞开。'},
+    {g:'Activity',en:'A steady stream of buyers today.',zh:'今天看房的买家络绎不绝。'},
+    {g:'Activity',en:'Multiple showings booked — momentum is building.',zh:'多组预约看房 — 势头正旺。'},
+    {g:'Activity',en:'Come see it in person this weekend.',zh:'本周末，来现场亲眼看看。'},
+    {g:'Activity',en:'Interest is heating up on this one.',zh:'这套房，热度正在上升。'},
+    {g:'Activity',en:'Bring your questions to the open house.',zh:'把你的问题带到开放日来。'},
+    {g:'Activity',en:'Showings all week — book your time.',zh:'整周开放看房 — 预约你的时段。'},
     {g:'Story',en:'After 18 wonderful years, a new chapter begins.',zh:'美好的十八年后，新的篇章开启。'},
     {g:'Story',en:'The next chapter starts now.',zh:'新的篇章，此刻开始。'},
+    {g:'Story',en:'Every home holds a story. Here\u2019s this one\u2019s.',zh:'每个家都有故事，这是它的。'},
+    {g:'Story',en:'From first keys to fond farewells.',zh:'从拿到钥匙，到温馨道别。'},
+    {g:'Story',en:'A family grew up here. Now it\u2019s your turn.',zh:'一个家庭在此成长，如今轮到你。'},
+    {g:'Story',en:'Saying goodbye to a home full of memories.',zh:'告别一个满载回忆的家。'},
+    {g:'Story',en:'Where their journey ends, yours begins.',zh:'他们旅程的终点，是你的起点。'},
+    {g:'Story',en:'The right home found the right family.',zh:'对的家，遇见对的家庭。'},
+    {g:'Story',en:'Years of memories, ready for new ones.',zh:'多年回忆，等待新的故事。'},
+    {g:'Story',en:'Some homes are hard to leave — for good reason.',zh:'有些家，难以离开 — 自有道理。'},
     {g:'Success',en:'Just sold — over asking.',zh:'刚刚成交 — 高于要价。'},
     {g:'Success',en:'Sold fast. Here\u2019s what worked.',zh:'快速成交。成功的关键在这里。'},
     {g:'Success',en:'Another happy seller. Key handover day.',zh:'又一位满意的卖家。交钥匙的日子。'},
-    {g:'Success',en:'Lessons for sellers from this sale.',zh:'这次成交，给卖家的启示。'}
+    {g:'Success',en:'Lessons for sellers from this sale.',zh:'这次成交，给卖家的启示。'},
+    {g:'Success',en:'Sold in days, not weeks.',zh:'几天成交，而非几周。'},
+    {g:'Success',en:'The right price brought the right buyer.',zh:'合理的定价，带来对的买家。'},
+    {g:'Success',en:'Another address, another success story.',zh:'又一个地址，又一个成功故事。'},
+    {g:'Success',en:'From listed to sold — smoothly.',zh:'从上市到成交 — 一路顺畅。'},
+    {g:'Success',en:'Strategy, preparation, result.',zh:'策略、准备、成果。'},
+    {g:'Success',en:'Grateful to hand over the keys again.',zh:'再一次，满怀感激地交出钥匙。'}
   ];
+  const DEFAULT_SNIPPETS=[
+    {label:'IG hashtags',en:'#RichmondHillRealEstate #GTAHomes #YorkRegion #JustListed',zh:'',platforms:['instagram_en','instagram_zh']},
+    {label:'Sold hashtags',en:'#JustSold #SoldOverAsking #RichmondHillRealtor',zh:'',platforms:['instagram_en','instagram_zh','facebook_en','facebook_zh']},
+    {label:'CTA · book a showing',en:'📩 DM me for a private showing.',zh:'📩 私信预约看房。',platforms:['facebook_en','facebook_zh','instagram_en','instagram_zh','wechat']},
+    {label:'CTA · free home valuation',en:'What\u2019s your home worth today? Link in bio.',zh:'想知道您的房子现在值多少？详见简介链接。',platforms:['instagram_en','instagram_zh']},
+    {label:'小红书 tags',en:'',zh:'#多伦多房产 #大多地产 #列治文山',platforms:['red']}
+  ];
+  let bank={version:1,captions:JSON.parse(JSON.stringify(DEFAULT_CAPTIONS)),snippets:JSON.parse(JSON.stringify(DEFAULT_SNIPPETS))};
+  let BANK=bank.captions;
+  let bankRot={}; // {group: nextIndex} — rotation counter for "rotate through group"
+  function bankFor(group){const a=BANK.filter(b=>b.g===group);return a.length?a[0]:null;}
+  function pickCaption(t){
+    const grp=(bank.captions||[]).filter(c=>c.g===t.group);
+    if(!grp.length)return {en:'',zh:''};
+    if(t.pin){const f=grp.find(c=>c.en===t.pin);if(f)return f;}      // pinned (falls back to rotate if edited away)
+    const idx=(bankRot[t.group]||0)%grp.length;                      // rotate
+    bankRot[t.group]=(idx+1)%grp.length;setPut('bankRot',bankRot);
+    return grp[idx];
+  }
 
   // ---------- state + storage (graceful: IndexedDB local, memory fallback) ----------
   let queue=[]; let editingId=null; let db=null;
-  let gh={owner:'',repo:'',path:'queue.json',statusUrl:'',token:''};
+  let gh={owner:'',repo:'',path:'queue.json',tplPath:'template.json',bankPath:'bank.json',statusUrl:'',token:''};
   let statusMap={};
   const DB='pls-scheduler', STORE='queue', SET='settings';
   function openDB(){return new Promise(res=>{try{
@@ -273,6 +572,7 @@
   function buildBanks(){
     ['En','Zh'].forEach(L=>{
       const sel=$('bank'+L);const groups={};
+      sel.querySelectorAll('optgroup').forEach(o=>o.remove());
       BANK.forEach((b,i)=>{(groups[b.g]=groups[b.g]||[]).push(i);});
       Object.keys(groups).forEach(g=>{
         const og=document.createElement('optgroup');og.label=g;
@@ -287,7 +587,7 @@
   // ---------- media preview ----------
   function mediaList(){
     const base=$('baseUrl').value.trim();
-    return $('media').value.split('\n').map(s=>s.trim()).filter(Boolean).map(name=>{
+    return $('media').value.split('\n').map(s=>s.trim()).filter(Boolean).filter(s=>!s.endsWith('/')).map(name=>{
       const url=/^https?:\/\//i.test(name)?name:(base+name);
       const type=/\.(mp4|mov|webm|m4v)$/i.test(name)?'video':'image';
       return {filename:name.split('/').pop(),url,type};
@@ -313,9 +613,10 @@
     const targets=selectedTargets();
     if(!$('when').value){alert('Pick a schedule time.');return;}
     if(targets.length===0){alert('Select at least one platform.');return;}
+    const prev=editingId?(queue.find(p=>p.id===editingId)||{}):{};
     const post={
       id:editingId||uid(),
-      created:editingId?(queue.find(p=>p.id===editingId)||{}).created||new Date().toISOString():new Date().toISOString(),
+      created:editingId?prev.created||new Date().toISOString():new Date().toISOString(),
       scheduledFor:new Date($('when').value).toISOString(),
       scheduledLocal:$('when').value,
       status:'queued',
@@ -325,8 +626,10 @@
       commentLinks:{en:$('linkEn').value.trim(),zh:$('linkZh').value.trim()},
       targets
     };
+    // carry weekly-plan linkage so an edited generated post stays mapped to its day card
+    if(prev.day)post.day=prev.day;if(prev.weekStart)post.weekStart=prev.weekStart;if(prev.folder)post.folder=prev.folder;
     if(editingId){queue=queue.map(p=>p.id===editingId?post:p);}else{queue.push(post);}
-    dbPut(post);resetForm();render();
+    dbPut(post);resetForm();render();buildWeek();
   };
 
   function editPost(id){
@@ -334,11 +637,20 @@
     $('formTitle').textContent='Edit post';$('addBtn').textContent='Save changes';$('addBtn').classList.add('editing');
     $('title').value=p.title==='(untitled)'?'':p.title;
     $('when').value=p.scheduledLocal||defaultWhen();
-    $('media').value=(p.media||[]).map(m=>m.filename).join('\n');
+    const base=$('baseUrl').value.trim();
+    $('media').value=(p.media||[]).map(m=>{
+      if(m.url&&base&&m.url.indexOf(base)===0)return m.url.slice(base.length);
+      if(/^https?:/i.test(m.url||''))return m.url;
+      return m.filename;
+    }).join('\n');
+    if(!(p.media&&p.media.length)&&p.folder)$('media').value=p.folder;
     $('capEn').value=p.captions.en||'';$('capZh').value=p.captions.zh||'';cc('En');cc('Zh');
     $('linkEn').value=p.commentLinks.en||'';$('linkZh').value=p.commentLinks.zh||'';
     document.querySelectorAll('#plats .chip').forEach(c=>c.classList.toggle('on',(p.targets||[]).some(t=>t.platform===c.dataset.key)));
-    renderMediaPrev();window.scrollTo({top:0,behavior:'smooth'});
+    renderMediaPrev();
+    const card=$('formTitle').closest('.card')||$('formTitle');
+    card.scrollIntoView({behavior:'smooth',block:'start'});
+    const mm=$('media');if(mm){setTimeout(()=>{mm.focus();const v=mm.value;mm.setSelectionRange(v.length,v.length);},350);}
   }
   function delPost(id){if(!confirm('Delete this post?'))return;queue=queue.filter(p=>p.id!==id);dbDel(id);if(editingId===id)resetForm();render();}
 
@@ -352,24 +664,22 @@
     const now=Date.now();wrap.innerHTML='';
     queue.forEach(p=>{
       const due=new Date(p.scheduledFor).getTime()<=now;
-      const el=document.createElement('div');el.className='post'+(due?' due':'');
-      const cap=(p.captions.en||p.captions.zh||'').slice(0,120);
-      const tgs=(p.targets||[]).map(t=>'<span class="tg '+t.tier+'">'+t.label+' '+(t.lang==='en'?'EN':'中文')+tgMark(p.id,t.platform)+'</span>').join('');
-      el.innerHTML='<div class="pt"><span class="ptitle">'+esc(p.title)+overallPill(p.id)+'</span><span class="when">'+fmtWhen(p.scheduledFor)+'</span></div>'+
-        (cap?'<div class="pcap">'+esc(cap)+'</div>':'')+
-        '<div class="tgs">'+tgs+'</div>'+
-        '<div class="pact"><button data-e="'+p.id+'">Edit</button><button class="del" data-d="'+p.id+'">Delete</button></div>';
+      const el=document.createElement('div');el.className='qchip'+(due?' due':'');
+      const oneoff=p.weekStart?'':'<span class="adhoc">one-off</span>';
+      el.innerHTML='<div class="qt">'+esc(p.title)+'</div>'+
+        '<div class="qw">'+fmtWhen(p.scheduledFor)+'</div>'+
+        '<div class="qs">'+(overallPill(p.id)||'')+oneoff+'</div>'+
+        '<button class="qx" data-d="'+p.id+'" title="Delete">✕</button>';
+      el.onclick=()=>editPost(p.id);
+      el.querySelector('.qx').onclick=e=>{e.stopPropagation();delPost(p.id);};
       wrap.appendChild(el);
     });
-    wrap.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>editPost(b.dataset.e));
-    wrap.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>delPost(b.dataset.d));
   }
   function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 
   // ---------- export / import ----------
   function queueJSON(){return JSON.stringify({version:1,generated:new Date().toISOString(),posts:queue},null,2);}
   $('exportBtn').onclick=()=>{const blob=new Blob([queueJSON()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='queue.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);};
-  $('copyBtn').onclick=()=>{navigator.clipboard.writeText(queueJSON()).then(()=>{$('copyBtn').textContent='Copied!';setTimeout(()=>$('copyBtn').textContent='Copy',1200);});};
   const dlg=$('ioDlg');
   $('importBtn').onclick=()=>{$('ioText').value='';dlg.showModal();};
   $('ioClose').onclick=()=>dlg.close();
@@ -411,24 +721,314 @@
       else if(gh.owner&&gh.repo&&gh.token){const r=await fetch(ghUrl('status.json')+'?ref=HEAD',{headers:ghH()});if(r.ok)txt=b64utf8((await r.json()).content);}
       statusMap=txt?(JSON.parse(txt).statuses||{}):{};
     }catch(e){statusMap={};}
-    render();
+    render();buildWeek();
   }
   function tgMark(id,key){const s=statusMap[id];if(!s||!s.targets)return '';const t=s.targets[key];if(!t)return '';const m={posted:' <span class="ok">✓</span>',failed:' <span class="no">✕</span>',nudged:' <span class="wait">⏳</span>'};return m[t.status]||'';}
   function overallPill(id){const s=statusMap[id];if(!s||!s.overall||s.overall==='queued')return '';return '<span class="ovl '+s.overall+'">'+s.overall+'</span>';}
 
-  function openGh(){$('ghRepo').value=(gh.owner&&gh.repo)?gh.owner+'/'+gh.repo:'';$('ghPath').value=gh.path||'queue.json';$('ghStatus').value=gh.statusUrl||'';$('ghToken').value=gh.token||'';$('ghDlg').showModal();}
-  $('ghSave').onclick=()=>{const r=($('ghRepo').value||'').trim().split('/');gh={owner:(r[0]||'').trim(),repo:(r[1]||'').trim(),path:($('ghPath').value||'queue.json').trim(),statusUrl:($('ghStatus').value||'').trim(),token:$('ghToken').value.trim()};setPut('gh',gh);$('ghDlg').close();fetchStatus();toast('Sync settings saved');};
+  function openGh(){$('ghRepo').value=(gh.owner&&gh.repo)?gh.owner+'/'+gh.repo:'';$('ghPath').value=gh.path||'queue.json';$('ghTpl').value=gh.tplPath||'template.json';$('ghBank').value=gh.bankPath||'bank.json';$('ghStatus').value=gh.statusUrl||'';$('ghToken').value=gh.token||'';$('ghDlg').showModal();}
+  $('ghSave').onclick=()=>{const r=($('ghRepo').value||'').trim().split('/');gh={owner:(r[0]||'').trim(),repo:(r[1]||'').trim(),path:($('ghPath').value||'queue.json').trim(),tplPath:($('ghTpl').value||'template.json').trim(),bankPath:($('ghBank').value||'bank.json').trim(),statusUrl:($('ghStatus').value||'').trim(),token:$('ghToken').value.trim()};setPut('gh',gh);$('ghDlg').close();fetchStatus();toast('Sync settings saved');};
   $('ghCancel').onclick=()=>$('ghDlg').close();
   $('pushBtn').onclick=pushQueue;$('pullBtn').onclick=pullQueue;$('statusBtn').onclick=fetchStatus;$('ghBtn').onclick=openGh;
+  $('moreBtn').onclick=()=>{const m=$('qmore');m.hidden=!m.hidden;};
   function toast(msg){let t=$('toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t);}t.textContent=msg;t.className='show';clearTimeout(t._t);t._t=setTimeout(()=>t.className='',2200);}
+
+  // ---------- weekly plan ----------
+  function mondayOf(d){const x=new Date(d);const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);x.setHours(0,0,0,0);return x;}
+  function ymd(d){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
+  function resolveFolder(f,prop){return (f||'').replace('{property}',prop||'{property}');}
+  function curWeekStart(){return $('weekStart').value||ymd(mondayOf(new Date()));}
+  function weekDefaultProp(){return ($('activeProp').value||'').trim();}
+  function propFor(ws,key){const wk=dayProps[ws]||{};return (wk[key]||'').trim()||weekDefaultProp();}
+  function setDayProp(ws,key,val){if(!dayProps[ws])dayProps[ws]={};if(val)dayProps[ws][key]=val;else delete dayProps[ws][key];setPut('dayProps',dayProps);}
+  function genTitle(t,prop,dt){return (t.theme||'')+(prop?' · '+prop:'')+' · '+(dt.getMonth()+1)+'/'+dt.getDate();}
+
+  function shortLabel(p){let l=p.label;const map={'WeChat 朋友圈':'WeChat','小红书 RED':'小红书'};if(map[l])l=map[l];if(p.lang==='zh'&&!/小红书|WeChat/.test(l))l+=' 中';return l;}
+  function surfChips(keys){return '<div class="dsurf">'+(keys||[]).map(k=>{const p=PMAP[k];if(!p)return'';return '<span class="schip '+p.tier+'">'+esc(shortLabel(p))+'</span>';}).join('')+'</div>';}
+  function cellStatus(post,plat,t,due){
+    const targeted=post?(post.targets||[]).some(x=>x.platform===plat):(t.targets||[]).includes(plat);
+    if(!targeted)return {cls:'none',txt:'·'};
+    if(post){
+      const tg=statusMap[post.id]&&statusMap[post.id].targets&&statusMap[post.id].targets[plat];
+      const s=tg&&tg.status;
+      if(s==='posted')return{cls:'posted',txt:'✓'};
+      if(s==='failed')return{cls:'failed',txt:'✕'};
+      if(s==='nudged')return{cls:'due',txt:'⏳'};
+      return due?{cls:'due',txt:'⏳'}:{cls:'sched',txt:'○'};
+    }
+    return {cls:'sched',txt:'○'};
+  }
+  function buildWeek(){
+    const host=$('weekGrid');if(!host)return;host.innerHTML='';
+    const ws=curWeekStart();const def=weekDefaultProp();const now=Date.now();
+    const grid=document.createElement('div');grid.className='wkgrid';
+    const corner=document.createElement('div');corner.className='wk-corner';corner.textContent='Surface \\ Day';grid.appendChild(corner);
+    // day-column headers
+    DAYS.forEach(d=>{
+      const t=template.days[d.key]||{};
+      const post=queue.find(p=>p.day===d.key&&p.weekStart===ws);
+      const dt=new Date(ws+'T00:00');dt.setDate(dt.getDate()+d.offset);
+      const needsProp=(t.folder||'').includes('{property}');
+      const h=document.createElement('div');h.className='wk-day';h.dataset.day=d.key;
+      let st,stcls;
+      if(!post){st='not generated';stcls='empty';}
+      else if(post.media&&post.media.length){st='media set';stcls='ready';}
+      else{st='add media';stcls='needs';}
+      let inner='<div class="wk-dn">'+d.name+' '+(dt.getMonth()+1)+'/'+dt.getDate()+'</div>'+
+        '<div class="wk-bt"><span class="b">'+(t.media||'')+'</span><span class="wk-th">'+esc(t.theme||'')+'</span></div>'+
+        '<div class="wk-tm">🕐 '+(t.time||'')+'</div>'+
+        '<div class="wk-st '+stcls+'">'+st+'</div>';
+      if(post){
+        const en=(post.captions.en||'').trim();const zh=(post.captions.zh||'').trim();
+        if(en)inner+='<div class="wk-cap">'+esc(en)+'</div>';
+        if(zh)inner+='<div class="wk-cap zh">'+esc(zh)+'</div>';
+      }
+      if(needsProp){const ov=(dayProps[ws]&&dayProps[ws][d.key])||'';inner+='<input class="wk-prop" data-day="'+d.key+'" value="'+esc(ov)+'" placeholder="'+esc(def||'listing')+'" list="propList">';}
+      h.innerHTML=inner;
+      h.onclick=()=>{ if(post)editPost(post.id); else toast('Generate this week first to fill '+d.name); };
+      const inp=h.querySelector('.wk-prop');
+      if(inp){
+        inp.addEventListener('click',e=>e.stopPropagation());
+        inp.addEventListener('change',e=>{e.stopPropagation();setDayProp(ws,d.key,inp.value.trim());const np=propFor(ws,d.key);const ep=queue.find(p=>p.day===d.key&&p.weekStart===ws);if(ep){ep.property=np;ep.folder=resolveFolder((template.days[d.key]||{}).folder,np);ep.title=genTitle(template.days[d.key]||{},np,new Date(ep.scheduledLocal||(ws+'T00:00')));dbPut(ep);render();}buildWeek();});
+      }
+      grid.appendChild(h);
+    });
+    // surface rows + status cells
+    PLATFORMS.forEach(p=>{
+      const lab=document.createElement('div');lab.className='wk-surf '+p.tier;
+      lab.innerHTML='<span>'+esc(shortLabel(p))+'</span>'+(p.tier==='auto'?'<span class="ti">AUTO</span>':'');
+      grid.appendChild(lab);
+      DAYS.forEach(d=>{
+        const t=template.days[d.key]||{};
+        const post=queue.find(pp=>pp.day===d.key&&pp.weekStart===ws);
+        const dt=new Date(ws+'T00:00');dt.setDate(dt.getDate()+d.offset);
+        const due=post?new Date(post.scheduledFor||0).getTime()<=now:false;
+        const cs=cellStatus(post,p.key,t,due);
+        const cl=document.createElement('div');cl.className='wk-cell '+cs.cls;cl.textContent=cs.txt;
+        grid.appendChild(cl);
+      });
+    });
+    host.appendChild(grid);
+    const lg=document.createElement('div');lg.className='wklegend';
+    lg.innerHTML='<span>✓ posted</span><span>⏳ due / nudged</span><span>○ scheduled</span><span>· not targeted</span><span style="margin-left:auto">tap a day to fill it →</span>';
+    host.appendChild(lg);
+  }
+
+  // ---------- template editor ----------
+  function pinOptions(group,pin){
+    const grp=(bank.captions||[]).filter(c=>c.g===group);
+    let html='<option value="">↻ Rotate through group</option>';
+    grp.forEach(c=>{html+='<option value="'+esc(c.en)+'"'+(pin===c.en?' selected':'')+'>📌 '+esc((c.en||c.zh||'').slice(0,40))+'</option>';});
+    return html;
+  }
+  let tplDraft=null;
+  function dayHeaderInner(d){
+    const t=tplDraft[d.key]||{};
+    return '<div class="tg-dn">'+d.name+'</div>'+
+      '<div class="tg-sum"><span class="tg-badge">'+(t.media||'')+'</span><span class="tg-th">'+esc(t.theme||'—')+'</span></div>'+
+      '<div class="tg-meta">🕐 '+(t.time||'')+' · '+(t.pin?'📌':'↻')+'</div>'+
+      '<div class="tg-fold">'+esc(t.folder||'')+'</div>'+
+      '<div class="tg-editbtn">✎ edit day</div>';
+  }
+  function refreshHeader(key){const h=document.querySelector('.tg-day[data-day="'+key+'"]');if(h){const d=DAYS.find(x=>x.key===key);h.innerHTML=dayHeaderInner(d);}}
+  function openTpl(focusDay){
+    tplDraft=JSON.parse(JSON.stringify(template.days||{}));
+    DAYS.forEach(d=>{if(!tplDraft[d.key])tplDraft[d.key]={theme:'',media:'📷',time:'09:00',group:'',folder:'',targets:[],pin:''};if(!tplDraft[d.key].targets)tplDraft[d.key].targets=[];});
+    const wrap=$('tplRows');wrap.innerHTML='';
+    const grid=document.createElement('div');grid.className='tplgrid';
+    const corner=document.createElement('div');corner.className='tg-corner';corner.textContent='Surface \\ Day';grid.appendChild(corner);
+    DAYS.forEach(d=>{
+      const h=document.createElement('div');h.className='tg-day';h.dataset.day=d.key;
+      h.innerHTML=dayHeaderInner(d);
+      h.onclick=()=>openDay(d.key);
+      grid.appendChild(h);
+    });
+    PLATFORMS.forEach(p=>{
+      const lab=document.createElement('div');lab.className='tg-surf '+p.tier;
+      lab.innerHTML='<span>'+esc(shortLabel(p))+'</span>'+(p.tier==='auto'?'<span class="ti">AUTO</span>':'');
+      grid.appendChild(lab);
+      DAYS.forEach(d=>{
+        const on=(tplDraft[d.key].targets||[]).includes(p.key);
+        const cl=document.createElement('div');cl.className='tg-cell'+(on?' on':'');cl.dataset.day=d.key;cl.dataset.plat=p.key;cl.textContent=on?'✓':'';
+        cl.onclick=()=>{const arr=tplDraft[d.key].targets;const i=arr.indexOf(p.key);if(i>=0)arr.splice(i,1);else arr.push(p.key);const o=i<0;cl.classList.toggle('on',o);cl.textContent=o?'✓':'';};
+        grid.appendChild(cl);
+      });
+    });
+    wrap.appendChild(grid);
+    $('tplDlg').showModal();
+    if(focusDay)setTimeout(()=>openDay(focusDay),0);
+  }
+  // floating per-day editor
+  function openDay(key){
+    const t=tplDraft[key];const d=DAYS.find(x=>x.key===key);
+    const grpOpts=[...new Set(BANK.map(b=>b.g))].map(g=>'<option'+(t.group===g?' selected':'')+'>'+esc(g)+'</option>').join('');
+    const badgeOpts=['📷','🎬','📝','🎬📝','📷📝'].map(b=>'<option'+(t.media===b?' selected':'')+'>'+b+'</option>').join('');
+    $('dayTitle').textContent=d.name+' — pattern';
+    $('dayBody').innerHTML=
+      '<div class="f"><label>Theme</label><input id="dTheme" value="'+esc(t.theme||'')+'"></div>'+
+      '<div class="frow"><div class="f"><label>Media</label><select id="dMedia">'+badgeOpts+'</select></div>'+
+      '<div class="f"><label>Time</label><input id="dTime" type="time" value="'+(t.time||'')+'"></div></div>'+
+      '<div class="f"><label>Caption angle (group)</label><select id="dGroup">'+grpOpts+'</select></div>'+
+      '<div class="f"><label>Caption</label><select id="dPin">'+pinOptions(t.group,t.pin)+'</select></div>'+
+      '<div class="f"><label>R2 folder</label><input id="dFolder" value="'+esc(t.folder||'')+'" placeholder="{property}/sold/"></div>';
+    const sync=()=>{t.theme=$('dTheme').value;t.media=$('dMedia').value;t.time=$('dTime').value;t.group=$('dGroup').value;t.pin=$('dPin').value;t.folder=$('dFolder').value;};
+    $('dGroup').addEventListener('change',()=>{$('dPin').innerHTML=pinOptions($('dGroup').value,'');sync();});
+    $('dayBody').querySelectorAll('input,select').forEach(el=>el.addEventListener('input',sync));
+    $('dayDone').onclick=()=>{sync();refreshHeader(key);$('dayDlg').close();};
+    $('dayDlg').showModal();
+  }
+  function readTpl(){return {version:1,days:JSON.parse(JSON.stringify(tplDraft))};}
+  $('tplSave').onclick=async()=>{template=readTpl();setPut('template',template);buildWeek();await pushTpl();$('tplDlg').close();toast('Pattern saved');};
+  $('tplReset').onclick=()=>{if(confirm('Reset the weekly pattern to defaults?')){template=JSON.parse(JSON.stringify(DEFAULT_TPL));openTpl();}};
+  $('tplCancel').onclick=()=>$('tplDlg').close();
+  $('editTpl').onclick=()=>openTpl();
+
+  // ---------- generate this week (clean slate) ----------
+  $('genWeek').onclick=()=>{
+    const ws=curWeekStart();
+    if(queue.length && !confirm('Generate this week will REPLACE the entire queue ('+queue.length+' posts) with a fresh 7-day plan. Continue?'))return;
+    setPut('activeProp',weekDefaultProp());
+    const posts=[];
+    DAYS.forEach(d=>{
+      const t=template.days[d.key]||{};
+      const prop=propFor(ws,d.key);
+      const dt=new Date(ws+'T00:00');dt.setDate(dt.getDate()+d.offset);
+      const local=ymd(dt)+'T'+(t.time||'09:00');
+      const targets=(t.targets||[]).map(k=>{const p=PMAP[k];return p?{platform:p.key,label:p.label,lang:p.lang,tier:p.tier,status:'queued'}:null;}).filter(Boolean);
+      const angle=pickCaption(t);
+      posts.push({
+        id:uid(),created:new Date().toISOString(),
+        scheduledFor:new Date(local).toISOString(),scheduledLocal:local,
+        status:'queued',
+        title:genTitle(t,prop,dt),
+        media:[],
+        captions:{en:angle?angle.en:'',zh:angle?angle.zh:''},
+        commentLinks:{en:'',zh:''},
+        targets,
+        day:d.key,weekStart:ws,property:prop,folder:resolveFolder(t.folder,prop)
+      });
+    });
+    // clean slate: clear queue + db, then load the generated week
+    queue.forEach(p=>dbDel(p.id));
+    queue=posts;queue.forEach(dbPut);
+    render();buildWeek();
+    toast('Generated 7 posts for week of '+ws);
+  };
+
+  // ---------- template sync (repo master + IndexedDB cache) ----------
+  async function pushTpl(){
+    if(!gh.owner||!gh.repo||!gh.token)return; // silent if sync not configured
+    try{
+      const path=gh.tplPath||'template.json';let sha=null;
+      const g=await fetch(ghUrl(path)+'?ref=HEAD',{headers:ghH()});if(g.ok)sha=(await g.json()).sha;
+      const body={message:'Update template.json '+new Date().toISOString(),content:utf8b64(JSON.stringify({version:1,updated:new Date().toISOString(),days:template.days},null,2))};if(sha)body.sha=sha;
+      const r=await fetch(ghUrl(path),{method:'PUT',headers:ghH(),body:JSON.stringify(body)});
+      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(r.status+' '+(e.message||''));}
+    }catch(e){toast('Template push failed: '+e.message);}
+  }
+  async function pullTpl(){
+    if(!gh.owner||!gh.repo||!gh.token)return false;
+    try{
+      const path=gh.tplPath||'template.json';
+      const g=await fetch(ghUrl(path)+'?ref=HEAD',{headers:ghH()});if(!g.ok)return false;
+      const data=JSON.parse(b64utf8((await g.json()).content));
+      if(data&&data.days){template=data;setPut('template',template);return true;}
+    }catch(e){}
+    return false;
+  }
+
+
+  // ---------- caption bank editor ----------
+  function bankPath(){return (gh.bankPath||'bank.json');}
+  function rebuildBankUI(){BANK=bank.captions;buildBanks();}
+  function capRow(c){
+    const row=document.createElement('div');row.className='brow';
+    row.innerHTML='<div class="br1"><input class="bgrp" data-k="g" value="'+esc(c.g||'')+'" placeholder="group (angle)" list="grpList"><button type="button" class="del">✕</button></div>'+
+      '<textarea data-k="en" placeholder="English caption…">'+esc(c.en||'')+'</textarea>'+
+      '<textarea data-k="zh" placeholder="中文文案…">'+esc(c.zh||'')+'</textarea>';
+    row.querySelector('.del').onclick=()=>row.remove();
+    return row;
+  }
+  function snipRow(s){
+    const row=document.createElement('div');row.className='brow';
+    row.innerHTML='<div class="br1"><input class="blabel" data-k="label" value="'+esc(s.label||'')+'" placeholder="name (e.g. IG hashtags)"><button type="button" class="del">✕</button></div>'+
+      '<textarea data-k="en" placeholder="English text (hashtags / CTA)…">'+esc(s.en||'')+'</textarea>'+
+      '<textarea data-k="zh" placeholder="中文文字（标签 / CTA）…">'+esc(s.zh||'')+'</textarea>'+
+      '<div class="pf"></div>';
+    const pf=row.querySelector('.pf');const sel=new Set(s.platforms||[]);
+    PLATFORMS.filter(p=>p.tier==='assist').forEach(p=>{
+      const c=document.createElement('button');c.type='button';c.className='pchip'+(sel.has(p.key)?' on':'');c.dataset.key=p.key;
+      c.textContent=shortLabel(p);c.onclick=()=>c.classList.toggle('on');pf.appendChild(c);
+    });
+    row.querySelector('.del').onclick=()=>row.remove();
+    return row;
+  }
+  function openBank(){
+    // grp suggestions datalist
+    let dl=$('grpList');if(!dl){dl=document.createElement('datalist');dl.id='grpList';document.body.appendChild(dl);}
+    dl.innerHTML=[...new Set(bank.captions.map(c=>c.g))].map(g=>'<option value="'+esc(g)+'">').join('');
+    const cr=$('capRows');cr.innerHTML='';bank.captions.forEach(c=>cr.appendChild(capRow(c)));
+    const sr=$('snipRows');sr.innerHTML='';bank.snippets.forEach(s=>sr.appendChild(snipRow(s)));
+    showTab('cap');
+    $('bankDlg').showModal();
+  }
+  function showTab(which){
+    $('tabCap').classList.toggle('on',which==='cap');$('tabSnip').classList.toggle('on',which==='snip');
+    $('capPane').style.display=which==='cap'?'':'none';$('snipPane').style.display=which==='snip'?'':'none';
+  }
+  function readBank(){
+    const caps=[];document.querySelectorAll('#capRows .brow').forEach(row=>{const o={};row.querySelectorAll('[data-k]').forEach(i=>o[i.dataset.k]=i.value.trim());if(o.g&&(o.en||o.zh))caps.push(o);});
+    const snips=[];document.querySelectorAll('#snipRows .brow').forEach(row=>{const o={platforms:[]};row.querySelectorAll('[data-k]').forEach(i=>o[i.dataset.k]=i.value.trim());row.querySelectorAll('.pchip.on').forEach(c=>o.platforms.push(c.dataset.key));if(o.label&&(o.en||o.zh))snips.push(o);});
+    return {version:1,captions:caps,snippets:snips};
+  }
+  $('tabCap').onclick=()=>showTab('cap');
+  $('tabSnip').onclick=()=>showTab('snip');
+  $('addCap').onclick=()=>$('capRows').appendChild(capRow({g:'',en:'',zh:''}));
+  $('addSnip').onclick=()=>$('snipRows').appendChild(snipRow({label:'',en:'',zh:'',platforms:[]}));
+  $('bankSave').onclick=async()=>{bank=readBank();setPut('bank',bank);rebuildBankUI();await pushBank();$('bankDlg').close();toast('Bank saved ('+bank.captions.length+' captions, '+bank.snippets.length+' snippets)');};
+  $('bankReset').onclick=()=>{if(confirm('Reset the caption bank to defaults?')){bank={version:1,captions:JSON.parse(JSON.stringify(DEFAULT_CAPTIONS)),snippets:JSON.parse(JSON.stringify(DEFAULT_SNIPPETS))};openBank();}};
+  $('bankCancel').onclick=()=>$('bankDlg').close();
+  $('editBank').onclick=openBank;
+  async function pushBank(){
+    if(!gh.owner||!gh.repo||!gh.token)return;
+    try{
+      const path=bankPath();let sha=null;
+      const g=await fetch(ghUrl(path)+'?ref=HEAD',{headers:ghH()});if(g.ok)sha=(await g.json()).sha;
+      const body={message:'Update bank.json '+new Date().toISOString(),content:utf8b64(JSON.stringify({version:1,updated:new Date().toISOString(),captions:bank.captions,snippets:bank.snippets},null,2))};if(sha)body.sha=sha;
+      const r=await fetch(ghUrl(path),{method:'PUT',headers:ghH(),body:JSON.stringify(body)});
+      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(r.status+' '+(e.message||''));}
+    }catch(e){toast('Bank push failed: '+e.message);}
+  }
+  async function pullBank(){
+    if(!gh.owner||!gh.repo||!gh.token)return false;
+    try{
+      const g=await fetch(ghUrl(bankPath())+'?ref=HEAD',{headers:ghH()});if(!g.ok)return false;
+      const data=JSON.parse(b64utf8((await g.json()).content));
+      if(data&&data.captions){bank={version:1,captions:data.captions,snippets:data.snippets||[]};setPut('bank',bank);return true;}
+    }catch(e){}
+    return false;
+  }
 
   // ---------- init ----------
   buildPlats();buildBanks();resetForm();
+  // week panel defaults
+  $('weekStart').value=ymd(mondayOf(new Date()));
+  $('weekStart').addEventListener('change',buildWeek);
+  $('activeProp').addEventListener('input',()=>{setPut('activeProp',$('activeProp').value.trim());buildWeek();});
+  $('weekCollapse').onclick=()=>{const b=$('weekBody');const hide=b.style.display!=='none';b.style.display=hide?'none':'';$('weekCollapse').textContent=hide?'▸':'▾';};
   openDB().then(async()=>{
-    const b=await setGet('baseUrl');if(b){$('baseUrl').value=b;}
-    const g=await setGet('gh');if(g){gh=g;}
+    let b=await setGet('baseUrl');
+    if(!b){b='https://media.peterluo.homes/';setPut('baseUrl',b);}
+    $('baseUrl').value=b;
+    const g=await setGet('gh');if(g){gh=Object.assign({path:'queue.json',tplPath:'template.json',bankPath:'bank.json'},g);}
+    const ap=await setGet('activeProp');if(ap)$('activeProp').value=ap;
+    const dp=await setGet('dayProps');if(dp)dayProps=dp;
+    const tpl=await setGet('template');if(tpl&&tpl.days){template=tpl;}else{await pullTpl();}
+    const bk=await setGet('bank');if(bk&&bk.captions){bank=Object.assign({snippets:[]},bk);}else{await pullBank();}
+    const br=await setGet('bankRot');if(br)bankRot=br;
+    rebuildBankUI();
     const saved=await dbAll();if(saved&&saved.length){queue=saved;}
-    render();fetchStatus();
+    render();buildWeek();fetchStatus();
   });
 })();
 </script>
