@@ -530,7 +530,7 @@
 
   // ---------- state + storage (graceful: IndexedDB local, memory fallback) ----------
   let queue=[]; let editingId=null; let db=null;
-  let gh={owner:'',repo:'',path:'queue.json',tplPath:'template.json',bankPath:'bank.json',statusUrl:'',token:''};
+  let gh={owner:'',repo:'',path:'queue.json',tplPath:'template.json',bankPath:'bank.json',statusUrl:'',token:'',branch:''};
   let statusMap={};
   const DB='pls-scheduler', STORE='queue', SET='settings';
   function openDB(){return new Promise(res=>{try{
@@ -690,26 +690,27 @@
   function b64utf8(b){return decodeURIComponent(escape(atob(String(b).replace(/\n/g,''))));}
   function ghH(){return {'Authorization':'Bearer '+gh.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};}
   function ghUrl(path){return 'https://api.github.com/repos/'+gh.owner+'/'+gh.repo+'/contents/'+(path||gh.path);}
+  function ghRef(){return gh.branch?('?ref='+encodeURIComponent(gh.branch)):'';} // '' = repo default branch; 'HEAD' is NOT valid here and 404s
   function needGh(){if(!gh.owner||!gh.repo||!gh.token){openGh();return false;}return true;}
 
   async function pushQueue(){
     if(!needGh())return;
     try{
       let sha=null;
-      const g=await fetch(ghUrl()+'?ref=HEAD',{headers:ghH()});
+      const g=await fetch(ghUrl()+ghRef(),{headers:ghH()});
       if(g.ok){sha=(await g.json()).sha;}
       const body={message:'Update queue.json '+new Date().toISOString(),content:utf8b64(queueJSON())};if(sha)body.sha=sha;
       const r=await fetch(ghUrl(),{method:'PUT',headers:ghH(),body:JSON.stringify(body)});
-      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(r.status+' '+(e.message||''));}
+      if(!r.ok){const e=await r.json().catch(()=>({}));const hint=(r.status===403||r.status===404)?'\n\nIf this says 403 "Resource not accessible", the token is missing Contents: read & write on this repo.':'';throw new Error(r.status+' '+(e.message||'')+hint);}
       toast('Pushed queue.json ✓');
-    }catch(e){alert('Push failed: '+e.message+'\n\nNeeds a fine-grained token with Contents: read & write on that repo.');}
+    }catch(e){alert('Push failed: '+e.message);}
   }
   async function pullQueue(){
     if(!needGh())return;
     if(queue.length && !confirm('Replace the local queue with the version in the repo?'))return;
     try{
-      const g=await fetch(ghUrl()+'?ref=HEAD',{headers:ghH()});
-      if(!g.ok)throw new Error(g.status);
+      const g=await fetch(ghUrl()+ghRef(),{headers:ghH()});
+      if(!g.ok){const e=await g.json().catch(()=>({}));throw new Error(g.status+' '+(e.message||'')+(g.status===404?' — is queue.json committed on the default branch?':''));}
       const data=JSON.parse(b64utf8((await g.json()).content));
       queue=Array.isArray(data)?data:(data.posts||[]);queue.forEach(dbPut);render();toast('Pulled queue.json ✓');
     }catch(e){alert('Pull failed: '+e.message);}
@@ -718,7 +719,7 @@
     try{
       let txt=null;
       if(gh.statusUrl){const r=await fetch(gh.statusUrl+(gh.statusUrl.includes('?')?'&':'?')+'t='+Date.now());if(r.ok)txt=await r.text();}
-      else if(gh.owner&&gh.repo&&gh.token){const r=await fetch(ghUrl('status.json')+'?ref=HEAD',{headers:ghH()});if(r.ok)txt=b64utf8((await r.json()).content);}
+      else if(gh.owner&&gh.repo&&gh.token){const r=await fetch(ghUrl('status.json')+ghRef(),{headers:ghH()});if(r.ok)txt=b64utf8((await r.json()).content);}
       statusMap=txt?(JSON.parse(txt).statuses||{}):{};
     }catch(e){statusMap={};}
     render();buildWeek();
@@ -920,7 +921,7 @@
     if(!gh.owner||!gh.repo||!gh.token)return; // silent if sync not configured
     try{
       const path=gh.tplPath||'template.json';let sha=null;
-      const g=await fetch(ghUrl(path)+'?ref=HEAD',{headers:ghH()});if(g.ok)sha=(await g.json()).sha;
+      const g=await fetch(ghUrl(path)+ghRef(),{headers:ghH()});if(g.ok)sha=(await g.json()).sha;
       const body={message:'Update template.json '+new Date().toISOString(),content:utf8b64(JSON.stringify({version:1,updated:new Date().toISOString(),days:template.days},null,2))};if(sha)body.sha=sha;
       const r=await fetch(ghUrl(path),{method:'PUT',headers:ghH(),body:JSON.stringify(body)});
       if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(r.status+' '+(e.message||''));}
@@ -930,7 +931,7 @@
     if(!gh.owner||!gh.repo||!gh.token)return false;
     try{
       const path=gh.tplPath||'template.json';
-      const g=await fetch(ghUrl(path)+'?ref=HEAD',{headers:ghH()});if(!g.ok)return false;
+      const g=await fetch(ghUrl(path)+ghRef(),{headers:ghH()});if(!g.ok)return false;
       const data=JSON.parse(b64utf8((await g.json()).content));
       if(data&&data.days){template=data;setPut('template',template);return true;}
     }catch(e){}
@@ -993,7 +994,7 @@
     if(!gh.owner||!gh.repo||!gh.token)return;
     try{
       const path=bankPath();let sha=null;
-      const g=await fetch(ghUrl(path)+'?ref=HEAD',{headers:ghH()});if(g.ok)sha=(await g.json()).sha;
+      const g=await fetch(ghUrl(path)+ghRef(),{headers:ghH()});if(g.ok)sha=(await g.json()).sha;
       const body={message:'Update bank.json '+new Date().toISOString(),content:utf8b64(JSON.stringify({version:1,updated:new Date().toISOString(),captions:bank.captions,snippets:bank.snippets},null,2))};if(sha)body.sha=sha;
       const r=await fetch(ghUrl(path),{method:'PUT',headers:ghH(),body:JSON.stringify(body)});
       if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(r.status+' '+(e.message||''));}
@@ -1002,7 +1003,7 @@
   async function pullBank(){
     if(!gh.owner||!gh.repo||!gh.token)return false;
     try{
-      const g=await fetch(ghUrl(bankPath())+'?ref=HEAD',{headers:ghH()});if(!g.ok)return false;
+      const g=await fetch(ghUrl(bankPath())+ghRef(),{headers:ghH()});if(!g.ok)return false;
       const data=JSON.parse(b64utf8((await g.json()).content));
       if(data&&data.captions){bank={version:1,captions:data.captions,snippets:data.snippets||[]};setPut('bank',bank);return true;}
     }catch(e){}
