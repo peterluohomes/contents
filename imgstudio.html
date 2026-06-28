@@ -64,7 +64,7 @@
     <div class="grp" id="langGrp"><label>Language — written in parallel, never translated</label>
       <div class="pills"><button class="pill lang on" data-lang="en">English</button><button class="pill lang" data-lang="zh">中文</button></div></div>
     <div class="grp" id="themeGrp" style="display:none"><label>Background</label>
-      <div class="pills"><button class="pill theme on" data-theme="cream">Cream</button><button class="pill theme" data-theme="navy">Navy</button></div></div>
+      <div class="pills"><button class="pill theme on" data-theme="cream">Cream</button><button class="pill theme" data-theme="navy">Navy</button><button class="pill theme" data-theme="clear">Clear</button></div></div>
     <div class="divider"></div>
     <div id="libWrap"></div>
     <div class="grp" id="fields"></div>
@@ -264,10 +264,10 @@
   function goldBar(cx,y,w){ctx.fillStyle='#bb9b46';ctx.fillRect(cx-w/2,y,w,W*0.006);}
 
   function photoActive(){ return photos.length>0 && (TEMPLATES[cur].photo || (document.getElementById('photoBg')&&document.getElementById('photoBg').checked)); }
-  function paintBg(bg){ if(photoActive()){ drawPhotos(0,0,W,H); ctx.fillStyle=hexA(bg,0.64); ctx.fillRect(0,0,W,H); } else { ctx.fillStyle=bg; ctx.fillRect(0,0,W,H); } }
+  function paintBg(bg){ const clear=(!bg||bg==='transparent'); if(photoActive()){ drawPhotos(0,0,W,H); if(!clear){ ctx.fillStyle=hexA(bg,0.64); ctx.fillRect(0,0,W,H); } } else if(!clear){ ctx.fillStyle=bg; ctx.fillRect(0,0,W,H); } else { ctx.clearRect(0,0,W,H); } }
 
   function renderStat(d){
-    const navyBg=theme==='navy',bg=navyBg?'#16243f':'#f6f2e8',ink=navyBg?'#f6f2e8':'#16243f',sub=navyBg?'#aeb9cc':'#5a6273';
+    const navyBg=theme==='navy',bg=navyBg?'#16243f':(theme==='clear'?'transparent':'#f6f2e8'),ink=navyBg?'#f6f2e8':'#16243f',sub=navyBg?'#aeb9cc':'#5a6273';
     paintBg(bg);
     ctx.strokeStyle=hexA('#bb9b46',0.55);ctx.lineWidth=W*0.006;ctx.strokeRect(W*0.055,H*0.04,W*0.89,H*0.92);
     ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.03,false,false);spacing('4px');ctx.fillText((d.eyebrow||'').toUpperCase(),W/2,H*0.18);spacing('0px');
@@ -305,7 +305,7 @@
     footer(hexA('#f6f2e8',0.9));
   }
   function renderProof(d){
-    const navyBg=theme==='navy',bg=navyBg?'#16243f':'#f6f2e8',ink=navyBg?'#f6f2e8':'#16243f';
+    const navyBg=theme==='navy',bg=navyBg?'#16243f':(theme==='clear'?'transparent':'#f6f2e8'),ink=navyBg?'#f6f2e8':'#16243f';
     paintBg(bg);
     ctx.strokeStyle=hexA('#bb9b46',0.55);ctx.lineWidth=W*0.006;ctx.strokeRect(W*0.055,H*0.04,W*0.89,H*0.92);
     ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.03,false,false);spacing('4px');ctx.fillText((d.eyebrow||'').toUpperCase(),W/2,H*0.20);spacing('0px');
@@ -318,7 +318,7 @@
     footer('#bb9b46');
   }
   function renderAuthority(d){
-    const navyBg=theme==='navy',bg=navyBg?'#16243f':'#f6f2e8',ink=navyBg?'#f6f2e8':'#16243f';
+    const navyBg=theme==='navy',bg=navyBg?'#16243f':(theme==='clear'?'transparent':'#f6f2e8'),ink=navyBg?'#f6f2e8':'#16243f';
     paintBg(bg);
     ctx.strokeStyle=hexA('#bb9b46',0.55);ctx.lineWidth=W*0.006;ctx.strokeRect(W*0.055,H*0.04,W*0.89,H*0.92);
     ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.03,false,false);spacing('4px');ctx.fillText((d.eyebrow||'').toUpperCase(),W/2,H*0.20);spacing('0px');
@@ -336,7 +336,7 @@
     footer(hexA('#f6f2e8',0.9));
   }
   function renderHoliday(d){
-    const navyBg=theme==='navy',bg=navyBg?'#16243f':'#f6f2e8',ink=navyBg?'#f6f2e8':'#16243f';
+    const navyBg=theme==='navy',bg=navyBg?'#16243f':(theme==='clear'?'transparent':'#f6f2e8'),ink=navyBg?'#f6f2e8':'#16243f';
     paintBg(bg);
     ctx.fillStyle='#bb9b46';ctx.fillRect(W*0.12,H*0.12,W*0.76,W*0.0035);
     ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.03,false,false);spacing('5px');ctx.fillText((d.eyebrow||'').toUpperCase(),W/2,H*0.205);spacing('0px');
