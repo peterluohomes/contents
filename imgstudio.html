@@ -68,11 +68,28 @@
     <div class="divider"></div>
     <div id="libWrap"></div>
     <div class="grp" id="fields"></div>
-    <div class="grp" id="photoGrp" style="display:none"><label>Photos — 1 to 4 (auto-collage)</label>
+    <div class="grp" id="photoGrp" style="display:none"><label>Photos — add 1 to 4</label>
+      <div class="photo-row" id="photoBgWrap" style="display:none;align-items:center"><label style="margin:0;display:inline-flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--cream,#f6f2e8);cursor:pointer"><input type="checkbox" id="photoBg" style="width:16px;height:16px;accent-color:#c9a84c"> Use a photo background on this card</label></div>
       <div class="photo-row"><button class="btn" id="addPhoto">+ Add photos</button><button class="btn ghost" id="clearPhoto">Clear</button>
         <input type="file" id="photoInput" accept="image/*" multiple style="display:none"></div>
+      <div class="photo-row" style="margin-top:8px;align-items:center"><label style="margin:0;white-space:nowrap">Layout</label>
+        <select id="layoutSel" style="flex:1">
+          <option value="auto" selected>Auto (by photo count)</option>
+          <option value="one">Single — full bleed</option>
+          <option value="stack2">Two — split</option>
+          <option value="split7030">Two — 70 / 30</option>
+          <option value="collage3">Three — feature + pair</option>
+          <option value="vert3">Three — columns</option>
+          <option value="triptych">Three — bands</option>
+          <option value="two1wide">Three — L-shape</option>
+          <option value="bigstrip2">Three — big + strip</option>
+          <option value="grid4">Four — grid</option>
+          <option value="horiz4">Four — rows</option>
+          <option value="film1x3">Four — feature + filmstrip</option>
+          <option value="corner">Picture-in-picture</option>
+        </select></div>
       <div class="thumbs" id="thumbs"></div>
-      <p class="hint">Drag a photo on the canvas to reposition · scroll to zoom · or use each photo's slider. 2 split · 3 feature+pair · 4 grid.</p>
+      <p class="hint">Drag a photo on the canvas to reposition · scroll to zoom. Pick a <b>Layout</b>, then add that many photos — empty slots show dimmed.</p>
     </div>
   </div>
   <div class="stage">
@@ -197,14 +214,48 @@
     ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.drawImage(img,ix,iy,dw,dh);ctx.restore();
     cellRects.push({x,y,w,h,pi,slackX,slackY});
   }
+  const LAYOUT_SLOTS={one:1,stack2:2,split7030:2,collage3:3,vert3:3,triptych:3,two1wide:3,bigstrip2:3,grid4:4,horiz4:4,film1x3:4,corner:2};
+  function autoLayout(n){ return n<=1?'one':n===2?'stack2':n===3?'collage3':'grid4'; }
+  function curLayout(){ var s=document.getElementById('layoutSel'); return s?s.value:'auto'; }
+  function layoutRects(layout,x,y,w,h){
+    var wide=w>h;
+    function R(a){ return a.map(function(r){ return [x+r[0],y+r[1],r[2],r[3]]; }); }
+    switch(layout){
+      case 'one':       return R([[0,0,w,h]]);
+      case 'stack2':    return R(wide?[[0,0,w/2,h],[w/2,0,w/2,h]]:[[0,0,w,h/2],[0,h/2,w,h/2]]);
+      case 'split7030': return R(wide?[[0,0,0.7*w,h],[0.7*w,0,0.3*w,h]]:[[0,0,w,0.7*h],[0,0.7*h,w,0.3*h]]);
+      case 'vert3':     return R([[0,0,w/3,h],[w/3,0,w/3,h],[2*w/3,0,w/3,h]]);
+      case 'triptych':  return R(wide?[[0,0,0.25*w,h],[0.25*w,0,0.5*w,h],[0.75*w,0,0.25*w,h]]:[[0,0,w,0.25*h],[0,0.25*h,w,0.5*h],[0,0.75*h,w,0.25*h]]);
+      case 'collage3':  return wide
+        ? R((function(){var bw=w*0.62,sw=w-bw;return [[0,0,bw,h],[bw,0,sw,h/2],[bw,h/2,sw,h/2]];})())
+        : R((function(){var bh=h*0.62,sh=h-bh;return [[0,0,w,bh],[0,bh,w/2,sh],[w/2,bh,w/2,sh]];})());
+      case 'two1wide':  return R(wide?[[0,0,0.5*w,0.5*h],[0,0.5*h,0.5*w,0.5*h],[0.5*w,0,0.5*w,h]]:[[0,0,0.5*w,0.5*h],[0.5*w,0,0.5*w,0.5*h],[0,0.5*h,w,0.5*h]]);
+      case 'bigstrip2': return R(wide?[[0,0,0.56*w,h],[0.56*w,0,0.22*w,h],[0.78*w,0,0.22*w,h]]:[[0,0,w,0.56*h],[0,0.56*h,0.5*w,0.44*h],[0.5*w,0.56*h,0.5*w,0.44*h]]);
+      case 'grid4':     return R([[0,0,w/2,h/2],[w/2,0,w/2,h/2],[0,h/2,w/2,h/2],[w/2,h/2,w/2,h/2]]);
+      case 'horiz4':    return R([[0,0,w,h/4],[0,h/4,w,h/4],[0,h/2,w,h/4],[0,3*h/4,w,h/4]]);
+      case 'film1x3':   return R(wide?[[0,0,0.7*w,h],[0.7*w,0,0.3*w,h/3],[0.7*w,h/3,0.3*w,h/3],[0.7*w,2*h/3,0.3*w,h/3]]:[[0,0,w,0.7*h],[0,0.7*h,w/3,0.3*h],[w/3,0.7*h,w/3,0.3*h],[2*w/3,0.7*h,w/3,0.3*h]]);
+      case 'corner':    { var cm=Math.round(Math.min(w,h)*0.045),cs=Math.round(Math.min(w,h)*0.32); return R([[0,0,w,h],[w-cm-cs,h-cm-cs,cs,cs]]); }
+      default:          return R([[0,0,w,h]]);
+    }
+  }
+  function placeholderCell(x,y,w,h){
+    var grd=ctx.createLinearGradient(x,y,x+w,y+h);grd.addColorStop(0,'#22324f');grd.addColorStop(1,'#16243f');
+    ctx.fillStyle=grd;ctx.fillRect(x,y,w,h);
+    ctx.fillStyle=hexA('#f6f2e8',0.32);ctx.textAlign='center';ctx.font=font(500,Math.min(w,h)*0.10,false,false);spacing('0px');
+    ctx.fillText('+',x+w/2,y+h/2+Math.min(w,h)*0.035);
+  }
   function drawPhotos(x,y,w,h){
-    cellRects=[];const n=Math.min(photos.length,4),g=w*0.012;
-    if(n===0){const grd=ctx.createLinearGradient(x,y,x+w,y+h);grd.addColorStop(0,'#22324f');grd.addColorStop(1,'#16243f');ctx.fillStyle=grd;ctx.fillRect(x,y,w,h);
+    cellRects=[];
+    if(photos.length===0){const grd=ctx.createLinearGradient(x,y,x+w,y+h);grd.addColorStop(0,'#22324f');grd.addColorStop(1,'#16243f');ctx.fillStyle=grd;ctx.fillRect(x,y,w,h);
       ctx.fillStyle=hexA('#f6f2e8',0.4);ctx.textAlign='center';ctx.font=font(500,w*0.04,false,false);spacing('0px');ctx.fillText('Add 1\u20134 photos',x+w/2,y+h/2);return;}
-    if(n===1){drawCell(0,x,y,w,h);}
-    else if(n===2){if(h>=w){const ch=(h-g)/2;drawCell(0,x,y,w,ch);drawCell(1,x,y+ch+g,w,ch);}else{const cw=(w-g)/2;drawCell(0,x,y,cw,h);drawCell(1,x+cw+g,y,cw,h);}}
-    else if(n===3){if(h>=w){const bh=(h-g)*0.62;drawCell(0,x,y,w,bh);const cw=(w-g)/2,by=y+bh+g,ch=h-bh-g;drawCell(1,x,by,cw,ch);drawCell(2,x+cw+g,by,cw,ch);}else{const bw=(w-g)*0.62;drawCell(0,x,y,bw,h);const ch=(h-g)/2,bx=x+bw+g,cw=w-bw-g;drawCell(1,bx,y,cw,ch);drawCell(2,bx,y+ch+g,cw,ch);}}
-    else{const cw=(w-g)/2,ch=(h-g)/2;drawCell(0,x,y,cw,ch);drawCell(1,x+cw+g,y,cw,ch);drawCell(2,x,y+ch+g,cw,ch);drawCell(3,x+cw+g,y+ch+g,cw,ch);}
+    var lay=curLayout(); if(lay==='auto') lay=autoLayout(photos.length);
+    var rects=layoutRects(lay,x,y,w,h);
+    rects.forEach(function(r,i){
+      if(i<photos.length) drawCell(i,r[0],r[1],r[2],r[3]);
+      else placeholderCell(r[0],r[1],r[2],r[3]);
+    });
+    // corner PiP: thin frame so it reads as an inset
+    if(lay==='corner' && rects[1]){ var c=rects[1]; ctx.strokeStyle=hexA('#f6f2e8',0.9); ctx.lineWidth=Math.max(2,w*0.004); ctx.strokeRect(c[0],c[1],c[2],c[3]); }
   }
   function wrapLines(text,maxW){const out=[];String(text).split('\n').forEach(para=>{const hasSpace=/\s/.test(para);const toks=hasSpace?para.split(/(\s+)/):[...para];let line='';toks.forEach(t=>{const test=line+t;if(ctx.measureText(test.trim()).width>maxW&&line.trim()!==''){out.push(line.trim());line=t.replace(/^\s+/,'');}else line=test;});if(line.trim())out.push(line.trim());});return out;}
   function drawWrapped(text,cx,y,maxW,lh,align){const lines=wrapLines(text,maxW);ctx.textAlign=align||'center';lines.forEach((l,i)=>ctx.fillText(l,cx,y+i*lh));return y+lines.length*lh;}
@@ -212,9 +263,12 @@
   function footer(c){ctx.fillStyle=c;ctx.textAlign='center';ctx.font=font(600,W*0.024,false,false);spacing('3px');ctx.fillText(BRAND,W/2,H*0.945);spacing('0px');}
   function goldBar(cx,y,w){ctx.fillStyle='#bb9b46';ctx.fillRect(cx-w/2,y,w,W*0.006);}
 
+  function photoActive(){ return photos.length>0 && (TEMPLATES[cur].photo || (document.getElementById('photoBg')&&document.getElementById('photoBg').checked)); }
+  function paintBg(bg){ if(photoActive()){ drawPhotos(0,0,W,H); ctx.fillStyle=hexA(bg,0.64); ctx.fillRect(0,0,W,H); } else { ctx.fillStyle=bg; ctx.fillRect(0,0,W,H); } }
+
   function renderStat(d){
     const navyBg=theme==='navy',bg=navyBg?'#16243f':'#f6f2e8',ink=navyBg?'#f6f2e8':'#16243f',sub=navyBg?'#aeb9cc':'#5a6273';
-    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    paintBg(bg);
     ctx.strokeStyle=hexA('#bb9b46',0.55);ctx.lineWidth=W*0.006;ctx.strokeRect(W*0.055,H*0.04,W*0.89,H*0.92);
     ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.03,false,false);spacing('4px');ctx.fillText((d.eyebrow||'').toUpperCase(),W/2,H*0.18);spacing('0px');
     ctx.fillStyle='#bb9b46';ctx.font=font(700,W*0.155,true,false);ctx.fillText(d.stat||'',W/2,H*0.40);
@@ -232,7 +286,7 @@
     footer(hexA('#f6f2e8',0.9));
   }
   function renderQuote(d){
-    ctx.fillStyle='#16243f';ctx.fillRect(0,0,W,H);
+    paintBg('#16243f');
     ctx.fillStyle=hexA('#bb9b46',0.32);ctx.textAlign='left';ctx.font=font(700,W*0.32,true,false);ctx.fillText('\u201C',W*0.10,H*0.30);
     ctx.fillStyle='#f6f2e8';ctx.textAlign='center';ctx.font=font(500,W*0.072,true,true);
     const lines=wrapLines(d.quote||'',W*0.80),lh=W*0.092,startY=H*0.46-(lines.length-1)*lh/2;
@@ -252,7 +306,7 @@
   }
   function renderProof(d){
     const navyBg=theme==='navy',bg=navyBg?'#16243f':'#f6f2e8',ink=navyBg?'#f6f2e8':'#16243f';
-    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    paintBg(bg);
     ctx.strokeStyle=hexA('#bb9b46',0.55);ctx.lineWidth=W*0.006;ctx.strokeRect(W*0.055,H*0.04,W*0.89,H*0.92);
     ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.03,false,false);spacing('4px');ctx.fillText((d.eyebrow||'').toUpperCase(),W/2,H*0.20);spacing('0px');
     ctx.fillStyle='#bb9b46';ctx.font=font(400,W*0.05,false,false);ctx.fillText('\u2605 \u2605 \u2605 \u2605 \u2605',W/2,H*0.275);
@@ -265,7 +319,7 @@
   }
   function renderAuthority(d){
     const navyBg=theme==='navy',bg=navyBg?'#16243f':'#f6f2e8',ink=navyBg?'#f6f2e8':'#16243f';
-    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    paintBg(bg);
     ctx.strokeStyle=hexA('#bb9b46',0.55);ctx.lineWidth=W*0.006;ctx.strokeRect(W*0.055,H*0.04,W*0.89,H*0.92);
     ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.03,false,false);spacing('4px');ctx.fillText((d.eyebrow||'').toUpperCase(),W/2,H*0.20);spacing('0px');
     ctx.fillStyle=ink;ctx.font=font(700,W*0.07,true,false);
@@ -283,7 +337,7 @@
   }
   function renderHoliday(d){
     const navyBg=theme==='navy',bg=navyBg?'#16243f':'#f6f2e8',ink=navyBg?'#f6f2e8':'#16243f';
-    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    paintBg(bg);
     ctx.fillStyle='#bb9b46';ctx.fillRect(W*0.12,H*0.12,W*0.76,W*0.0035);
     ctx.fillStyle='#bb9b46';ctx.textAlign='center';ctx.font=font(700,W*0.03,false,false);spacing('5px');ctx.fillText((d.eyebrow||'').toUpperCase(),W/2,H*0.205);spacing('0px');
     ctx.fillStyle=ink;ctx.font=font(700,W*0.092,true,false);let y=drawWrapped(d.headline||'',W/2,H*0.36,W*0.82,W*0.10,'center');
@@ -344,12 +398,14 @@
       row.appendChild(inp);f.appendChild(row);wrap.appendChild(f);
     });
   }
-  function syncCond(){document.getElementById('themeGrp').style.display=TEMPLATES[cur].theme?'block':'none';document.getElementById('photoGrp').style.display=TEMPLATES[cur].photo?'block':'none';}
+  function syncCond(){document.getElementById('themeGrp').style.display=TEMPLATES[cur].theme?'block':'none';document.getElementById('photoGrp').style.display='block';document.getElementById('photoBgWrap').style.display=TEMPLATES[cur].photo?'none':'flex';}
 
   // photos
   const pin=document.getElementById('photoInput');
   document.getElementById('addPhoto').onclick=()=>pin.click();
   document.getElementById('clearPhoto').onclick=()=>{photos=[];drawThumbs();render();};
+  document.getElementById('layoutSel').onchange=()=>{render();};
+  document.getElementById('photoBg').onchange=()=>{render();};
   pin.onchange=e=>{const files=[...e.target.files];let left=files.length;files.forEach(file=>{const r=new FileReader();r.onload=ev=>{const img=new Image();img.onload=()=>{photos.push({img,z:1,fx:0.5,fy:0.5});if(photos.length>4)photos=photos.slice(-4);if(--left<=0){drawThumbs();render();}};img.src=ev.target.result;};r.readAsDataURL(file);});pin.value='';};
   function drawThumbs(){const t=document.getElementById('thumbs');t.innerHTML='';photos.forEach((p,i)=>{
     const c=document.createElement('div');c.className='tcard';

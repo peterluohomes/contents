@@ -3,409 +3,413 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF → Private Offering · Pinnacle Listing System</title>
+<title>Base64 &amp; Encode Kit · Pinnacle Listing System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
   :root{ --navy:#16243f; --navy-deep:#0f1830; --panel:#1b2a4a; --gold:#c9a84c; --gold-soft:#d3b25a; --cream:#f8f4ea; --muted:#8a93a8; --line:#2a3a5c; --bad:#d46a6a; --ok:#5bbb7b;
     --display:'Playfair Display',Georgia,serif; --body:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:var(--body);background:var(--navy);color:var(--cream);line-height:1.55;-webkit-font-smoothing:antialiased;}
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px clamp(16px,4vw,34px);border-bottom:1px solid var(--line);background:var(--navy-deep);position:sticky;top:0;z-index:20;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px clamp(16px,4vw,34px);border-bottom:1px solid var(--line);background:var(--navy-deep);}
   .topbar .brand{font-family:var(--display);font-style:italic;font-size:18px;}
   .topbar .brand small{display:block;font-style:normal;font-family:var(--body);font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-top:2px;}
-  .wrap{display:grid;grid-template-columns:minmax(340px,440px) 1fr;gap:22px;padding:22px clamp(16px,4vw,34px);align-items:start;}
-  @media(max-width:980px){.wrap{grid-template-columns:1fr;}}
-  .card{background:var(--navy-deep);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px;}
-  .card h2{font-family:var(--display);font-size:17px;font-weight:500;margin-bottom:4px;}
-  .card .sub{font-size:11.5px;color:var(--muted);margin-bottom:14px;}
-  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:26px 18px;text-align:center;cursor:pointer;transition:.2s;background:var(--panel);}
+  .topbar .note{font-size:11px;color:var(--muted);}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;padding:16px clamp(16px,4vw,34px) 0;}
+  .tab{font-family:var(--body);font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--muted);background:var(--navy-deep);border:1px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;padding:10px 18px;cursor:pointer;}
+  .tab.active{color:var(--navy);background:var(--gold);border-color:var(--gold);}
+  .wrap{padding:0 clamp(16px,4vw,34px) 34px;}
+  .panel{display:none;background:var(--navy-deep);border:1px solid var(--line);border-radius:0 14px 14px 14px;padding:20px;}
+  .panel.active{display:block;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr;}}
+  label{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px;}
+  textarea,input[type=text],input[type=number],select{font-family:ui-monospace,SFMono-Regular,monospace;font-size:13px;color:var(--cream);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 12px;width:100%;}
+  textarea{resize:vertical;min-height:120px;line-height:1.5;word-break:break-all;}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);}
+  .row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin:12px 0;}
+  .btn{font-family:var(--body);font-size:13px;font-weight:600;border:none;border-radius:9px;padding:10px 16px;cursor:pointer;}
+  .btn.gold{background:var(--gold);color:var(--navy);}
+  .btn.gold:hover{background:var(--gold-soft);}
+  .btn.ghost{background:var(--panel);color:var(--cream);border:1px solid var(--line);}
+  .btn.ghost:hover{border-color:var(--gold);}
+  .btn.sm{padding:7px 12px;font-size:12px;}
+  .chk{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--cream);cursor:pointer;}
+  .chk input{accent-color:var(--gold);width:15px;height:15px;}
+  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:30px 18px;text-align:center;cursor:pointer;transition:.2s;background:var(--panel);}
   .drop:hover,.drop.drag{border-color:var(--gold);background:#1f3052;}
   .drop b{color:var(--gold-soft);}
   .drop .hint{font-size:11px;color:var(--muted);margin-top:6px;}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-  .field{display:flex;flex-direction:column;gap:4px;margin-bottom:11px;flex:1;min-width:0;}
-  .field.half{flex:1 1 calc(50% - 5px);}
-  label{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
-  input,select,textarea{font-family:var(--body);font-size:13px;color:var(--cream);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;}
-  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);}
-  textarea{resize:vertical;min-height:46px;line-height:1.5;}
-  .stat-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
-  .stat-row input{flex:1;}
-  .stat-row .x{flex:0 0 auto;background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:7px;width:32px;height:34px;cursor:pointer;font-size:15px;}
-  .stat-row .x:hover{border-color:var(--bad);color:var(--bad);}
-  .addbtn{font-size:11px;font-weight:600;color:var(--gold-soft);background:transparent;border:1px dashed var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;}
-  .addbtn:hover{border-color:var(--gold);}
-  details{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden;}
-  details summary{cursor:pointer;padding:11px 14px;font-weight:600;font-size:13px;background:var(--panel);list-style:none;}
-  details summary::-webkit-details-marker{display:none;}
-  details summary::before{content:'▸ ';color:var(--gold);}
-  details[open] summary::before{content:'▾ ';}
-  details .inner{padding:14px;}
-  .thumbs{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;}
-  .thumb{position:relative;width:54px;}
-  .thumb img{width:100%;border:1px solid var(--line);border-radius:4px;display:block;}
-  .thumb span{position:absolute;bottom:2px;right:3px;font-size:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:3px;padding:0 3px;}
-  .bigbtn{display:block;width:100%;font-family:var(--body);font-size:14px;font-weight:600;letter-spacing:.04em;border:none;border-radius:10px;padding:13px;cursor:pointer;margin-top:8px;}
-  .bigbtn.gold{background:var(--gold);color:var(--navy);}
-  .bigbtn.gold:hover{background:var(--gold-soft);}
-  .bigbtn.ghost{background:var(--panel);color:var(--cream);border:1px solid var(--gold);}
-  .bigbtn:disabled{opacity:.45;cursor:not-allowed;}
+  .out{margin-top:14px;}
   .status{font-size:12px;color:var(--muted);margin-top:10px;min-height:16px;}
   .status b{color:var(--gold-soft);}
-  .prev-wrap{position:sticky;top:78px;}
-  .prev-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .prev-head .sz{font-size:11px;color:var(--muted);}
-  iframe{width:100%;height:78vh;border:1px solid var(--line);border-radius:12px;background:#0b1622;}
-  .empty{height:78vh;border:1px dashed var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:13px;padding:24px;}
-  .note{font-size:11px;color:var(--muted);line-height:1.7;margin-top:12px;}
+  .meta{font-size:11px;color:var(--muted);margin-top:6px;}
+  .preview{margin-top:14px;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-height:60px;}
+  .preview img{max-width:100%;max-height:300px;border-radius:6px;}
+  #qrBox{display:flex;align-items:center;justify-content:center;background:#fff;border-radius:10px;padding:16px;min-height:120px;}
+  #qrBox img,#qrBox canvas{display:block;}
+  .hintline{font-size:11px;color:var(--muted);line-height:1.7;margin-top:12px;}
+  code{font-family:ui-monospace,monospace;color:var(--gold-soft);}
 </style>
 </head>
 <body>
   <div class="topbar">
-    <div class="brand">PDF → Private Offering<small>Pinnacle Listing System</small></div>
-    <div style="font-size:11px;color:var(--muted)">Self-contained · share the file directly</div>
+    <div class="brand">Base64 &amp; Encode Kit<small>Pinnacle Listing System</small></div>
+    <div class="note">Everything runs in your browser — nothing is uploaded</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="text">Text</button>
+    <button class="tab" data-tab="image">Image &rarr; Base64</button>
+    <button class="tab" data-tab="url">URL</button>
+    <button class="tab" data-tab="qr">QR Code</button>
+    <button class="tab" data-tab="pdf">PDF</button>
   </div>
 
   <div class="wrap">
-    <!-- LEFT: controls -->
-    <div>
-      <div class="card">
-        <h2>1 · Drop your PDF</h2>
-        <div class="sub">Each page becomes a full-width plate, embedded in the page so the HTML works on its own.</div>
-        <div class="drop" id="drop">
-          <div><b>Choose a PDF</b> or drag it here</div>
-          <div class="hint">Brochure, feature sheet, floor plans — any PDF</div>
-          <input type="file" id="file" accept="application/pdf" style="display:none">
+    <div class="panel active" id="panel-text">
+      <div class="grid2">
+        <div>
+          <label>Plain text</label>
+          <textarea id="txtIn" placeholder="Type or paste text..."></textarea>
         </div>
-        <div class="row" style="margin-top:12px">
-          <div class="field" style="flex:1">
-            <label>Image quality</label>
-            <select id="quality">
-              <option value="std" selected>Standard — smaller file</option>
-              <option value="high">High — sharper, larger file</option>
-            </select>
-          </div>
+        <div>
+          <label>Base64</label>
+          <textarea id="txtOut" placeholder="...or paste Base64 to decode"></textarea>
         </div>
-        <div class="status" id="loadStatus"></div>
-        <div class="thumbs" id="thumbs"></div>
       </div>
-
-      <div class="card">
-        <h2>2 · Details</h2>
-        <div class="sub">Pre-filled — edit per listing. The contact block stays the same each time.</div>
-
-        <details open>
-          <summary>Header &amp; Hero</summary>
-          <div class="inner">
-            <div class="row">
-              <div class="field half"><label>Brand line (header)</label><input id="brandMain" value="156 Tower Hill Road"></div>
-              <div class="field half"><label>Header subtitle</label><input id="brandSmall" value="A Private Offering"></div>
-            </div>
-            <div class="field"><label>Hero eyebrow</label><input id="heroEyebrow" value="The Collector Edition · Vol. I"></div>
-            <div class="field"><label>Hero title (big italic)</label><input id="heroTitle" value="The Ravine Residence"></div>
-            <div class="field"><label>Location line</label><input id="heroLoc" value="Jefferson · Richmond Hill · Ontario"></div>
-            <div class="row">
-              <div class="field half"><label>CTA label</label><input id="ctaLabel" value="Book a Viewing"></div>
-              <div class="field half"><label>CTA link</label><input id="ctaHref" value="#contact"></div>
-            </div>
-          </div>
-        </details>
-
-        <details open>
-          <summary>Stats</summary>
-          <div class="inner">
-            <div id="statList"></div>
-            <button class="addbtn" id="addStat" type="button">+ Add stat</button>
-          </div>
-        </details>
-
-        <details>
-          <summary>Page title &amp; description (SEO / link preview)</summary>
-          <div class="inner">
-            <div class="field"><label>Browser / link title</label><input id="titleMeta" value="156 Tower Hill Road · A Private Offering"></div>
-            <div class="field"><label>Description</label><textarea id="descMeta">The Ravine Residence — 156 Tower Hill Road, Jefferson, Richmond Hill. A rare ravine-backing estate with a self-contained walk-out lower level.</textarea></div>
-          </div>
-        </details>
-
-        <details>
-          <summary>Contact block</summary>
-          <div class="inner">
-            <div class="row">
-              <div class="field half"><label>Eyebrow</label><input id="contactEyebrow" value="Exclusively Presented"></div>
-              <div class="field half"><label>By-line</label><input id="contactBy" value="— By Appointment Only —"></div>
-            </div>
-            <div class="field"><label>Name</label><input id="agentName" value="Peter Luo"></div>
-            <div class="row">
-              <div class="field half"><label>Designations</label><input id="agentDesig" value="SRS · MCNE"></div>
-              <div class="field half"><label>Role</label><input id="agentRole" value="Broker · Pinnacle Listing System"></div>
-            </div>
-            <div class="field"><label>Brokerage</label><input id="agentFirm" value="RE/MAX Realtron Realty Inc., Brokerage"></div>
-            <div class="row">
-              <div class="field half"><label>Direct phone</label><input id="tel" value="+1 (647) 824-3718"></div>
-              <div class="field half"><label>Email</label><input id="email" value="peterluo@peterluo.com"></div>
-            </div>
-            <div class="field"><label>Website</label><input id="website" value="www.peterluo.com"></div>
-            <div class="field"><label>Disclaimer</label><textarea id="disclaimer">All information deemed reliable but not guaranteed · Not intended to solicit clients under contract</textarea></div>
-          </div>
-        </details>
-
-        <details>
-          <summary>Output</summary>
-          <div class="inner">
-            <div class="field"><label>File name</label><input id="slug" value="156-tower-hill-road"></div>
-          </div>
-        </details>
+      <div class="row">
+        <button class="btn gold" onclick="txtEncode()">Text &rarr; Base64</button>
+        <button class="btn ghost" onclick="txtDecode()">Base64 &rarr; Text</button>
+        <label class="chk"><input type="checkbox" id="txtUrlSafe"> URL-safe (base64url)</label>
+        <button class="btn ghost sm" onclick="copyVal('txtOut')">Copy Base64</button>
+        <button class="btn ghost sm" onclick="copyVal('txtIn')">Copy text</button>
       </div>
-
-      <div class="card">
-        <h2>3 · Generate</h2>
-        <button class="bigbtn ghost" id="previewBtn" type="button" disabled>↻ Build preview</button>
-        <button class="bigbtn gold" id="downloadBtn" type="button" disabled>⤓ Download HTML</button>
-        <div class="status" id="genStatus"></div>
-        <div class="note">The HTML embeds every page as an image, so it's a single file you can drop into any folder, upload to your site, or send as-is. No image hosting needed.</div>
-      </div>
+      <div class="status" id="txtStatus"></div>
+      <div class="hintline">UTF-8 safe &mdash; handles accents, &#20013;&#25991;, emoji. <b>URL-safe</b> swaps <code>+ /</code> for <code>- _</code> and drops padding, for use in links and tokens.</div>
     </div>
 
-    <!-- RIGHT: preview -->
-    <div class="prev-wrap">
-      <div class="prev-head"><h2 style="font-family:var(--display);font-weight:500;font-size:17px">Preview</h2><span class="sz" id="sizeTag"></span></div>
-      <div class="empty" id="empty">Drop a PDF and hit <b style="color:var(--gold-soft);margin:0 4px">Build preview</b> to see your offering page here.</div>
-      <iframe id="preview" style="display:none"></iframe>
+    <div class="panel" id="panel-image">
+      <div class="drop" id="imgDrop">
+        <div><b>Choose an image</b> or drag it here</div>
+        <div class="hint">JPG &middot; PNG &middot; WEBP &middot; GIF &middot; SVG &mdash; becomes a Base64 data URI</div>
+        <input type="file" id="imgFile" accept="image/*" style="display:none">
+      </div>
+      <div class="preview" id="imgPreview" style="display:none"></div>
+      <div class="out" style="display:none" id="imgOutWrap">
+        <label>Data URI <span id="imgMeta" style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;"></span></label>
+        <textarea id="imgOut" readonly></textarea>
+        <div class="row">
+          <button class="btn gold sm" onclick="copyVal('imgOut')">Copy data URI</button>
+          <button class="btn ghost sm" onclick="copyImgTag()">Copy &lt;img&gt; tag</button>
+          <button class="btn ghost sm" onclick="copyCssBg()">Copy CSS background</button>
+        </div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--line);margin:20px 0">
+      <label>Decode &mdash; paste a data URI or raw Base64 image</label>
+      <textarea id="imgDecodeIn" placeholder="data:image/jpeg;base64,..."></textarea>
+      <div class="row">
+        <button class="btn gold sm" onclick="imgDecode()">Preview &amp; download</button>
+      </div>
+      <div class="preview" id="imgDecodeView" style="display:none"></div>
+      <div class="status" id="imgStatus"></div>
+    </div>
+
+    <div class="panel" id="panel-url">
+      <div class="grid2">
+        <div>
+          <label>Input</label>
+          <textarea id="urlIn" placeholder="https://peterluo.homes/showing?cta=1&src=fb"></textarea>
+        </div>
+        <div>
+          <label>Output</label>
+          <textarea id="urlOut" readonly></textarea>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn gold sm" onclick="urlDo('enc')">URL-encode</button>
+        <button class="btn ghost sm" onclick="urlDo('dec')">URL-decode</button>
+        <button class="btn ghost sm" onclick="urlDo('b64')">To Base64url</button>
+        <button class="btn ghost sm" onclick="urlDo('unb64')">From Base64url</button>
+        <button class="btn ghost sm" onclick="copyVal('urlOut')">Copy</button>
+      </div>
+      <div class="status" id="urlStatus"></div>
+      <div class="hintline"><b>URL-encode</b> escapes spaces &amp; special characters for safe links. <b>Base64url</b> is handy when a whole link needs to ride inside another link or a token.</div>
+    </div>
+
+    <div class="panel" id="panel-qr">
+      <div class="grid2">
+        <div>
+          <label>Text or link</label>
+          <textarea id="qrIn" placeholder="https://peterluo.homes/156-tower-hill-road">https://peterluo.homes/showing</textarea>
+          <div class="row">
+            <label style="margin:0">Size
+              <select id="qrSize" style="width:auto;margin-left:6px;">
+                <option value="256">256</option>
+                <option value="512" selected>512</option>
+                <option value="800">800</option>
+                <option value="1024">1024</option>
+              </select>
+            </label>
+            <label style="margin:0">Error level
+              <select id="qrEcl" style="width:auto;margin-left:6px;">
+                <option value="L">L &middot; 7%</option>
+                <option value="M" selected>M &middot; 15%</option>
+                <option value="Q">Q &middot; 25%</option>
+                <option value="H">H &middot; 30%</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <label class="chk" style="margin:0">Dark
+              <input type="color" id="qrDark" value="#16243f" style="width:34px;height:28px;padding:0;border:1px solid var(--line);border-radius:6px;background:none;">
+            </label>
+            <label class="chk" style="margin:0">Light
+              <input type="color" id="qrLight" value="#ffffff" style="width:34px;height:28px;padding:0;border:1px solid var(--line);border-radius:6px;background:none;">
+            </label>
+            <button class="btn gold sm" onclick="makeQR()">Generate</button>
+          </div>
+        </div>
+        <div>
+          <label>QR code</label>
+          <div id="qrBox"><span style="color:#999;font-size:12px">Your QR will appear here</span></div>
+          <div class="row">
+            <button class="btn gold sm" onclick="qrDownload()">Download PNG</button>
+            <button class="btn ghost sm" onclick="qrCopyData()">Copy Base64</button>
+          </div>
+        </div>
+      </div>
+      <div class="status" id="qrStatus"></div>
+      <div class="hintline">For listing links, riders, and open-house signs. Higher <b>error level</b> survives a printed logo or a scuff over the code; bump it to <b>Q</b> or <b>H</b> if you'll overlay anything.</div>
+    </div>
+
+    <div class="panel" id="panel-pdf">
+      <div class="drop" id="pdfDrop">
+        <div><b>Choose a PDF</b> or drag it here</div>
+        <div class="hint">Get a Base64 data URI, the page images, or a shareable HTML page</div>
+        <input type="file" id="pdfFile" accept="application/pdf" style="display:none">
+      </div>
+      <div class="row">
+        <label style="margin:0">Image quality
+          <select id="pdfQuality" style="width:auto;margin-left:6px;">
+            <option value="std" selected>Standard</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+      </div>
+      <div class="status" id="pdfStatus"></div>
+      <div class="thumbs" id="pdfThumbs" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;"></div>
+
+      <div id="pdfOutWrap" style="display:none">
+        <hr style="border:none;border-top:1px solid var(--line);margin:20px 0">
+        <div class="row" style="margin-top:0">
+          <button class="btn gold" id="pdfHtmlBtn" onclick="pdfDownloadHTML()">&#8595; Download HTML</button>
+          <button class="btn ghost" onclick="pdfPreviewHTML()">Preview HTML</button>
+          <button class="btn ghost" onclick="pdfDownloadJPGs()">Download page JPGs</button>
+        </div>
+        <label style="margin-top:14px">Whole PDF as Base64 data URI <span id="pdfMeta" style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;"></span></label>
+        <textarea id="pdfDataUri" readonly placeholder="data:application/pdf;base64,..."></textarea>
+        <div class="row">
+          <button class="btn ghost sm" onclick="copyVal('pdfDataUri')">Copy data URI</button>
+        </div>
+      </div>
+      <div class="hintline">The <b>HTML</b> output is one self-contained file (each page embedded as an image) &mdash; drop it in a folder, upload it, or send it as-is. The <b>data URI</b> embeds the raw PDF for use in an <code>&lt;embed&gt;</code> or another single-file tool.</div>
     </div>
   </div>
 
 <script>
-  const OUTPUT_CSS = `  :root {
-    --navy:#0b1622; --navy-soft:#102234; --gold:#c8a45a; --gold-bright:#d8bd7e;
-    --cream:#f3ede1; --muted:#9fb0c0; --line:rgba(200,164,90,.28);
-  }
-  * { box-sizing:border-box; margin:0; padding:0; }
-  html { scroll-behavior:smooth; }
-  body {
-    font-family:'DM Sans',sans-serif; color:var(--cream); background:var(--navy);
-    background-image:
-      radial-gradient(circle at 15% 0%, rgba(200,164,90,.10), transparent 45%),
-      radial-gradient(circle at 85% 100%, rgba(30,70,110,.30), transparent 50%);
-    background-attachment:fixed; -webkit-font-smoothing:antialiased; line-height:1.7;
-  }
-  /* sticky header */
-  header {
-    position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
-    padding:14px clamp(18px,5vw,48px); backdrop-filter:blur(10px);
-    background:rgba(11,22,34,.72); border-bottom:1px solid var(--line);
-  }
-  .brand { font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(15px,2.2vw,19px); letter-spacing:.02em; }
-  .brand small { display:block; font-family:'DM Sans',sans-serif; font-style:normal; font-size:9.5px; letter-spacing:.34em; color:var(--gold); text-transform:uppercase; margin-top:2px; }
-  .cta {
-    font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--navy);
-    background:var(--gold); padding:11px 20px; border-radius:2px; text-decoration:none;
-    transition:.25s; white-space:nowrap; font-weight:500;
-  }
-  .cta:hover { background:var(--gold-bright); transform:translateY(-1px); }
-  /* hero */
-  .hero { text-align:center; padding:clamp(64px,12vw,140px) 24px clamp(40px,7vw,72px); }
-  .hero .eyebrow { font-size:11px; letter-spacing:.42em; text-transform:uppercase; color:var(--gold); margin-bottom:26px; }
-  .hero h1 { font-family:'Playfair Display',serif; font-style:italic; font-weight:400; font-size:clamp(38px,8vw,82px); line-height:1.05; letter-spacing:.01em; }
-  .hero .loc { font-size:12px; letter-spacing:.34em; text-transform:uppercase; color:var(--muted); margin-top:20px; }
-  .stats { display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(20px,6vw,64px); margin-top:46px; }
-  .stats .s { min-width:64px; }
-  .stats .n { font-family:'Playfair Display',serif; font-size:clamp(24px,4vw,34px); color:var(--cream); }
-  .stats .l { font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--gold); margin-top:6px; }
-  .rule { width:54px; height:1px; background:var(--gold); margin:40px auto 0; opacity:.8; }
-  /* plates */
-  .gallery { max-width:920px; margin:0 auto; padding:clamp(30px,6vw,60px) clamp(14px,4vw,28px) 20px; display:flex; flex-direction:column; gap:clamp(26px,5vw,54px); }
-  .plate { opacity:0; transform:translateY(26px); transition:opacity .9s ease, transform .9s ease; }
-  .plate.in { opacity:1; transform:none; }
-  .plate img { width:100%; height:auto; display:block; border:1px solid var(--line); border-radius:3px;
-    box-shadow:0 24px 60px rgba(0,0,0,.5); }
-  /* contact */
-  #contact { margin-top:clamp(50px,9vw,90px); padding:clamp(56px,10vw,96px) 24px clamp(40px,7vw,64px);
-    border-top:1px solid var(--line); text-align:center;
-    background:linear-gradient(180deg, transparent, rgba(8,16,25,.85)); }
-  #contact .eyebrow { font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(26px,5vw,40px); }
-  #contact .by { font-size:11px; letter-spacing:.32em; text-transform:uppercase; color:var(--gold); margin-top:12px; }
-  .name { font-family:'Playfair Display',serif; font-size:30px; margin-top:38px; }
-  .desig { font-size:11px; letter-spacing:.3em; color:var(--gold); margin-top:8px; }
-  .role { font-size:11px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); margin-top:22px; }
-  .firm { font-family:'Playfair Display',serif; font-style:italic; font-size:16px; margin-top:8px; color:var(--cream); }
-  .contacts { display:flex; flex-wrap:wrap; justify-content:center; gap:14px 34px; margin-top:30px; }
-  .contacts a { color:var(--cream); text-decoration:none; font-size:14px; letter-spacing:.03em; border-bottom:1px solid transparent; transition:.2s; }
-  .contacts a:hover { color:var(--gold-bright); border-color:var(--gold); }
-  .contacts .k { display:block; font-size:9.5px; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); margin-bottom:5px; }
-  .disclaimer { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); opacity:.65; margin-top:48px; line-height:2; }`;
-
   const $ = id => document.getElementById(id);
-  let PAGES = [];            // base64 JPEG data URLs, one per page
-  let lastBlobUrl = null;
 
-  if (window['pdfjsLib']) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    $('panel-' + t.dataset.tab).classList.add('active');
+  }));
 
-  function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function slugify(s){ return (s||'').toLowerCase().split(',')[0].trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
-
-  // ---------- stats editor ----------
-  const DEFAULT_STATS = [['4+1','Beds'],['5','Baths'],['3,800','Sq Ft'],['50 ft','Lot']];
-  function addStatRow(n='', l=''){
-    const div = document.createElement('div'); div.className='stat-row';
-    div.innerHTML = `<input placeholder="4+1" value="${esc(n)}"><input placeholder="Beds" value="${esc(l)}"><button class="x" type="button" title="Remove">×</button>`;
-    div.querySelector('.x').onclick = () => div.remove();
-    $('statList').appendChild(div);
+  function setStatus(id, msg, color){ const s=$(id); if(s) s.innerHTML = color ? '<b style="color:'+color+'">'+msg+'</b>' : msg; }
+  function copyText(text, statusId){
+    const done = () => setStatus(statusId, 'Copied', 'var(--ok)');
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done)); }
+    else fallbackCopy(text, done);
   }
-  DEFAULT_STATS.forEach(s => addStatRow(s[0], s[1]));
-  $('addStat').onclick = () => addStatRow();
-  function getStats(){
-    return [...$('statList').querySelectorAll('.stat-row')].map(r=>{
-      const i = r.querySelectorAll('input');
-      return { n:i[0].value.trim(), l:i[1].value.trim() };
-    }).filter(s => s.n || s.l);
+  function fallbackCopy(text, done){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); done&&done(); }
+  function copyVal(id){ const el=$(id); if(!el||!el.value){ return; } const sid = id.startsWith('txt')?'txtStatus':id.startsWith('img')?'imgStatus':id.startsWith('url')?'urlStatus':'qrStatus'; copyText(el.value, sid); }
+  function dl(href, name){ const a=document.createElement('a'); a.href=href; a.download=name; document.body.appendChild(a); a.click(); a.remove(); }
+  function bytesFmt(n){ return n>1048576 ? (n/1048576).toFixed(2)+' MB' : n>1024 ? (n/1024).toFixed(1)+' KB' : n+' B'; }
+
+  function b64encode(str){
+    const bytes = new TextEncoder().encode(str); let bin='';
+    const chunk=0x8000; for(let i=0;i<bytes.length;i+=chunk){ bin += String.fromCharCode.apply(null, bytes.subarray(i,i+chunk)); }
+    return btoa(bin);
   }
+  function b64decode(b64){
+    b64 = b64.trim().replace(/-/g,'+').replace(/_/g,'/'); while(b64.length%4) b64+='=';
+    const bin = atob(b64); const bytes = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function toUrlSafe(b64){ return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
 
-  // auto slug from brand line
-  $('brandMain').addEventListener('input', () => { $('slug').value = slugify($('brandMain').value) || 'offering'; });
+  window.txtEncode = function(){
+    try{ let b = b64encode($('txtIn').value); if($('txtUrlSafe').checked) b = toUrlSafe(b); $('txtOut').value = b; setStatus('txtStatus','Encoded','var(--ok)'); }
+    catch(e){ setStatus('txtStatus','Could not encode: '+e.message,'var(--bad)'); }
+  };
+  window.txtDecode = function(){
+    try{ $('txtIn').value = b64decode($('txtOut').value); setStatus('txtStatus','Decoded','var(--ok)'); }
+    catch(e){ setStatus('txtStatus','That is not valid Base64.','var(--bad)'); }
+  };
 
-  // ---------- PDF → images ----------
-  $('drop').onclick = () => $('file').click();
-  $('file').onchange = e => { if(e.target.files[0]) handlePDF(e.target.files[0]); };
-  ['dragover','dragenter'].forEach(ev => $('drop').addEventListener(ev, e=>{ e.preventDefault(); $('drop').classList.add('drag'); }));
-  ['dragleave','drop'].forEach(ev => $('drop').addEventListener(ev, e=>{ e.preventDefault(); $('drop').classList.remove('drag'); }));
-  $('drop').addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(f && f.type==='application/pdf') handlePDF(f); });
+  function readImage(file){
+    if(!file || !/^image\//.test(file.type)){ setStatus('imgStatus','Please choose an image file.','var(--bad)'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const uri = reader.result;
+      $('imgOut').value = uri;
+      $('imgMeta').textContent = '\u00b7 ' + file.type + ' \u00b7 ' + bytesFmt(file.size) + ' source \u00b7 ' + bytesFmt(uri.length) + ' as text';
+      $('imgPreview').innerHTML = '<img src="'+uri+'" alt="">'; $('imgPreview').style.display='block';
+      $('imgOutWrap').style.display='block';
+      setStatus('imgStatus','Encoded \u2014 copy the data URI below.','var(--ok)');
+    };
+    reader.readAsDataURL(file);
+  }
+  $('imgDrop').onclick = () => $('imgFile').click();
+  $('imgFile').onchange = e => { if(e.target.files[0]) readImage(e.target.files[0]); };
+  ['dragover','dragenter'].forEach(ev => $('imgDrop').addEventListener(ev, e=>{ e.preventDefault(); $('imgDrop').classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev => $('imgDrop').addEventListener(ev, e=>{ e.preventDefault(); $('imgDrop').classList.remove('drag'); }));
+  $('imgDrop').addEventListener('drop', e=>{ if(e.dataTransfer.files[0]) readImage(e.dataTransfer.files[0]); });
 
-  async function handlePDF(file){
-    if(!window['pdfjsLib']){ $('loadStatus').innerHTML = '<b style="color:var(--bad)">PDF engine didn\'t load.</b> Check your connection and refresh.'; return; }
-    const q = $('quality').value === 'high' ? {scale:2.2, jpeg:0.9} : {scale:1.6, jpeg:0.82};
-    PAGES = []; $('thumbs').innerHTML=''; $('previewBtn').disabled = true; $('downloadBtn').disabled = true;
-    $('loadStatus').innerHTML = 'Reading <b>'+esc(file.name)+'</b>…';
+  window.copyImgTag = function(){ const u=$('imgOut').value; if(!u) return; copyText('<img src="'+u+'" alt="">','imgStatus'); };
+  window.copyCssBg  = function(){ const u=$('imgOut').value; if(!u) return; copyText("background-image:url('"+u+"');",'imgStatus'); };
+
+  window.imgDecode = function(){
+    let v = $('imgDecodeIn').value.trim(); if(!v){ setStatus('imgStatus','Paste a data URI or Base64 first.','var(--bad)'); return; }
+    if(!/^data:/.test(v)){ v = 'data:image/png;base64,' + v.replace(/\s+/g,''); }
+    const img = new Image();
+    img.onload = () => {
+      const mime = (v.match(/^data:([^;]+)/)||[])[1] || 'image/png';
+      const ext = (mime.split('/')[1]||'png').replace('svg+xml','svg').replace('jpeg','jpg');
+      $('imgDecodeView').innerHTML = '<img src="'+v+'" alt=""><div class="meta">'+img.naturalWidth+' \u00d7 '+img.naturalHeight+' px</div>';
+      const b=document.createElement('button'); b.className='btn gold sm'; b.textContent='Download image'; b.style.marginTop='10px'; b.onclick=()=>dl(v,'image.'+ext); $('imgDecodeView').appendChild(b);
+      $('imgDecodeView').style.display='block';
+      setStatus('imgStatus','Decoded \u2014 use the Download button below the preview.','var(--ok)');
+    };
+    img.onerror = () => setStatus('imgStatus','That is not a valid image data URI.','var(--bad)');
+    img.src = v;
+  };
+
+  window.urlDo = function(mode){
+    const v = $('urlIn').value;
+    try{
+      let out = '';
+      if(mode==='enc') out = encodeURIComponent(v);
+      else if(mode==='dec') out = decodeURIComponent(v);
+      else if(mode==='b64') out = toUrlSafe(b64encode(v));
+      else if(mode==='unb64') out = b64decode(v);
+      $('urlOut').value = out;
+      setStatus('urlStatus','Done','var(--ok)');
+    }catch(e){ setStatus('urlStatus','Could not process that input.','var(--bad)'); }
+  };
+
+  window.makeQR = function(){
+    const text = $('qrIn').value.trim();
+    if(!text){ setStatus('qrStatus','Enter some text or a link.','var(--bad)'); return; }
+    if(typeof QRCode === 'undefined'){ setStatus('qrStatus','QR library did not load \u2014 check your connection and refresh.','var(--bad)'); return; }
+    const box = $('qrBox'); box.innerHTML = '';
+    const size = parseInt($('qrSize').value,10) || 512;
+    const eclMap = { L:QRCode.CorrectLevel.L, M:QRCode.CorrectLevel.M, Q:QRCode.CorrectLevel.Q, H:QRCode.CorrectLevel.H };
+    new QRCode(box, {
+      text: text, width:size, height:size,
+      colorDark: $('qrDark').value, colorLight: $('qrLight').value,
+      correctLevel: eclMap[$('qrEcl').value] || QRCode.CorrectLevel.M
+    });
+    setTimeout(function(){ const c=box.querySelector('canvas')||box.querySelector('img'); if(c){ c.style.width='220px'; c.style.height='220px'; } }, 30);
+    setStatus('qrStatus','Generated ('+size+'\u00d7'+size+').','var(--ok)');
+  };
+  function qrDataURL(){
+    const c = $('qrBox').querySelector('canvas');
+    if(c) return c.toDataURL('image/png');
+    const i = $('qrBox').querySelector('img');
+    return i ? i.src : '';
+  }
+  window.qrDownload = function(){
+    const u = qrDataURL(); if(!u){ setStatus('qrStatus','Generate a QR first.','var(--bad)'); return; }
+    const name = ($('qrIn').value.trim().replace(/^https?:\/\//,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,40) || 'qr') + '.png';
+    dl(u, name); setStatus('qrStatus','Downloaded '+name,'var(--ok)');
+  };
+  window.qrCopyData = function(){ const u = qrDataURL(); if(!u){ setStatus('qrStatus','Generate a QR first.','var(--bad)'); return; } copyText(u,'qrStatus'); };
+
+  // ---------- PDF ----------
+  if(window['pdfjsLib']) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  let PDF_PAGES = [], PDF_NAME = 'document';
+  function escHtmlText(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  $('pdfDrop').onclick = () => $('pdfFile').click();
+  $('pdfFile').onchange = e => { if(e.target.files[0]) handlePDFfile(e.target.files[0]); };
+  ['dragover','dragenter'].forEach(ev => $('pdfDrop').addEventListener(ev, e=>{ e.preventDefault(); $('pdfDrop').classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev => $('pdfDrop').addEventListener(ev, e=>{ e.preventDefault(); $('pdfDrop').classList.remove('drag'); }));
+  $('pdfDrop').addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(f && f.type==='application/pdf') handlePDFfile(f); });
+
+  async function handlePDFfile(file){
+    if(file.type !== 'application/pdf'){ setStatus('pdfStatus','Please choose a PDF.','var(--bad)'); return; }
+    PDF_NAME = (file.name||'document').replace(/\.pdf$/i,'').replace(/[^\w\-]+/g,'_').slice(0,50) || 'document';
+    const r = new FileReader();
+    r.onload = () => { $('pdfDataUri').value = r.result; $('pdfMeta').textContent = '\u00b7 '+bytesFmt(file.size)+' \u00b7 '+bytesFmt(r.result.length)+' as text'; };
+    r.readAsDataURL(file);
+    if(!window['pdfjsLib']){ setStatus('pdfStatus','PDF engine did not load \u2014 check your connection and refresh.','var(--bad)'); return; }
+    const high = $('pdfQuality').value === 'high'; const scale = high ? 2.2 : 1.6, q = high ? 0.9 : 0.82;
+    PDF_PAGES = []; $('pdfThumbs').innerHTML = ''; $('pdfOutWrap').style.display = 'none';
+    setStatus('pdfStatus','Reading '+file.name+'\u2026');
     try{
       const buf = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({data: buf}).promise;
       for(let p=1; p<=pdf.numPages; p++){
-        $('loadStatus').innerHTML = 'Rendering page <b>'+p+'</b> of '+pdf.numPages+'…';
+        setStatus('pdfStatus','Rendering page '+p+' of '+pdf.numPages+'\u2026');
         const page = await pdf.getPage(p);
-        const vp = page.getViewport({scale:q.scale});
+        const vp = page.getViewport({scale});
         const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,c.width,c.height);
+        const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
         await page.render({canvasContext:ctx, viewport:vp}).promise;
-        const url = c.toDataURL('image/jpeg', q.jpeg);
-        PAGES.push(url);
-        const t = document.createElement('div'); t.className='thumb';
-        t.innerHTML = '<img src="'+url+'"><span>'+p+'</span>';
-        $('thumbs').appendChild(t);
+        const url = c.toDataURL('image/jpeg', q); PDF_PAGES.push(url);
+        const t = document.createElement('div'); t.style.width = '52px';
+        t.innerHTML = '<img src="'+url+'" style="width:100%;border:1px solid var(--line);border-radius:4px;display:block">';
+        $('pdfThumbs').appendChild(t);
       }
-      $('loadStatus').innerHTML = '<b style="color:var(--ok)">'+PAGES.length+' page'+(PAGES.length>1?'s':'')+' ready.</b> Edit details, then build the preview.';
-      $('previewBtn').disabled = false; $('downloadBtn').disabled = false;
-    }catch(err){
-      console.error(err);
-      $('loadStatus').innerHTML = '<b style="color:var(--bad)">Could not read that PDF.</b> Try re-saving it or another file.';
-    }
+      $('pdfOutWrap').style.display = 'block';
+      setStatus('pdfStatus', PDF_PAGES.length+' page'+(PDF_PAGES.length>1?'s':'')+' ready.', 'var(--ok)');
+    }catch(err){ console.error(err); setStatus('pdfStatus','Could not read that PDF.','var(--bad)'); }
   }
 
-  // ---------- collect values ----------
-  function vals(){
-    return {
-      brandMain:$('brandMain').value, brandSmall:$('brandSmall').value,
-      heroEyebrow:$('heroEyebrow').value, heroTitle:$('heroTitle').value, heroLoc:$('heroLoc').value,
-      ctaLabel:$('ctaLabel').value, ctaHref:$('ctaHref').value,
-      titleMeta:$('titleMeta').value, descMeta:$('descMeta').value,
-      contactEyebrow:$('contactEyebrow').value, contactBy:$('contactBy').value,
-      agentName:$('agentName').value, agentDesig:$('agentDesig').value, agentRole:$('agentRole').value, agentFirm:$('agentFirm').value,
-      tel:$('tel').value, email:$('email').value, website:$('website').value, disclaimer:$('disclaimer').value,
-      stats:getStats(), altBase:$('brandMain').value || 'Listing'
-    };
+  function buildPdfHTML(){
+    const plates = PDF_PAGES.map((src,i)=>'<img class="pg" loading="lazy" src="'+src+'" alt="page '+(i+1)+'">').join('\n');
+    return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>'+escHtmlText(PDF_NAME)+'</title>\n'
+      + '<style>body{margin:0;background:#3a3f47;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}'
+      + '.doc{max-width:920px;margin:0 auto;padding:28px 16px;}'
+      + '.pg{display:block;width:100%;height:auto;margin:0 auto 20px;box-shadow:0 8px 30px rgba(0,0,0,.4);border-radius:2px;background:#fff;}'
+      + '.ft{color:#aeb4be;font-size:12px;text-align:center;padding:6px 0 34px;letter-spacing:.04em;}</style>\n</head>\n<body>\n'
+      + '<div class="doc">\n' + plates + '\n<div class="ft">'+escHtmlText(PDF_NAME)+'</div>\n</div>\n</body>\n</html>';
   }
-
-  // ---------- build the offering HTML ----------
-  function buildHTML(){
-    const v = vals();
-    const stats = v.stats.map(s => `<div class="s"><div class="n">${esc(s.n)}</div><div class="l">${esc(s.l)}</div></div>`).join('\n      ');
-    const plates = PAGES.map((src,i) => `      <figure class="plate" data-reveal><img loading="lazy" src="${src}" alt="${esc(v.altBase)} — page ${i+1}"></figure>`).join('\n');
-    const telHref = (v.tel||'').replace(/[^+\d]/g,'');
-    const webHref = /^https?:\/\//i.test(v.website) ? v.website : ('https://' + v.website.replace(/^\/+/,''));
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${esc(v.titleMeta)}</title>
-<meta name="description" content="${esc(v.descMeta)}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-${OUTPUT_CSS}
-</style>
-</head>
-<body>
-  <header>
-    <div class="brand">${esc(v.brandMain)}<small>${esc(v.brandSmall)}</small></div>
-    <a class="cta" href="${esc(v.ctaHref)}">${esc(v.ctaLabel)}</a>
-  </header>
-
-  <section class="hero">
-    <div class="eyebrow">${esc(v.heroEyebrow)}</div>
-    <h1>${esc(v.heroTitle)}</h1>
-    <div class="loc">${esc(v.heroLoc)}</div>
-    <div class="stats">
-      ${stats}
-    </div>
-    <div class="rule"></div>
-  </section>
-
-  <main class="gallery">
-${plates}
-  </main>
-
-  <footer id="contact">
-    <div class="eyebrow">${esc(v.contactEyebrow)}</div>
-    <div class="by">${esc(v.contactBy)}</div>
-    <div class="name">${esc(v.agentName)}</div>
-    <div class="desig">${esc(v.agentDesig)}</div>
-    <div class="role">${esc(v.agentRole)}</div>
-    <div class="firm">${esc(v.agentFirm)}</div>
-    <div class="contacts">
-      <a href="tel:${esc(telHref)}"><span class="k">Direct</span>${esc(v.tel)}</a>
-      <a href="mailto:${esc(v.email)}"><span class="k">Email</span>${esc(v.email)}</a>
-      <a href="${esc(webHref)}" target="_blank" rel="noopener"><span class="k">Website</span>${esc(v.website)}</a>
-    </div>
-    <div class="disclaimer">${esc(v.disclaimer)}</div>
-  </footer>
-
-  <script>
-    const io = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
-    }, { threshold:0.12 });
-    document.querySelectorAll('[data-reveal]').forEach(el=>io.observe(el));
-  <\/script>
-</body>
-</html>`;
-  }
-
-  function fmtSize(bytes){ return bytes > 1048576 ? (bytes/1048576).toFixed(1)+' MB' : Math.round(bytes/1024)+' KB'; }
-
-  $('previewBtn').onclick = () => {
-    if(!PAGES.length){ $('genStatus').innerHTML='<b style="color:var(--bad)">Add a PDF first.</b>'; return; }
-    const html = buildHTML();
-    if(lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
-    lastBlobUrl = URL.createObjectURL(new Blob([html], {type:'text/html'}));
-    $('empty').style.display='none';
-    const f = $('preview'); f.style.display='block'; f.src = lastBlobUrl;
-    $('sizeTag').textContent = fmtSize(new Blob([html]).size) + ' · ' + PAGES.length + ' pages';
-    $('genStatus').innerHTML = '<b style="color:var(--ok)">Preview built.</b> Scroll inside it, then download.';
+  window.pdfDownloadHTML = function(){
+    if(!PDF_PAGES.length){ setStatus('pdfStatus','Load a PDF first.','var(--bad)'); return; }
+    const u = URL.createObjectURL(new Blob([buildPdfHTML()], {type:'text/html'}));
+    dl(u, PDF_NAME+'.html'); setTimeout(()=>URL.revokeObjectURL(u), 3000);
+    setStatus('pdfStatus','Downloaded '+PDF_NAME+'.html','var(--ok)');
+  };
+  window.pdfPreviewHTML = function(){
+    if(!PDF_PAGES.length){ setStatus('pdfStatus','Load a PDF first.','var(--bad)'); return; }
+    const u = URL.createObjectURL(new Blob([buildPdfHTML()], {type:'text/html'})); window.open(u, '_blank');
+    setStatus('pdfStatus','Opened a preview in a new tab.','var(--ok)');
+  };
+  window.pdfDownloadJPGs = function(){
+    if(!PDF_PAGES.length){ setStatus('pdfStatus','Load a PDF first.','var(--bad)'); return; }
+    PDF_PAGES.forEach((u,i)=>{ setTimeout(()=>dl(u, PDF_NAME+'-page-'+String(i+1).padStart(2,'0')+'.jpg'), i*250); });
+    setStatus('pdfStatus','Downloading '+PDF_PAGES.length+' JPG'+(PDF_PAGES.length>1?'s':'')+' (allow multiple downloads)\u2026','var(--ok)');
   };
 
-  $('downloadBtn').onclick = () => {
-    if(!PAGES.length){ $('genStatus').innerHTML='<b style="color:var(--bad)">Add a PDF first.</b>'; return; }
-    const html = buildHTML();
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([html], {type:'text/html'}));
-    a.download = (slugify($('slug').value) || 'offering') + '.html';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
-    $('genStatus').innerHTML = '<b style="color:var(--ok)">Downloaded '+esc(a.download)+'.</b> Drop it in a folder or upload it anywhere.';
-  };
+  window.addEventListener('load', function(){ if(typeof QRCode !== 'undefined') makeQR(); });
 </script>
 </body>
 </html>
