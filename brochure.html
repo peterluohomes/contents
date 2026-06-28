@@ -732,6 +732,8 @@
     <button class="matrix-btn" onclick="openVideoModal()">🎬 Video</button>
     <button class="print" onclick="exportCompressedPDF()">Compressed PDF</button>
     <button class="print" onclick="window.print()">Export PDF</button>
+    <button class="print" onclick="exportPageJPGs()">🖼 Page JPGs</button>
+    <button class="print" onclick="openWebExport()" style="background:#0E1C38;color:#f3ede1;border:1px solid #c8a45a;">🌐 Web page</button>
   </div>
   <span class="hint">Click images to upload · Click any text to edit</span>
   <div class="propbar">
@@ -756,7 +758,50 @@
   </div>
 </div>
 
-<div id="storageWarning" style="display:none; background:#7a1f1f; color:#fff; font-family:'DM Sans',sans-serif; font-size:13px; line-height:1.5; padding:12px 20px; text-align:center;">
+<!-- ===== Web page (shareable HTML) export modal ===== -->
+<div id="webExportModal" style="display:none; position:fixed; inset:0; z-index:10001; background:rgba(8,15,30,.86); font-family:'DM Sans',sans-serif; overflow:auto;">
+  <div style="max-width:560px; margin:5vh auto; background:#0f1830; color:#f3ede1; border:1px solid #2a3a5c; border-radius:14px; padding:22px 24px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+      <div style="font-family:'Playfair Display',serif; font-style:italic; font-size:20px;">Share as a web page</div>
+      <button onclick="closeWebExport()" style="background:none; border:none; color:#8a93a8; font-size:22px; cursor:pointer; line-height:1;">×</button>
+    </div>
+    <div style="font-size:12px; color:#9fb0c0; margin-bottom:16px;">Turns the brochure into a single self-contained HTML page — hero, stats and contact auto-filled from this brochure, each chosen page as an image plate.</div>
+
+    <div style="font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#c8a45a; margin-bottom:8px;">Pages to include
+      <button type="button" onclick="webPickAll(true)" style="float:right; margin-left:8px; font:600 10px/1 'DM Sans'; color:#d3b25a; background:none; border:1px solid #2a3a5c; border-radius:5px; padding:4px 8px; cursor:pointer;">All</button>
+      <button type="button" onclick="webPickAll(false)" style="float:right; font:600 10px/1 'DM Sans'; color:#9fb0c0; background:none; border:1px solid #2a3a5c; border-radius:5px; padding:4px 8px; cursor:pointer;">None</button>
+    </div>
+    <div id="webPages" style="max-height:200px; overflow:auto; border:1px solid #2a3a5c; border-radius:9px; padding:8px 10px; margin-bottom:16px; background:#16243f;"></div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+      <label style="font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8a93a8;">Hero eyebrow
+        <input id="webEyebrow" style="display:block; width:100%; margin-top:4px; background:#16243f; color:#f3ede1; border:1px solid #2a3a5c; border-radius:7px; padding:7px 9px; font-size:13px;">
+      </label>
+      <label style="font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8a93a8;">Location line
+        <input id="webLoc" style="display:block; width:100%; margin-top:4px; background:#16243f; color:#f3ede1; border:1px solid #2a3a5c; border-radius:7px; padding:7px 9px; font-size:13px;">
+      </label>
+      <label style="font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8a93a8;">CTA label
+        <input id="webCtaLabel" value="Book a Viewing" style="display:block; width:100%; margin-top:4px; background:#16243f; color:#f3ede1; border:1px solid #2a3a5c; border-radius:7px; padding:7px 9px; font-size:13px;">
+      </label>
+      <label style="font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8a93a8;">CTA link
+        <input id="webCtaHref" value="#contact" style="display:block; width:100%; margin-top:4px; background:#16243f; color:#f3ede1; border:1px solid #2a3a5c; border-radius:7px; padding:7px 9px; font-size:13px;">
+      </label>
+      <label style="font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8a93a8; grid-column:1 / -1;">Image quality
+        <select id="webQuality" style="display:block; width:100%; margin-top:4px; background:#16243f; color:#f3ede1; border:1px solid #2a3a5c; border-radius:7px; padding:7px 9px; font-size:13px;">
+          <option value="std" selected>Standard — smaller file</option>
+          <option value="high">High — sharper, larger file</option>
+        </select>
+      </label>
+    </div>
+
+    <div style="display:flex; gap:10px;">
+      <button onclick="webBuild()" style="flex:1; background:#16243f; color:#f3ede1; border:1px solid #c8a45a; border-radius:9px; padding:11px; font:600 13px/1 'DM Sans'; cursor:pointer;">↻ Build &amp; preview</button>
+      <button onclick="webDownload()" style="flex:1; background:#c8a45a; color:#0f1830; border:none; border-radius:9px; padding:11px; font:600 13px/1 'DM Sans'; cursor:pointer;">⤓ Download HTML</button>
+    </div>
+    <div id="webStatus" style="font-size:12px; color:#9fb0c0; margin-top:12px; min-height:16px;"></div>
+  </div>
+</div>
+
   <strong>Saving is OFF in this view.</strong>
   <span id="storageWarningDetail"></span>
 </div>
@@ -2227,6 +2272,7 @@ async function exportCompressedPDF() {
     const scale = perPageKB > 300 ? 2.2 : perPageKB > 150 ? 1.8 : perPageKB > 80 ? 1.5 : 1.2;
 
     // 1) Render each visible page to a canvas (the expensive step).
+    if (window.__reapplyXf) window.__reapplyXf();
     const canvases = [];
     for (let i = 0; i < pages.length; i++) {
       pdfProgress('Rendering page ' + (i + 1) + ' of ' + pages.length + '\u2026', 5 + (i / pages.length) * 70);
@@ -2279,6 +2325,38 @@ async function exportCompressedPDF() {
     console.warn('Compressed PDF failed:', err);
     alert('Could not build the compressed PDF: ' + err.message +
       '\n\nIf you are offline, the compressor needs a connection the first time (it loads a small library). The plain "Export PDF" button works offline.');
+  }
+}
+
+async function exportPageJPGs() {
+  const pages = [...document.querySelectorAll('.page')].filter(p => getComputedStyle(p).display !== 'none');
+  if (!pages.length) { alert('No pages to export.'); return; }
+  try {
+    pdfProgress('Loading tools\u2026', 2);
+    await ensurePdfLibs();
+    if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+    const cur = (typeof loadProps === 'function') ? loadProps().find(p => p.id === getCurrentId()) : null;
+    const base = (cur && cur.name ? cur.name : 'brochure').replace(/[^\w\-]+/g, '_').slice(0, 60);
+    const pad = n => String(n).padStart(2, '0');
+    if (window.__reapplyXf) window.__reapplyXf();
+    for (let i = 0; i < pages.length; i++) {
+      pdfProgress('Exporting page ' + (i + 1) + ' of ' + pages.length + '\u2026', 5 + (i / pages.length) * 92);
+      const c = await window.html2canvas(pages[i], {
+        scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false,
+        windowWidth: pages[i].scrollWidth, windowHeight: pages[i].scrollHeight,
+      });
+      const data = c.toDataURL('image/jpeg', 0.92);
+      const a = document.createElement('a');
+      a.href = data; a.download = base + '-page-' + pad(i + 1) + '.jpg';
+      document.body.appendChild(a); a.click(); a.remove();
+      await new Promise(r => setTimeout(r, 250)); // let each download start
+    }
+    pdfProgressDone();
+    flashStatus(pages.length + ' page JPG' + (pages.length > 1 ? 's' : '') + ' exported');
+  } catch (err) {
+    pdfProgressDone();
+    console.warn('JPG export failed:', err);
+    alert('Could not export JPGs: ' + err.message + '\n\n(The renderer needs a connection the first time it loads.)');
   }
 }
 
@@ -2545,10 +2623,15 @@ window.addEventListener('beforeunload', () => {
 })();
 </script>
 <script>
-/* ===== Image placement: zoom / pan / fit-vs-fill (exports via html2canvas, persists in localStorage) ===== */
+/* ===== Image placement: zoom / pan / fit-vs-fill — rendered via background-image so it survives html2canvas (PDF / JPG / web export) ===== */
 (function(){
+  // hide the placeholder once a photo is framed
+  var st = document.createElement('style');
+  st.textContent = '.img.xf-bg::after{display:none !important;}';
+  document.head.appendChild(st);
+
   function xfKey(box){ try { return 'bxf:' + (typeof pkey==='function' ? pkey(box.dataset.photoId) : box.dataset.photoId); } catch(e){ return 'bxf:'+box.dataset.photoId; } }
-  function defXf(){ return { zoom:1, panX:0, panY:0, fit:'cover' }; }
+  function defXf(){ return { zoom:1, panX:0, panY:0, fit:'cover' }; }   // panX/panY are pixel offsets from centre
   function getXf(box){ try { var s=localStorage.getItem(xfKey(box)); return s ? JSON.parse(s) : defXf(); } catch(e){ return defXf(); } }
   function saveXf(box, t){ try { localStorage.setItem(xfKey(box), JSON.stringify(t)); } catch(e){} }
   function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
@@ -2556,10 +2639,33 @@ window.addEventListener('beforeunload', () => {
   function applyXf(box){
     var img = box.querySelector('img'); if(!img) return;
     var t = box._xf || (box._xf = getXf(box));
-    img.style.objectFit = t.fit || 'cover';
-    img.style.objectPosition = (50 + (t.panX||0)) + '% ' + (50 + (t.panY||0)) + '%';
-    img.style.transform = 'scale(' + (t.zoom||1) + ')';
-    img.style.transformOrigin = 'center center';
+    var iw = img.naturalWidth, ih = img.naturalHeight;
+    var r = box.getBoundingClientRect(), W = r.width, H = r.height;
+    if(!iw || !ih || !W || !H) return;                       // not measurable yet
+    var coverS = Math.max(W/iw, H/ih), containS = Math.min(W/iw, H/ih);
+    var base = (t.fit==='contain') ? containS : coverS;
+    var s = base * (t.zoom || 1);
+    var bw = iw*s, bh = ih*s;
+    var px = (W - bw)/2 + (t.panX || 0);
+    var py = (H - bh)/2 + (t.panY || 0);
+    if(t.fit !== 'contain'){                                 // keep the frame fully covered
+      px = (bw > W) ? clamp(px, W - bw, 0) : (W - bw)/2;
+      py = (bh > H) ? clamp(py, H - bh, 0) : (H - bh)/2;
+      t.panX = px - (W - bw)/2;                              // write back the clamped pan
+      t.panY = py - (H - bh)/2;
+    } else { px = (W - bw)/2; py = (H - bh)/2; t.panX = 0; t.panY = 0; }
+    // position the real <img> (html2canvas renders this reliably — no transform / object-position)
+    img.style.position  = 'absolute';
+    img.style.width     = bw.toFixed(1) + 'px';
+    img.style.height    = bh.toFixed(1) + 'px';
+    img.style.left      = px.toFixed(1) + 'px';
+    img.style.top       = py.toFixed(1) + 'px';
+    img.style.maxWidth  = 'none';
+    img.style.maxHeight = 'none';
+    img.style.objectFit = 'fill';                            // box matches the scaled aspect, so no distortion
+    img.style.objectPosition = '';
+    img.style.transform = '';
+    box.classList.add('xf-bg');
   }
 
   function ensureTools(box){
@@ -2569,10 +2675,10 @@ window.addEventListener('beforeunload', () => {
       '<button data-it="fit" title="Fill (crop) vs Fit (whole photo)">Fill</button>' +
       '<button data-it="reset" title="Reset zoom &amp; position">Reset</button>' +
       '<button data-it="replace" title="Replace photo">Replace</button>';
-    box.appendChild(bar);
     var hint = document.createElement('div'); hint.className = 'img-hint';
     hint.textContent = 'drag to pan · scroll to zoom';
-    box.appendChild(hint);
+    box.insertBefore(hint, box.firstChild);                 // before <img> so the "loaded ~ *" rule can't hide them
+    box.insertBefore(bar, box.firstChild);
     bar.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
     bar.addEventListener('click', function(e){
       var it = e.target.getAttribute('data-it'); if(!it) return;
@@ -2595,15 +2701,26 @@ window.addEventListener('beforeunload', () => {
     var img = box.querySelector('img'); if(!img || !img.classList.contains('loaded')) return;
     box._xf = getXf(box);
     box.classList.add('xf-on');
-    var inp = box.querySelector('input[type=file]'); if(inp) inp.style.pointerEvents = 'none'; // free the slot for dragging
+    var inp = box.querySelector('input[type=file]'); if(inp) inp.style.pointerEvents = 'none';
     ensureTools(box);
-    applyXf(box);
+    if(img.naturalWidth && img.naturalHeight) applyXf(box);
+    else img.addEventListener('load', function(){ applyXf(box); }, { once:true });
   }
+
+  // re-apply to every loaded photo on visible pages (call before exporting / after layout changes)
+  window.__reapplyXf = function(){
+    document.querySelectorAll('.img.xf-on').forEach(function(b){ try { applyXf(b); } catch(e){} });
+  };
 
   // hook the single choke-point both load & restore use
   if(typeof window.setImageFromBlob === 'function'){
     var _orig = window.setImageFromBlob;
     window.setImageFromBlob = function(box, blob){ _orig(box, blob); try { enhance(box); } catch(e){} };
+  }
+  // re-apply after a page-count / template switch (newly-shown pages can now be measured)
+  if(typeof window.setTemplate === 'function'){
+    var _st = window.setTemplate;
+    window.setTemplate = function(){ var r = _st.apply(this, arguments); setTimeout(window.__reapplyXf, 60); return r; };
   }
   window.addEventListener('load', function(){
     setTimeout(function(){ document.querySelectorAll('.img').forEach(function(b){ try { enhance(b); } catch(e){} }); }, 400);
@@ -2615,23 +2732,21 @@ window.addEventListener('beforeunload', () => {
     var box = e.target.closest && e.target.closest('.img.xf-on'); if(!box) return;
     if(e.target.closest('.img-tools')) return;
     var img = box.querySelector('img'); if(!img || !img.classList.contains('loaded')) return;
-    var r = box.getBoundingClientRect();
-    drag = { box:box, lastX:e.clientX, lastY:e.clientY, w:r.width, h:r.height, moved:false };
+    drag = { box:box, lastX:e.clientX, lastY:e.clientY, moved:false };
   });
   document.addEventListener('pointermove', function(e){
     if(!drag) return;
     var t = drag.box._xf || (drag.box._xf = getXf(drag.box));
-    var dx = (e.clientX - drag.lastX) / drag.w * 100;
-    var dy = (e.clientY - drag.lastY) / drag.h * 100;
+    var dx = e.clientX - drag.lastX, dy = e.clientY - drag.lastY;
     drag.lastX = e.clientX; drag.lastY = e.clientY;
-    if(Math.abs(dx)>0.1 || Math.abs(dy)>0.1) drag.moved = true;
-    t.panX = clamp((t.panX||0) - dx, -50, 50);
-    t.panY = clamp((t.panY||0) - dy, -50, 50);
-    applyXf(drag.box);
+    if(Math.abs(dx)>0.5 || Math.abs(dy)>0.5) drag.moved = true;
+    t.panX = (t.panX || 0) + dx;
+    t.panY = (t.panY || 0) + dy;
+    applyXf(drag.box);                                       // clamps + writes back
     e.preventDefault();
   });
   document.addEventListener('pointerup', function(){
-    if(drag && drag.moved){ saveXf(drag.box, drag.box._xf); }
+    if(drag && drag.moved) saveXf(drag.box, drag.box._xf);
     drag = null;
   });
 
@@ -2643,11 +2758,269 @@ window.addEventListener('beforeunload', () => {
     e.preventDefault();
     var t = box._xf || (box._xf = getXf(box));
     var f = e.deltaY < 0 ? 1.08 : 0.926;
-    t.zoom = clamp((t.zoom||1) * f, 1, 4);
+    t.zoom = clamp((t.zoom || 1) * f, 1, 4);
     applyXf(box);
     clearTimeout(zsave[box.dataset.photoId]);
     zsave[box.dataset.photoId] = setTimeout(function(){ saveXf(box, t); }, 350);
   }, { passive:false });
+})();
+</script>
+<script>
+/* ===== Brochure → shareable offering web page ===== */
+(function(){
+  const OFFER_CSS = `  :root {
+    --navy:#0b1622; --navy-soft:#102234; --gold:#c8a45a; --gold-bright:#d8bd7e;
+    --cream:#f3ede1; --muted:#9fb0c0; --line:rgba(200,164,90,.28);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:'DM Sans',sans-serif; color:var(--cream); background:var(--navy);
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(200,164,90,.10), transparent 45%),
+      radial-gradient(circle at 85% 100%, rgba(30,70,110,.30), transparent 50%);
+    background-attachment:fixed; -webkit-font-smoothing:antialiased; line-height:1.7;
+  }
+  /* sticky header */
+  header {
+    position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
+    padding:14px clamp(18px,5vw,48px); backdrop-filter:blur(10px);
+    background:rgba(11,22,34,.72); border-bottom:1px solid var(--line);
+  }
+  .brand { font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(15px,2.2vw,19px); letter-spacing:.02em; }
+  .brand small { display:block; font-family:'DM Sans',sans-serif; font-style:normal; font-size:9.5px; letter-spacing:.34em; color:var(--gold); text-transform:uppercase; margin-top:2px; }
+  .cta {
+    font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--navy);
+    background:var(--gold); padding:11px 20px; border-radius:2px; text-decoration:none;
+    transition:.25s; white-space:nowrap; font-weight:500;
+  }
+  .cta:hover { background:var(--gold-bright); transform:translateY(-1px); }
+  /* hero */
+  .hero { text-align:center; padding:clamp(64px,12vw,140px) 24px clamp(40px,7vw,72px); }
+  .hero .eyebrow { font-size:11px; letter-spacing:.42em; text-transform:uppercase; color:var(--gold); margin-bottom:26px; }
+  .hero h1 { font-family:'Playfair Display',serif; font-style:italic; font-weight:400; font-size:clamp(38px,8vw,82px); line-height:1.05; letter-spacing:.01em; }
+  .hero .loc { font-size:12px; letter-spacing:.34em; text-transform:uppercase; color:var(--muted); margin-top:20px; }
+  .stats { display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(20px,6vw,64px); margin-top:46px; }
+  .stats .s { min-width:64px; }
+  .stats .n { font-family:'Playfair Display',serif; font-size:clamp(24px,4vw,34px); color:var(--cream); }
+  .stats .l { font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--gold); margin-top:6px; }
+  .rule { width:54px; height:1px; background:var(--gold); margin:40px auto 0; opacity:.8; }
+  /* plates */
+  .gallery { max-width:920px; margin:0 auto; padding:clamp(30px,6vw,60px) clamp(14px,4vw,28px) 20px; display:flex; flex-direction:column; gap:clamp(26px,5vw,54px); }
+  .plate { opacity:0; transform:translateY(26px); transition:opacity .9s ease, transform .9s ease; }
+  .plate.in { opacity:1; transform:none; }
+  .plate img { width:100%; height:auto; display:block; border:1px solid var(--line); border-radius:3px;
+    box-shadow:0 24px 60px rgba(0,0,0,.5); }
+  /* contact */
+  #contact { margin-top:clamp(50px,9vw,90px); padding:clamp(56px,10vw,96px) 24px clamp(40px,7vw,64px);
+    border-top:1px solid var(--line); text-align:center;
+    background:linear-gradient(180deg, transparent, rgba(8,16,25,.85)); }
+  #contact .eyebrow { font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(26px,5vw,40px); }
+  #contact .by { font-size:11px; letter-spacing:.32em; text-transform:uppercase; color:var(--gold); margin-top:12px; }
+  .name { font-family:'Playfair Display',serif; font-size:30px; margin-top:38px; }
+  .desig { font-size:11px; letter-spacing:.3em; color:var(--gold); margin-top:8px; }
+  .role { font-size:11px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); margin-top:22px; }
+  .firm { font-family:'Playfair Display',serif; font-style:italic; font-size:16px; margin-top:8px; color:var(--cream); }
+  .contacts { display:flex; flex-wrap:wrap; justify-content:center; gap:14px 34px; margin-top:30px; }
+  .contacts a { color:var(--cream); text-decoration:none; font-size:14px; letter-spacing:.03em; border-bottom:1px solid transparent; transition:.2s; }
+  .contacts a:hover { color:var(--gold-bright); border-color:var(--gold); }
+  .contacts .k { display:block; font-size:9.5px; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); margin-bottom:5px; }
+  .disclaimer { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); opacity:.65; margin-top:48px; line-height:2; }`;
+  let WEB_PAGES = [];   // {el, label}
+  let lastWebUrl = null;
+
+  function escH(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function slug(s){ return (s||'').toLowerCase().split(',')[0].trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+  function txt(sel){ const e=document.querySelector(sel); return e ? (e.innerText||e.textContent||'').trim() : ''; }
+
+  const TYPE_LABEL = {
+    'cover':'Cover','title-page':'Title','four-vertical-page':'Gallery','cream-page':'Statement',
+    'agent-page':'Agent','letter-page':'Letter','heritage-page':'Heritage','floorplan-page':'Floor Plan',
+    'schools-page':'Schools','designer-page':'Designer','day-night-page':'Day / Night',
+    'highlights-page':'Highlights','gratitude-page':'Thank You'
+  };
+  function pageLabel(el){
+    for(const k in TYPE_LABEL){ if(el.classList.contains(k)) return TYPE_LABEL[k]; }
+    if(el.querySelector('.img') && el.children.length<=2) return 'Photo';
+    return 'Page';
+  }
+
+  window.openWebExport = function(){
+    const pages = [...document.querySelectorAll('.page')].filter(p => getComputedStyle(p).display !== 'none');
+    WEB_PAGES = pages.map(el => ({ el, label: pageLabel(el) }));
+    const host = document.getElementById('webPages'); host.innerHTML = '';
+    WEB_PAGES.forEach((p,i) => {
+      const isAgent = p.el.classList.contains('agent-page'); // contact footer usually covers this
+      const row = document.createElement('label');
+      row.style.cssText = 'display:flex; align-items:center; gap:9px; padding:5px 2px; font-size:13px; cursor:pointer;';
+      row.innerHTML = '<input type="checkbox" data-i="'+i+'" '+(isAgent?'':'checked')+' style="accent-color:#c8a45a; width:15px; height:15px;">'
+        + '<span style="color:#c8a45a; font-size:10px; letter-spacing:.04em; width:34px;">Pg '+(i+1)+'</span>'
+        + '<span>'+escH(p.label)+'</span>';
+      host.appendChild(row);
+    });
+    // auto-fill hero bits
+    document.getElementById('webEyebrow').value = txt('.title-page .vivid-label') || 'The Collector Edition · Vol. I';
+    document.getElementById('webLoc').value = txt('.cover .city') || '';
+    document.getElementById('webStatus').textContent = '';
+    document.getElementById('webExportModal').style.display = 'block';
+  };
+  window.closeWebExport = function(){ document.getElementById('webExportModal').style.display = 'none'; };
+  window.webPickAll = function(on){ document.querySelectorAll('#webPages input[type=checkbox]').forEach(c => c.checked = on); };
+
+  function selectedPages(){
+    const out = [];
+    document.querySelectorAll('#webPages input[type=checkbox]').forEach(c => { if(c.checked) out.push(WEB_PAGES[+c.dataset.i].el); });
+    return out;
+  }
+
+  function gatherVals(){
+    const addr = txt('.cover .address') || txt('.title-page h1') || 'Private Offering';
+    const heroTitle = txt('.title-page h1') || addr;
+    // stats: unique label/value pairs from the brochure's stat blocks
+    const seen = {}, stats = [];
+    document.querySelectorAll('.stat').forEach(s => {
+      const l = (s.querySelector('.lbl')||{}).textContent || '';
+      const v = (s.querySelector('.val')||{}).textContent || '';
+      const L = l.trim(), V = v.trim();
+      if((L||V) && !seen[L.toLowerCase()]){ seen[L.toLowerCase()] = 1; stats.push({n:V, l:L}); }
+    });
+    return {
+      brandMain: addr,
+      brandSmall: 'A Private Offering',
+      heroEyebrow: document.getElementById('webEyebrow').value || 'A Private Offering',
+      heroTitle,
+      heroLoc: document.getElementById('webLoc').value || txt('.cover .city'),
+      ctaLabel: document.getElementById('webCtaLabel').value || 'Book a Viewing',
+      ctaHref: document.getElementById('webCtaHref').value || '#contact',
+      titleMeta: addr + ' · A Private Offering',
+      descMeta: txt('.title-page .pullquote') || (heroTitle + ' — ' + addr + '. Exclusively presented.'),
+      stats: stats.slice(0,5),
+      altBase: addr,
+      // constant contact block
+      contactEyebrow: 'Exclusively Presented',
+      contactBy: '— By Appointment Only —',
+      agentName: 'Peter Luo',
+      agentDesig: 'SRS · MCNE',
+      agentRole: 'Broker · Pinnacle Listing System',
+      agentFirm: 'RE/MAX Realtron Realty Inc., Brokerage',
+      tel: '+1 (647) 824-3718',
+      email: 'peterluo@peterluo.com',
+      website: 'www.peterluo.com',
+      disclaimer: 'All information deemed reliable but not guaranteed · Not intended to solicit clients under contract'
+    };
+  }
+
+  function buildOffering(images, v){
+    const stats = v.stats.map(s => `<div class="s"><div class="n">${escH(s.n)}</div><div class="l">${escH(s.l)}</div></div>`).join('\n      ');
+    const plates = images.map((src,i) => `      <figure class="plate" data-reveal><img loading="lazy" src="${src}" alt="${escH(v.altBase)} — page ${i+1}"></figure>`).join('\n');
+    const telHref = (v.tel||'').replace(/[^+\d]/g,'');
+    const webHref = /^https?:\/\//i.test(v.website) ? v.website : ('https://' + v.website.replace(/^\/+/,''));
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escH(v.titleMeta)}</title>
+<meta name="description" content="${escH(v.descMeta)}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+${OFFER_CSS}
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">${escH(v.brandMain)}<small>${escH(v.brandSmall)}</small></div>
+    <a class="cta" href="${escH(v.ctaHref)}">${escH(v.ctaLabel)}</a>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">${escH(v.heroEyebrow)}</div>
+    <h1>${escH(v.heroTitle)}</h1>
+    <div class="loc">${escH(v.heroLoc)}</div>
+    <div class="stats">
+      ${stats}
+    </div>
+    <div class="rule"></div>
+  </section>
+
+  <main class="gallery">
+${plates}
+  </main>
+
+  <footer id="contact">
+    <div class="eyebrow">${escH(v.contactEyebrow)}</div>
+    <div class="by">${escH(v.contactBy)}</div>
+    <div class="name">${escH(v.agentName)}</div>
+    <div class="desig">${escH(v.agentDesig)}</div>
+    <div class="role">${escH(v.agentRole)}</div>
+    <div class="firm">${escH(v.agentFirm)}</div>
+    <div class="contacts">
+      <a href="tel:${escH(telHref)}"><span class="k">Direct</span>${escH(v.tel)}</a>
+      <a href="mailto:${escH(v.email)}"><span class="k">Email</span>${escH(v.email)}</a>
+      <a href="${escH(webHref)}" target="_blank" rel="noopener"><span class="k">Website</span>${escH(v.website)}</a>
+    </div>
+    <div class="disclaimer">${escH(v.disclaimer)}</div>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold:0.12 });
+    document.querySelectorAll('[data-reveal]').forEach(el=>io.observe(el));
+  <\/script>
+</body>
+</html>`;
+  }
+
+  async function renderImages(pages){
+    if(typeof ensurePdfLibs === 'function') await ensurePdfLibs();
+    if(document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
+    const high = document.getElementById('webQuality').value === 'high';
+    const scale = high ? 2.2 : 1.6, q = high ? 0.9 : 0.82;
+    if (window.__reapplyXf) window.__reapplyXf();
+    const imgs = [];
+    for(let i=0;i<pages.length;i++){
+      setWebStatus('Rendering page ' + (i+1) + ' of ' + pages.length + '…');
+      const c = await window.html2canvas(pages[i], { scale, useCORS:true, backgroundColor:'#ffffff', logging:false, windowWidth:pages[i].scrollWidth, windowHeight:pages[i].scrollHeight });
+      imgs.push(c.toDataURL('image/jpeg', q));
+    }
+    return imgs;
+  }
+
+  function setWebStatus(msg, color){ const s=document.getElementById('webStatus'); s.innerHTML = color ? '<b style="color:'+color+'">'+msg+'</b>' : msg; }
+  function fmtSize(b){ return b>1048576 ? (b/1048576).toFixed(1)+' MB' : Math.round(b/1024)+' KB'; }
+
+  async function generate(){
+    const pages = selectedPages();
+    if(!pages.length){ setWebStatus('Tick at least one page.', '#d46a6a'); return null; }
+    const v = gatherVals();
+    const imgs = await renderImages(pages);
+    return buildOffering(imgs, v);
+  }
+
+  window.webBuild = async function(){
+    try{ setWebStatus('Building…'); const html = await generate(); if(!html) return;
+      if(lastWebUrl) URL.revokeObjectURL(lastWebUrl);
+      lastWebUrl = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+      window.open(lastWebUrl, '_blank');
+      setWebStatus('Opened a preview in a new tab · ' + fmtSize(new Blob([html]).size) + '. Download when it looks right.', '#5bbb7b');
+    }catch(e){ console.error(e); setWebStatus('Build failed — see console.', '#d46a6a'); }
+  };
+  window.webDownload = async function(){
+    try{ setWebStatus('Building…'); const html = await generate(); if(!html) return;
+      const v = gatherVals();
+      const cur = (typeof loadProps==='function') ? loadProps().find(p=>p.id===getCurrentId()) : null;
+      const name = slug(v.brandMain) || (cur && cur.name ? slug(cur.name) : 'offering');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+      a.download = name + '.html';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
+      setWebStatus('Downloaded ' + escH(a.download) + ' · ' + fmtSize(new Blob([html]).size) + '.', '#5bbb7b');
+    }catch(e){ console.error(e); setWebStatus('Download failed — see console.', '#d46a6a'); }
+  };
 })();
 </script>
 </body>
