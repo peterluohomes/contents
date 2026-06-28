@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Postcard Back Designer · Peter Luo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Oswald:wght@500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --red:#E4002B; --red-dk:#B8001F; --blue:#003DA5; --blue-br:#1C5FA8;
+    --ink:#14171c; --muted:#6b7280; --line:#e3e6ea; --paper:#fff;
+    --bg:#eef1f4; --panel:#fff; --gold:#b8923a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans','Noto Sans SC',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .app{display:grid;grid-template-columns:380px 1fr;min-height:100vh;}
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;height:100vh;position:sticky;top:0;}
+  .side-head{padding:22px 24px 18px;border-bottom:1px solid var(--line);}
+  .side-head .eyebrow{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--red);font-weight:700;}
+  .side-head h1{font-family:'Playfair Display',serif;font-size:21px;font-weight:600;margin-top:6px;color:var(--ink);}
+  .side-head p{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;}
+  .sect{padding:18px 24px;border-bottom:1px solid var(--line);}
+  .sect-title{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .sect-title::before{content:"";width:14px;height:2px;background:var(--red);}
+
+  .tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .tpl{border:1px solid var(--line);border-radius:7px;padding:7px 6px 6px;background:#fff;cursor:pointer;transition:.15s;text-align:center;}
+  .tpl:hover{border-color:var(--blue-br);}
+  .tpl.active{border-color:var(--red);box-shadow:0 0 0 2px rgba(228,0,43,.15);}
+  .tpl svg{width:100%;height:36px;display:block;}
+  .tpl .tname{font-size:9.5px;color:var(--muted);margin-top:5px;line-height:1.2;font-weight:500;}
+  .tpl.active .tname{color:var(--ink);}
+
+  .btn{font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.02em;border:none;border-radius:6px;padding:10px 16px;cursor:pointer;transition:.15s;}
+  .btn-primary{background:var(--red);color:#fff;}
+  .btn-primary:hover{background:var(--red-dk);}
+  .btn-blue{background:var(--blue);color:#fff;}
+  .btn-blue:hover{background:#002f80;}
+  .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--muted);}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+
+  label.fl{display:block;font-size:11px;color:var(--muted);font-weight:600;margin:12px 0 5px;letter-spacing:.02em;}
+  input.fi,textarea.fi,select.fi{width:100%;font-family:'DM Sans','Noto Sans SC',sans-serif;font-size:13px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:6px;padding:9px 11px;transition:.15s;}
+  input.fi:focus,textarea.fi:focus,select.fi:focus{outline:none;border-color:var(--blue-br);}
+  textarea.fi{resize:vertical;min-height:54px;line-height:1.5;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;margin:10px 0;}
+  .toggle-row span{font-size:12.5px;color:var(--ink);font-weight:500;}
+  .switch{position:relative;width:40px;height:22px;flex:0 0 auto;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;inset:0;background:#cfd5db;border-radius:22px;transition:.2s;cursor:pointer;}
+  .slider::before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;}
+  .switch input:checked + .slider{background:var(--red);}
+  .switch input:checked + .slider::before{transform:translateX(18px);}
+
+  .seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  .seg button{flex:1;border:none;background:#fff;padding:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);}
+  .seg button.on{color:#fff;}
+  .seg button.on.red-on{background:var(--red);}
+  .seg button.on.blue-on{background:var(--blue);}
+
+  /* photo tray */
+  .tray{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px;}
+  .tray .thumb{position:relative;aspect-ratio:3/2;border-radius:5px;background-size:cover;background-position:center;border:1px solid var(--line);}
+  .tray .thumb .rm{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .tray .thumb .ix{position:absolute;bottom:2px;left:3px;font-size:9px;background:rgba(0,0,0,.6);color:#fff;padding:1px 4px;border-radius:3px;}
+  .placement{margin-top:12px;display:grid;gap:7px;}
+  .place-row{display:flex;align-items:center;gap:8px;font-size:11.5px;}
+  .place-row .pl-label{flex:0 0 96px;color:var(--muted);font-weight:600;}
+  .place-row select{flex:1;}
+
+  .prop-card{border:1px solid var(--line);border-radius:7px;padding:12px;margin-bottom:10px;background:#fcfcfd;}
+  .prop-card .pc-head{font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.04em;margin-bottom:8px;text-transform:uppercase;}
+
+  .hint{font-size:11px;color:var(--muted);line-height:1.5;margin-top:8px;}
+
+  /* ---------- Stage ---------- */
+  .stage{padding:36px;display:flex;flex-direction:column;align-items:center;gap:16px;}
+  .stage-bar{width:100%;max-width:1000px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .stage-bar .meta{font-size:12px;color:var(--muted);}
+  #cardScaler{transform-origin:top left;}
+  #card{width:1200px;height:800px;background:#fff;position:relative;overflow:hidden;font-family:'DM Sans','Noto Sans SC',sans-serif;
+        box-shadow:0 12px 40px rgba(20,30,50,.16);-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+  /* card internals */
+  .c-top{height:0;display:flex;flex-direction:column;justify-content:center;padding:0 54px;color:#fff;overflow:hidden;}
+  .c-top.show{height:158px;}
+  .c-top.red-bg{background:linear-gradient(100deg,var(--red),var(--red-dk));}
+  .c-top.blue-bg{background:linear-gradient(100deg,var(--blue),#002f80);}
+  .c-top .c-eyebrow{font-size:16px;letter-spacing:.34em;text-transform:uppercase;font-weight:700;opacity:.92;}
+  .c-top .c-msg{font-family:'Playfair Display','Noto Sans SC',serif;font-size:42px;font-weight:600;line-height:1.08;margin-top:8px;max-width:1000px;}
+
+  .c-content{position:absolute;left:0;right:0;}
+  .slot{position:absolute;background:#dfe3e8 center/cover no-repeat;overflow:hidden;}
+  .slot .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9aa3ad;gap:6px;}
+  .slot .ph svg{width:46px;height:46px;opacity:.55;}
+  .slot .ph span{font-size:14px;font-weight:600;letter-spacing:.04em;}
+
+  .cap{position:absolute;left:0;right:0;bottom:0;padding:14px 18px;color:#fff;background:linear-gradient(transparent,rgba(8,12,20,.82));}
+  .cap.full{padding:20px 22px;}
+  .cap .addr{font-family:'Playfair Display','Noto Sans SC',serif;font-weight:600;line-height:1.15;}
+  .cap.compact .addr{font-size:21px;}
+  .cap.full .addr{font-size:30px;}
+  .cap .price{font-weight:700;color:#fff;}
+  .cap.compact .price{font-size:18px;margin-top:2px;}
+  .cap.full .price{font-size:26px;margin-top:5px;}
+  .cap .specs{font-size:14px;opacity:.9;margin-top:6px;letter-spacing:.02em;font-weight:500;}
+  .cap.compact .specs{font-size:12px;margin-top:3px;}
+
+  .badge{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;padding:5px 11px;border-radius:3px;margin-bottom:8px;}
+  .badge.red{background:var(--red);}
+  .badge.blue{background:var(--blue);}
+  .badge.gold{background:var(--gold);}
+
+  /* panel slot (text block) */
+  .panel{position:absolute;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:26px 28px;border-left:4px solid var(--red);}
+  .panel.blue-acc{border-left-color:var(--blue);}
+  .panel .addr{font-family:'Playfair Display','Noto Sans SC',serif;font-size:30px;font-weight:600;line-height:1.15;color:var(--ink);}
+  .panel .price{font-size:27px;font-weight:700;color:var(--red);margin-top:8px;}
+  .panel.blue-acc .price{color:var(--blue);}
+  .panel .specs{font-size:15px;color:var(--muted);margin-top:10px;font-weight:500;}
+  .panel .pdesc{font-size:14px;color:var(--muted);margin-top:12px;line-height:1.55;}
+
+  /* agent strip */
+  .strip{position:absolute;left:0;right:0;bottom:0;height:110px;background:#fff;border-top:4px solid var(--red);display:flex;align-items:center;padding:0 40px;gap:24px;}
+  .strip.blue-acc{border-top-color:var(--blue);}
+  .strip .s-name{font-family:'Playfair Display',serif;font-size:34px;font-weight:600;line-height:1;}
+  .strip .s-name .r{color:var(--red);} .strip .s-name .b{color:var(--blue);}
+  .strip .s-broker{font-size:12px;color:var(--muted);letter-spacing:.05em;margin-top:3px;}
+  .strip .s-creds{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.14em;margin-top:5px;}
+  .strip .s-divider{width:1px;align-self:stretch;background:var(--line);margin:18px 0;}
+  .strip .s-contact{display:flex;flex-direction:column;gap:2px;}
+  .strip .s-phone{font-family:'Playfair Display',serif;font-size:30px;font-weight:600;color:var(--ink);line-height:1.05;}
+  .strip .s-line{font-size:14px;color:var(--muted);}
+  .strip .s-brand{margin-left:auto;text-align:right;display:flex;align-items:center;gap:14px;}
+  .strip .s-brand img{max-height:80px;max-width:190px;object-fit:contain;}
+  .strip .s-brkblock{text-align:left;max-width:190px;font-size:15px;font-weight:600;color:var(--ink);line-height:1.25;}
+  .strip .s-brkblock.s-brkonly{font-family:'Playfair Display',serif;font-size:18px;}
+
+  /* ---------- showcase designs ---------- */
+  #card .sc-layer{position:absolute;inset:0;font-family:'DM Sans','Noto Sans SC',sans-serif;}
+  .sc-ph{background:#d8dde3 center/cover no-repeat;position:absolute;overflow:hidden;}
+  .sc-ph .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9aa3ad;}
+  .sc-ph .ph svg{width:40px;height:40px;opacity:.5;}
+  .sc-frame{border:8px solid #fff;box-shadow:0 12px 28px rgba(0,0,0,.34);}
+  .sc-cond{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;line-height:.94;}
+  .sc-script{font-family:'Dancing Script',cursive;font-weight:700;line-height:1;}
+  .sc-badge{position:absolute;border-radius:50%;background:#111;color:#fff;display:flex;flex-direction:column;
+            align-items:center;justify-content:center;text-align:center;font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;}
+  .sc-bar{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:24px;padding:0 44px;}
+  .sc-flag{position:absolute;font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;color:#fff;padding:8px 16px;letter-spacing:.06em;}
+  .sc-flag::after{content:"";position:absolute;left:0;top:100%;border-left:14px solid transparent;border-right:14px solid transparent;border-top:12px solid currentColor;}
+  .sc-agentimg{position:absolute;background:#cfd5db center/cover no-repeat;}
+  .sc-crop{position:absolute;width:24px;height:24px;border:2px solid #fff;}
+
+  /* ---------- click-to-edit ---------- */
+  #card [data-edit]{cursor:text;border-radius:3px;transition:box-shadow .12s,background .12s;}
+  #card span[data-edit]{display:inline-block;min-width:6px;}
+  #card [data-edit]:empty::before{content:"\200b";}
+  #card [data-edit]:hover{box-shadow:0 0 0 2px rgba(28,95,168,.6);}
+  #card [data-edit]:focus{outline:none;box-shadow:0 0 0 2px var(--red);background:rgba(120,120,120,.12);}
+  #card [data-photo]{cursor:pointer;}
+  #card [data-photo]::after{content:"";position:absolute;inset:0;background:rgba(18,38,76,0);transition:background .12s;pointer-events:none;z-index:3;}
+  #card [data-photo]:hover::after{background:rgba(18,38,76,.24);}
+  #card .photo-x{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:1px solid rgba(255,255,255,.85);font-size:15px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:6;padding:0;}
+  #card [data-photo]:hover .photo-x{display:flex;}
+  #card .photo-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.62);color:#fff;font-size:13px;font-weight:600;padding:6px 12px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity .12s;z-index:4;white-space:nowrap;}
+  #card [data-photo]:hover .photo-hint{opacity:1;}
+  body.exporting #card [data-edit]{box-shadow:none!important;background:transparent!important;}
+  body.exporting .photo-x,body.exporting .photo-hint{display:none!important;}
+  @media print{.photo-x,.photo-hint{display:none!important;}#card [data-edit]{box-shadow:none!important;background:transparent!important;}}
+
+  @media (max-width:980px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{height:auto;position:static;}
+  }
+  @media print{
+    @page{size:6in 4in;margin:0;}
+    body{background:#fff;}
+    .sidebar,.stage-bar{display:none!important;}
+    .stage{padding:0;}
+    #card{box-shadow:none;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="side-head">
+      <div class="eyebrow">Pinnacle Marketing</div>
+      <h1>Postcard Back Designer</h1>
+      <p>12 brochure layouts for the back of your 6&times;4&Prime; postcard. Pick a layout, drop in photos, edit the details, export.</p>
+      <p style="margin-top:8px;color:var(--blue);font-weight:600;">Tip: click any photo or any line of text directly on the card to change it.</p>
+    </div>
+
+    <div class="sect">
+      <div class="sect-title">Layout</div>
+      <div class="tpl-grid" id="tplGrid"></div>
+    </div>
+
+    <div class="sect">
+      <div class="sect-title">Photos</div>
+      <div class="btn-row">
+        <button class="btn btn-blue" onclick="document.getElementById('photoIn').click()">Add photos</button>
+        <button class="btn btn-ghost" onclick="clearPhotos()">Clear</button>
+      </div>
+      <input type="file" id="photoIn" accept="image/*" multiple style="display:none">
+      <div class="tray" id="tray"></div>
+      <div class="placement" id="placement"></div>
+      <div class="hint" id="photoHint">Photos stay in this browser tab only — export before you close it.</div>
+    </div>
+
+    <div class="sect">
+      <div class="sect-title">Headline band</div>
+      <div class="toggle-row"><span>Show headline band</span>
+        <label class="switch"><input type="checkbox" id="tgHead" checked><span class="slider"></span></label></div>
+      <label class="fl">Eyebrow</label>
+      <input class="fi" id="fEyebrow" value="JUST LISTED IN YOUR NEIGHBOURHOOD">
+      <label class="fl">Message</label>
+      <textarea class="fi" id="fMsg">Thinking of Selling? Find Out What Your Home Is Worth.</textarea>
+    </div>
+
+    <div class="sect">
+      <div class="sect-title">Accent &amp; details</div>
+      <label class="fl">Accent colour</label>
+      <div class="seg" id="accentSeg">
+        <button data-acc="red" class="on red-on">RE/MAX Red</button>
+        <button data-acc="blue">RE/MAX Blue</button>
+      </div>
+      <div class="toggle-row" style="margin-top:14px"><span>Show beds / baths / sqft</span>
+        <label class="switch"><input type="checkbox" id="tgSpecs" checked><span class="slider"></span></label></div>
+    </div>
+
+    <div class="sect">
+      <div class="sect-title">Showcase text · designs 13–24</div>
+      <label class="fl">Big headline (e.g. JUST LISTED / SOLD)</label>
+      <input class="fi" id="fBig" value="JUST LISTED">
+      <label class="fl">Script accent line</label>
+      <input class="fi" id="fScript" value="Just Listed">
+      <label class="fl">Badge / circle text</label>
+      <input class="fi" id="fBadge" value="SOLD OVER ASKING">
+      <label class="fl">Result chips (Sold / Stats designs)</label>
+      <input class="fi" id="fStat0" value="Sold over asking" style="margin-bottom:6px">
+      <input class="fi" id="fStat1" value="Multiple offers" style="margin-bottom:6px">
+      <input class="fi" id="fStat2" value="12 days on market">
+      <div class="row2" style="margin-top:6px">
+        <div><label class="fl">Open house — day</label><input class="fi" id="fODate" value="Saturday &amp; Sunday"></div>
+        <div><label class="fl">Time</label><input class="fi" id="fOTime" value="2:00 – 4:00 PM"></div>
+      </div>
+      <label class="fl">Collage footer line</label>
+      <input class="fi" id="fCollage" value="CALL ME NOW FOR MORE INFORMATION">
+      <div class="hint">The Message field above is reused as the sentence/CTA on designs that have one.</div>
+    </div>
+
+    <div class="sect">
+      <div class="sect-title">Properties</div>
+      <div id="propWrap"></div>
+    </div>
+
+    <div class="sect">
+      <div class="sect-title">Agent strip</div>
+      <label class="fl">Name (Peter / Luo split automatically)</label>
+      <input class="fi" id="aName" value="Peter Luo">
+      <div class="row2">
+        <div><label class="fl">Title</label><input class="fi" id="aBroker" value="Broker"></div>
+        <div><label class="fl">Credentials</label><input class="fi" id="aCreds" value="SRS · MCNE"></div>
+      </div>
+      <label class="fl">Phone</label><input class="fi" id="aPhone" value="647-824-3718">
+      <div class="row2">
+        <div><label class="fl">Email</label><input class="fi" id="aEmail" value="peterluo@peterluo.com"></div>
+        <div><label class="fl">Website</label><input class="fi" id="aWeb" value="www.peterluo.com"></div>
+      </div>
+      <label class="fl">Brokerage name</label><input class="fi" id="aBrk" value="RE/MAX Realtron Realty Inc., Brokerage">
+      <label class="fl">RE/MAX logo (upload the official artwork from the RE/MAX brand centre)</label>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="document.getElementById('logoIn').click()">Upload logo</button>
+        <button class="btn btn-ghost" onclick="removeLogo()">Remove</button>
+      </div>
+      <input type="file" id="logoIn" accept="image/*" style="display:none">
+      <label class="fl">Agent photo (used by Circle / Sell-Yours designs)</label>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="document.getElementById('agentPhotoIn').click()">Upload photo</button>
+        <button class="btn btn-ghost" onclick="ST.agentPhoto=null;render()">Remove</button>
+      </div>
+      <input type="file" id="agentPhotoIn" accept="image/*" style="display:none">
+    </div>
+
+    <div class="sect">
+      <div class="sect-title">Export</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="exportPNG()">Download PNG</button>
+        <button class="btn btn-blue" onclick="downloadPDF()">Download PDF</button>
+        <button class="btn btn-blue" onclick="printPDF()">Print</button>
+      </div>
+      <div class="hint">PNG exports at ~400 DPI (2400&times;1600). For a printer, ask for a 6&times;4&Prime; postcard with 1/8&Prime; bleed.</div>
+    </div>
+  </aside>
+
+  <!-- ===================== STAGE ===================== -->
+  <main class="stage">
+    <div class="stage-bar">
+      <div class="meta" id="stageMeta">Layout 01 · Full-Bleed Hero</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="cycleTpl(-1)">&larr; Prev</button>
+        <button class="btn btn-ghost" onclick="cycleTpl(1)">Next &rarr;</button>
+      </div>
+    </div>
+    <div id="cardScaler"><div id="card"></div></div>
+  </main>
+</div>
+
+<script>
+/* ============================ TEMPLATES ============================
+   Each rect: {x,y,w,h} in % of the content area, role:'photo'|'panel',
+   prop: which property's caption shows here (null = no caption).
+   detail:'full'|'compact' controls caption density.                    */
+const GAP = 1.6;
+const T = [
+  {id:'t1', name:'Full-Bleed Hero', detail:'full', rects:[
+     {x:0,y:0,w:100,h:100,role:'photo',prop:0,cap:'full'} ]},
+  {id:'t2', name:'Hero + Detail Panel', detail:'full', rects:[
+     {x:0,y:0,w:62,h:100,role:'photo',prop:null},
+     {x:62+GAP,y:0,w:38-GAP,h:100,role:'panel',prop:0} ]},
+  {id:'t3', name:'Hero + Three', detail:'full', rects:[
+     {x:0,y:0,w:62,h:100,role:'photo',prop:0,cap:'full'},
+     {x:62+GAP,y:0,w:38-GAP,h:(100-2*GAP)/3,role:'photo',prop:null},
+     {x:62+GAP,y:(100-2*GAP)/3+GAP,w:38-GAP,h:(100-2*GAP)/3,role:'photo',prop:null},
+     {x:62+GAP,y:2*((100-2*GAP)/3+GAP),w:38-GAP,h:(100-2*GAP)/3,role:'photo',prop:null} ]},
+  {id:'t4', name:'Magazine Spread', detail:'full', rects:[
+     {x:0,y:0,w:58,h:100,role:'photo',prop:null},
+     {x:58+GAP,y:0,w:42-GAP,h:(100-2*GAP)/3,role:'photo',prop:null},
+     {x:58+GAP,y:(100-2*GAP)/3+GAP,w:42-GAP,h:(100-2*GAP)/3,role:'photo',prop:null},
+     {x:58+GAP,y:2*((100-2*GAP)/3+GAP),w:42-GAP,h:(100-2*GAP)/3,role:'panel',prop:0} ]},
+  {id:'t5', name:'Duo · Side by Side', detail:'compact', rects:[
+     {x:0,y:0,w:(100-GAP)/2,h:100,role:'photo',prop:0,cap:'compact'},
+     {x:(100-GAP)/2+GAP,y:0,w:(100-GAP)/2,h:100,role:'photo',prop:1,cap:'compact'} ]},
+  {id:'t6', name:'Two Listings · Cards', detail:'compact', rects:[
+     {x:0,y:0,w:(100-GAP)/2,h:(100-GAP)*2/3,role:'photo',prop:0,cap:'none'},
+     {x:0,y:(100-GAP)*2/3+GAP,w:(100-GAP)/2,h:(100-GAP)/3,role:'panel',prop:0,compact:true},
+     {x:(100+GAP)/2,y:0,w:(100-GAP)/2,h:(100-GAP)/3,role:'panel',prop:1,compact:true},
+     {x:(100+GAP)/2,y:(100-GAP)/3+GAP,w:(100-GAP)/2,h:(100-GAP)*2/3,role:'photo',prop:1,cap:'none'} ]},
+  {id:'t7', name:'Trio · Row', detail:'compact', rects:[
+     {x:0,y:0,w:(100-2*GAP)/3,h:100,role:'photo',prop:0,cap:'compact'},
+     {x:(100-2*GAP)/3+GAP,y:0,w:(100-2*GAP)/3,h:100,role:'photo',prop:1,cap:'compact'},
+     {x:2*((100-2*GAP)/3+GAP),y:0,w:(100-2*GAP)/3,h:100,role:'photo',prop:2,cap:'compact'} ]},
+  {id:'t8', name:'Feature + Two', detail:'compact', rects:[
+     {x:0,y:0,w:57,h:100,role:'photo',prop:0,cap:'compact'},
+     {x:57+GAP,y:0,w:43-GAP,h:(100-GAP)/2,role:'photo',prop:1,cap:'compact'},
+     {x:57+GAP,y:(100-GAP)/2+GAP,w:43-GAP,h:(100-GAP)/2,role:'photo',prop:2,cap:'compact'} ]},
+  {id:'t9', name:'Quad Grid', detail:'compact', rects:[
+     {x:0,y:0,w:(100-GAP)/2,h:(100-GAP)/2,role:'photo',prop:0,cap:'compact'},
+     {x:(100-GAP)/2+GAP,y:0,w:(100-GAP)/2,h:(100-GAP)/2,role:'photo',prop:1,cap:'compact'},
+     {x:0,y:(100-GAP)/2+GAP,w:(100-GAP)/2,h:(100-GAP)/2,role:'photo',prop:2,cap:'compact'},
+     {x:(100-GAP)/2+GAP,y:(100-GAP)/2+GAP,w:(100-GAP)/2,h:(100-GAP)/2,role:'photo',prop:3,cap:'compact'} ]},
+  {id:'t10', name:'Hero + Trio', detail:'compact', rects:[
+     {x:0,y:0,w:57,h:100,role:'photo',prop:0,cap:'compact'},
+     {x:57+GAP,y:0,w:43-GAP,h:(100-2*GAP)/3,role:'photo',prop:1,cap:'compact'},
+     {x:57+GAP,y:(100-2*GAP)/3+GAP,w:43-GAP,h:(100-2*GAP)/3,role:'photo',prop:2,cap:'compact'},
+     {x:57+GAP,y:2*((100-2*GAP)/3+GAP),w:43-GAP,h:(100-2*GAP)/3,role:'photo',prop:3,cap:'compact'} ]},
+  {id:'t11', name:'Five · Mosaic', detail:'compact', rects:[
+     {x:0,y:0,w:50-GAP/2,h:100,role:'photo',prop:0,cap:'compact'},
+     {x:50+GAP/2,y:0,w:(50-GAP/2-GAP)/2,h:(100-GAP)/2,role:'photo',prop:1,cap:'compact'},
+     {x:50+GAP/2+(50-GAP/2-GAP)/2+GAP,y:0,w:(50-GAP/2-GAP)/2,h:(100-GAP)/2,role:'photo',prop:2,cap:'compact'},
+     {x:50+GAP/2,y:(100-GAP)/2+GAP,w:(50-GAP/2-GAP)/2,h:(100-GAP)/2,role:'photo',prop:3,cap:'compact'},
+     {x:50+GAP/2+(50-GAP/2-GAP)/2+GAP,y:(100-GAP)/2+GAP,w:(50-GAP/2-GAP)/2,h:(100-GAP)/2,role:'photo',prop:4,cap:'compact'} ]},
+  {id:'t12', name:'Six Up · 3 + 3', detail:'compact', rects:(function(){
+     const w=(100-2*GAP)/3, h=(100-GAP)/2, r=[]; let p=0;
+     for(let row=0;row<2;row++) for(let col=0;col<3;col++){
+       r.push({x:col*(w+GAP),y:row*(h+GAP),w:w,h:h,role:'photo',prop:p++,cap:'compact'});
+     } return r; })()},
+  /* ---- showcase designs (full-card, no rect grid) ---- */
+  {id:'t13', name:'Arc Hero',           slots:1, props:1, detail:'full',    fam:'arc'},
+  {id:'t14', name:'Circle Story',       slots:1, props:1, detail:'full',    fam:'circle', agent:true},
+  {id:'t15', name:'Diagonal Duo',       slots:2, props:1, detail:'compact', fam:'diagonal'},
+  {id:'t16', name:'Angled · Sell Yours',slots:2, props:1, detail:'compact', fam:'angled', agent:true},
+  {id:'t17', name:'Speech Bubble',      slots:1, props:1, detail:'full',    fam:'bubble'},
+  {id:'t18', name:'Tag & Stats',        slots:2, props:1, detail:'full',    fam:'tag'},
+  {id:'t22', name:'Sold · Stats',       slots:1, props:1, detail:'full',    fam:'soldstats'},
+  {id:'t23', name:'Price Spotlight',    slots:3, props:1, detail:'full',    fam:'pricespot'},
+  {id:'t24', name:'Open House',         slots:1, props:1, detail:'full',    fam:'openhouse'},
+  /* ---- replicas of uploaded reference cards ---- */
+  {id:'t25', name:'For Sale · Mosaic',          slots:8, props:1, detail:'full', fam:'forsalemosaic'},
+  {id:'t26', name:'For Sale · Hero',            slots:1, props:1, detail:'full', fam:'forsalehero'},
+  {id:'t27', name:'For Sale · Grid',            slots:4, props:1, detail:'full', fam:'forsalegrid'},
+  {id:'t30', name:'Sold Over Asking',           slots:1, props:1, detail:'full', fam:'soldask'},
+];
+
+function photoSlotCount(t){return t.rects ? t.rects.filter(r=>r.role==='photo').length : t.slots;}
+function propCount(t){ if(!t.rects) return t.props; let m=-1;t.rects.forEach(r=>{if(r.prop!=null&&r.prop>m)m=r.prop;});return m+1;}
+
+/* ============================ STATE ============================ */
+const ST = {
+  tpl:'t1', showHead:true, accent:'red', showSpecs:true,
+  eyebrow:'', msg:'', bigHeadline:'JUST LISTED', scriptLine:'Just Listed',
+  badge:'SOLD OVER ASKING', stats:['Sold over asking','Multiple offers','12 days on market'],
+  openDate:'Saturday & Sunday', openTime:'2:00 – 4:00 PM',
+  collageFooter:'CALL ME NOW FOR MORE INFORMATION',
+  photos:[], assign:[], logo:null, agentPhoto:null,
+  props:[
+    {status:'Just Listed', addr:'123 Maple Avenue, Richmond Hill', price:'$1,588,000', beds:'4', baths:'3', sqft:'3,200', desc:'Sun-filled detached home on a premium lot — fully renovated, steps to top-ranked schools.'},
+    {status:'For Sale', addr:'45 Bayview Crescent, Markham', price:'$1,288,000', beds:'3', baths:'3', sqft:'2,400', desc:''},
+    {status:'Sold', addr:'78 Hillcrest Road, Aurora', price:'Sold over asking', beds:'4', baths:'4', sqft:'3,600', desc:''},
+    {status:'Sold', addr:'9 Gandhi Lane, Markham', price:'Leased', beds:'4', baths:'3', sqft:'2,900', desc:''},
+    {status:'Just Listed', addr:'212 Oakridge Drive, Vaughan', price:'$1,750,000', beds:'5', baths:'4', sqft:'4,100', desc:''},
+    {status:'For Sale', addr:'30 Elmwood Court, Richmond Hill', price:'$1,398,000', beds:'4', baths:'3', sqft:'3,000', desc:''},
+  ],
+  agent:{name:'Peter Luo', broker:'Broker', creds:'SRS · MCNE', phone:'647-824-3718',
+         email:'peterluo@peterluo.com', web:'www.peterluo.com', brk:'RE/MAX Realtron Realty Inc., Brokerage'}
+};
+ST.eyebrow=document.getElementById('fEyebrow').value;
+ST.msg=document.getElementById('fMsg').value;
+
+const STATUS_COLOR={'Just Listed':'red','For Sale':'blue','Sold':'red','Leased':'blue','Open House':'gold','Coming Soon':'gold'};
+
+/* ============================ ICON ============================ */
+function iconSVG(t){
+  if(!t.rects) return showcaseIcon(t);
+  let r='<svg viewBox="0 0 100 67" preserveAspectRatio="none">';
+  r+='<rect x="0" y="0" width="100" height="67" fill="#f1f3f6"/>';
+  t.rects.forEach(rc=>{
+    const x=rc.x, y=rc.y*0.67, w=rc.w, h=rc.h*0.67;
+    const fill = rc.role==='panel' ? '#fff' : '#c6ced8';
+    const stroke = rc.role==='panel' ? '#9aa6b4' : 'none';
+    r+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="${stroke}" stroke-width="1"/>`;
+    if(rc.prop!=null && rc.role==='photo')
+      r+=`<rect x="${x}" y="${y+h-5}" width="${w}" height="5" fill="#E4002B" opacity=".85"/>`;
+  });
+  r+='</svg>'; return r;
+}
+
+/* ============================ BUILD SIDEBAR ============================ */
+function buildTplGrid(){
+  const g=document.getElementById('tplGrid'); g.innerHTML='';
+  T.forEach((t,i)=>{
+    const d=document.createElement('div');
+    d.className='tpl'+(t.id===ST.tpl?' active':'');
+    d.innerHTML=iconSVG(t)+`<div class="tname">${String(i+1).padStart(2,'0')} ${t.name}</div>`;
+    d.onclick=()=>{ST.tpl=t.id; reassignSlots(); buildTplGrid(); buildPlacement(); buildProps(); render();};
+    g.appendChild(d);
+  });
+}
+
+function buildTray(){
+  const tr=document.getElementById('tray'); tr.innerHTML='';
+  ST.photos.forEach((src,i)=>{
+    const d=document.createElement('div'); d.className='thumb';
+    d.style.backgroundImage=`url(${src})`;
+    d.innerHTML=`<span class="ix">${i+1}</span><button class="rm" title="Remove" onclick="removePhoto(${i})">&times;</button>`;
+    tr.appendChild(d);
+  });
+}
+
+function buildPlacement(){
+  const wrap=document.getElementById('placement'); wrap.innerHTML='';
+  if(!ST.photos.length){return;}
+  const t=T.find(x=>x.id===ST.tpl);
+  if(!t.rects){
+    for(let i=0;i<t.slots;i++){
+      const label = i===0 ? (t.slots>1?'Main / hero':'Photo') : `Photo ${i+1}`;
+      const opts=['<option value="-1">— empty —</option>'].concat(
+        ST.photos.map((_,pi)=>`<option value="${pi}" ${ST.assign[i]===pi?'selected':''}>Photo ${pi+1}</option>`)).join('');
+      const row=document.createElement('div'); row.className='place-row';
+      row.innerHTML=`<span class="pl-label">${label}</span><select class="fi" data-slot="${i}">${opts}</select>`;
+      row.querySelector('select').onchange=e=>{ST.assign[i]=parseInt(e.target.value);render();};
+      wrap.appendChild(row);
+    }
+    return;
+  }
+  let slot=0;
+  t.rects.forEach(rc=>{
+    if(rc.role!=='photo')return;
+    const idx=slot;
+    const label = rc.prop!=null ? (propCount(t)>1?`Property ${rc.prop+1}`:'Main photo') : `Extra ${idx+1}`;
+    const opts=['<option value="-1">— empty —</option>'].concat(
+      ST.photos.map((_,pi)=>`<option value="${pi}" ${ST.assign[idx]===pi?'selected':''}>Photo ${pi+1}</option>`)).join('');
+    const row=document.createElement('div'); row.className='place-row';
+    row.innerHTML=`<span class="pl-label">${label}</span><select class="fi" data-slot="${idx}">${opts}</select>`;
+    row.querySelector('select').onchange=e=>{ST.assign[idx]=parseInt(e.target.value);render();};
+    wrap.appendChild(row);
+    slot++;
+  });
+}
+
+function buildProps(){
+  const t=T.find(x=>x.id===ST.tpl); const n=propCount(t);
+  const wrap=document.getElementById('propWrap'); wrap.innerHTML='';
+  const full = t.detail==='full';
+  for(let i=0;i<n;i++){
+    const p=ST.props[i];
+    const c=document.createElement('div'); c.className='prop-card';
+    c.innerHTML=`<div class="pc-head">${n>1?'Property '+(i+1):'Listing details'}</div>
+      <label class="fl">Status badge</label>
+      <select class="fi" data-p="${i}" data-k="status">
+        ${['(none)','Just Listed','For Sale','Sold','Leased','Open House','Coming Soon'].map(s=>{
+          const v=s==='(none)'?'':s; return `<option ${p.status===v?'selected':''}>${s==='(none)'?'(none)':s}</option>`;}).join('')}
+      </select>
+      <label class="fl">Address</label>
+      <input class="fi" data-p="${i}" data-k="addr" value="<span data-edit="props.0.addr">${esc(p.addr)}</span>">
+      <label class="fl">Price / status line</label>
+      <input class="fi" data-p="${i}" data-k="price" value="<span data-edit="props.0.price">${esc(p.price)}</span>">
+      <div class="row3">
+        <div><label class="fl">Beds</label><input class="fi" data-p="${i}" data-k="beds" value="${esc(p.beds)}"></div>
+        <div><label class="fl">Baths</label><input class="fi" data-p="${i}" data-k="baths" value="${esc(p.baths)}"></div>
+        <div><label class="fl">Sq ft</label><input class="fi" data-p="${i}" data-k="sqft" value="${esc(p.sqft)}"></div>
+      </div>
+      ${full?`<label class="fl">Description (optional)</label><textarea class="fi" data-p="${i}" data-k="desc"><span data-edit="props.0.desc">${esc(p.desc)}</span></textarea>`:''}`;
+    wrap.appendChild(c);
+  }
+  wrap.querySelectorAll('[data-p]').forEach(el=>{
+    const ev = el.tagName==='SELECT'?'change':'input';
+    el.addEventListener(ev,e=>{
+      let v=e.target.value; if(e.target.dataset.k==='status'&&v==='(none)')v='';
+      ST.props[parseInt(e.target.dataset.p)][e.target.dataset.k]=v; render();
+    });
+  });
+}
+
+function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ============================ SHOWCASE DESIGNS ============================ */
+const NAVY='#14223c', GOLD='#b8923a';
+function aHex(){return ST.accent==='blue'?'#003DA5':'#E4002B';}
+function slotSrc(i){const pi=ST.assign[i];return (pi!=null&&pi>=0)?ST.photos[pi]:null;}
+function phMark(){return `<div class="ph">${cameraSVG()}</div>`;}
+function scPh(i,style,cls){const s=slotSrc(i);return `<div class="sc-ph ${cls||''}" data-photo="${i}" style="${style}${s?`background-image:url(${s});`:''}">${s?'':phMark()}<span class="photo-hint">${s?'Click to replace':'Click to add photo'}</span></div>`;}
+function scAgent(style){const s=ST.agentPhoto;return `<div class="sc-agentimg" data-photo="agent" style="${style}${s?`background-image:url(${s});`:''}">${s?'':phMark()}<span class="photo-hint">${s?'Click to replace':'Click to add photo'}</span></div>`;}
+function scContact(bg,fg){const a=ST.agent;return `<div class="sc-bar" style="height:96px;background:${bg};color:${fg};">
+  <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:600;line-height:1.05;"><span data-edit="agent.name">${esc(a.name)}</span>
+    <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;opacity:.85;"><span data-edit="agent.broker">${esc(a.broker)}</span>${a.creds?' · '+esc(a.creds):''}</div></div>
+  <div style="width:1px;height:54px;background:${fg};opacity:.35;"></div>
+  <div style="display:flex;flex-direction:column;gap:1px;">
+    <div style="font-weight:700;font-size:22px;"><span data-edit="agent.phone">${esc(a.phone)}</span></div>
+    <div style="font-size:15px;opacity:.92;"><span data-edit="agent.email">${esc(a.email)}</span> &nbsp;·&nbsp; <span data-edit="agent.web">${esc(a.web)}</span></div></div>
+  <div style="margin-left:auto;text-align:right;font-size:13.5px;opacity:.95;max-width:230px;line-height:1.3;"><span data-edit="agent.brk">${esc(a.brk)}</span></div></div>`;}
+function noremax(s){return (s||'').replace(/^RE\/MAX\s*/i,'');}
+
+function arc(){const acc=aHex(),p=ST.props[0],W=560;
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ ${scPh(0,`left:0;top:0;width:${W}px;height:800px;border-radius:0 230px 230px 0;`)}
+ ${ST.badge?`<div class="sc-badge" style="left:34px;top:40px;width:152px;height:152px;font-size:17px;padding:16px;"><span data-edit="badge">${esc(ST.badge)}</span></div>`:''}
+ <div style="position:absolute;left:${W+54}px;top:70px;right:50px;">
+   <div class="sc-script" style="color:${GOLD};font-size:42px;"><span data-edit="scriptLine">${esc(ST.scriptLine)}</span></div>
+   <div class="sc-cond" style="color:${acc};font-size:104px;margin-top:2px;"><span data-edit="bigHeadline">${esc(ST.bigHeadline)}</span></div>
+   <div style="font-family:'Playfair Display',serif;font-weight:600;font-size:26px;color:${NAVY};margin-top:22px;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div>
+   ${p.price?`<div style="font-size:24px;font-weight:700;color:${acc};margin-top:8px;"><span data-edit="props.0.price">${esc(p.price)}</span></div>`:''}</div>
+ <div style="position:absolute;left:${W+54}px;right:50px;bottom:150px;background:${acc};color:#fff;padding:18px 26px;font-size:19px;line-height:1.4;"><span data-edit="msg">${esc(ST.msg)}</span>
+   <div style="font-weight:700;font-size:23px;margin-top:6px;"><span data-edit="agent.phone">${esc(ST.agent.phone)}</span></div></div>
+ <div style="position:absolute;left:${W+54}px;right:50px;bottom:54px;font-family:'Oswald',sans-serif;font-weight:700;color:${NAVY};font-size:18px;text-transform:uppercase;letter-spacing:.04em;"><span data-edit="agent.brk">${esc(ST.agent.brk)}</span></div>`;}
+
+function circle(){const acc=aHex(),p=ST.props[0];
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ <div style="position:absolute;left:50px;top:64px;width:300px;">
+   <div class="sc-cond" style="color:${acc};font-size:40px;"><span data-edit="bigHeadline">${esc(ST.bigHeadline)}</span></div>
+   <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:28px;color:${NAVY};margin-top:6px;"><span data-edit="msg">${esc(ST.msg)}</span></div>
+   <div style="font-family:'Playfair Display',serif;font-weight:600;font-size:23px;color:${NAVY};margin-top:22px;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div>
+   ${p.price?`<div style="font-size:21px;font-weight:700;color:${acc};margin-top:6px;"><span data-edit="props.0.price">${esc(p.price)}</span></div>`:''}</div>
+ ${scAgent(`left:60px;bottom:118px;width:228px;height:296px;border-radius:8px;`)}
+ ${scPh(0,`left:470px;top:42px;width:620px;height:620px;border-radius:50%;`,'sc-frame')}
+ ${scContact(acc,'#fff')}`;}
+
+function diagonal(){const acc=aHex(),p=ST.props[0],a=ST.agent;
+ const nm=(a.name||'').trim().split(' '),nf=nm.shift()||'',nr=nm.join(' ');
+ return `${scPh(0,`left:0;top:0;width:600px;height:690px;`)}
+ ${scPh(1,`left:600px;top:0;width:600px;height:690px;`)}
+ <div class="sc-cond" style="position:absolute;left:-16px;top:64px;background:${NAVY};color:#fff;font-size:38px;padding:20px 56px;transform:rotate(-7deg);box-shadow:0 8px 20px rgba(0,0,0,.3);max-width:700px;"><span data-edit="bigHeadline">${esc(ST.bigHeadline)}</span></div>
+ <div style="position:absolute;right:-26px;bottom:170px;background:${acc};color:#fff;padding:22px 70px 22px 40px;transform:rotate(-7deg);box-shadow:0 8px 20px rgba(0,0,0,.3);text-align:center;">
+   <div class="sc-cond" style="font-size:30px;"><span data-edit="scriptLine">${esc(ST.scriptLine||'SOLD')}</span></div>
+   <div style="font-size:16px;margin-top:4px;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div></div>
+ <div style="position:absolute;left:0;right:0;bottom:0;height:110px;background:#fff;border-top:4px solid ${acc};display:flex;align-items:center;padding:0 44px;">
+   <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:600;"><span data-edit="agent.name"><span style="color:var(--red)">${esc(nf)}</span> <span style="color:var(--blue)">${esc(nr)}</span></span></div>
+   <div style="margin-left:24px;padding-left:24px;border-left:1px solid var(--line);font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:var(--ink);"><span data-edit="agent.phone">${esc(a.phone)}</span></div>
+   <div style="margin-left:auto;text-align:right;font-size:14px;color:var(--ink);max-width:300px;line-height:1.3;"><span data-edit="agent.brk">${esc(a.brk)}</span></div>
+ </div>`;}
+
+function angled(){const acc=aHex(),p=ST.props[0];
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ ${scAgent(`left:40px;bottom:122px;width:300px;height:420px;border-radius:8px;`)}
+ <div class="sc-cond" style="position:absolute;left:330px;top:58px;background:${acc};color:#fff;font-size:33px;padding:18px 38px;transform:rotate(-4deg);box-shadow:0 8px 18px rgba(0,0,0,.25);max-width:520px;line-height:1.05;"><span data-edit="bigHeadline">${esc(ST.bigHeadline)}</span></div>
+ <div style="position:absolute;left:360px;top:180px;font-size:19px;color:${NAVY};max-width:300px;line-height:1.5;"><span data-edit="msg">${esc(ST.msg)}</span></div>
+ ${scPh(0,`right:40px;top:58px;width:520px;height:282px;`,'sc-frame')}
+ ${scPh(1,`right:40px;top:380px;width:520px;height:282px;`,'sc-frame')}
+ ${scContact(NAVY,'#fff')}`;}
+
+function bubble(){const acc=aHex(),p=ST.props[0];
+ return `${scPh(0,`left:480px;top:0;width:720px;height:800px;`)}
+ <div style="position:absolute;left:0;top:0;width:480px;height:800px;background:${acc};color:#fff;padding:58px 46px;">
+   <div class="sc-script" style="color:#ffd87a;font-size:52px;"><span data-edit="scriptLine">${esc(ST.scriptLine)}</span></div>
+   <div class="sc-cond" style="font-size:60px;margin-top:10px;line-height:1.0;"><span data-edit="bigHeadline">${esc(ST.bigHeadline)}</span></div>
+   <div style="font-size:19px;margin-top:22px;line-height:1.5;opacity:.95;"><span data-edit="msg">${esc(ST.msg)}</span></div>
+   <div style="position:absolute;left:46px;right:46px;bottom:56px;">
+     <div style="font-family:'Playfair Display',serif;font-weight:600;font-size:24px;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div>
+     ${p.price?`<div style="font-size:20px;font-weight:700;margin-top:4px;"><span data-edit="props.0.price">${esc(p.price)}</span></div>`:''}
+     <div style="font-size:22px;font-weight:700;margin-top:14px;"><span data-edit="agent.phone">${esc(ST.agent.phone)}</span></div>
+     <div style="font-size:14px;opacity:.9;"><span data-edit="agent.name">${esc(ST.agent.name)}</span> · <span data-edit="agent.brk">${esc(ST.agent.brk)}</span></div></div></div>
+ <div style="position:absolute;left:452px;top:120px;width:56px;height:56px;background:${acc};transform:rotate(45deg);"></div>`;}
+
+function tag(){const acc=aHex(),p=ST.props[0];
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ <div style="position:absolute;left:30px;top:64px;bottom:104px;width:205px;display:flex;flex-direction:column;justify-content:center;">
+   <div class="sc-script" style="color:${NAVY};font-size:46px;line-height:1.05;"><span data-edit="msg">${esc(ST.msg)}</span></div></div>
+ ${scPh(0,`left:256px;top:64px;width:444px;height:460px;`)}
+ ${scPh(1,`left:716px;top:64px;width:444px;height:460px;`)}
+ <div class="sc-flag" style="left:236px;top:34px;color:${NAVY};font-size:28px;"><span style="position:relative;z-index:1;color:#fff;"><span data-edit="scriptLine">${esc(ST.scriptLine||'JUST SOLD')}</span></span><span style="position:absolute;inset:0;background:var(--red);z-index:0;"></span></div>
+ <div style="position:absolute;left:256px;top:540px;width:904px;background:${acc};color:#fff;text-align:center;padding:11px;font-weight:700;font-size:18px;"><span data-edit="props.0.price">${esc(p.price)}</span></div>
+ <div style="position:absolute;left:256px;top:600px;width:904px;font-family:'Playfair Display',serif;font-weight:600;font-size:24px;color:${NAVY};text-align:center;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div>
+ <div data-edit="props.0.__specs" style="position:absolute;left:256px;top:652px;width:904px;background:${NAVY};color:#fff;text-align:center;padding:12px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;">${(ST.showSpecs&&specsLine(p))?esc(specsLine(p)):'New Renovations Done'}</div>
+ ${scContact(GOLD,'#1a1a1a')}`;}
+
+function collage(n,scale,col){scale=scale||1;const acc=col||aHex(),p=ST.props[0];
+ const frames=[{l:70,t:130,w:250,h:175,r:-5},{l:840,t:95,w:285,h:185,r:4},{l:60,t:440,w:250,h:175,r:3},{l:870,t:395,w:270,h:200,r:-4},{l:300,t:480,w:195,h:150,r:6}];
+ let h=`<div style="position:absolute;inset:0;background:${acc};"></div>`;
+ h+=`<div class="sc-crop" style="left:18px;top:18px;border-right:none;border-bottom:none;"></div><div class="sc-crop" style="right:18px;top:18px;border-left:none;border-bottom:none;"></div><div class="sc-crop" style="left:18px;bottom:18px;border-right:none;border-top:none;"></div><div class="sc-crop" style="right:18px;bottom:18px;border-left:none;border-top:none;"></div>`;
+ h+=`<div style="position:absolute;left:0;right:0;top:50px;text-align:center;color:#fff;"><div class="sc-cond" style="font-style:italic;font-size:74px;"><span data-edit="bigHeadline">${esc(ST.bigHeadline)}</span></div><div style="font-family:'Playfair Display',serif;font-size:24px;opacity:.92;margin-top:2px;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div></div>`;
+ h+=scPh(0,`left:430px;top:255px;width:${Math.round(340*scale)}px;height:${Math.round(250*scale)}px;transform:rotate(-3deg);`,'sc-frame');
+ for(let i=1;i<n;i++){const f=frames[i-1];h+=scPh(i,`left:${f.l}px;top:${f.t}px;width:${Math.round(f.w*scale)}px;height:${Math.round(f.h*scale)}px;transform:rotate(${f.r}deg);`,'sc-frame');}
+ h+=`<div style="position:absolute;left:0;right:0;top:528px;text-align:center;color:#fff;"><div class="sc-cond" style="font-size:46px;">RE/MAX</div><div style="font-family:'Oswald',sans-serif;font-size:18px;letter-spacing:.12em;opacity:.95;">${esc(noremax(ST.agent.brk))}</div></div>`;
+ h+=`<div style="position:absolute;left:0;right:0;bottom:44px;text-align:center;color:#fff;font-family:'Oswald',sans-serif;font-size:28px;text-transform:uppercase;letter-spacing:.04em;"><span data-edit="collageFooter">${esc(ST.collageFooter)}</span></div>`;
+ return h;}
+
+function collagegrid(){const acc=aHex(),p=ST.props[0];
+ let h=`<div style="position:absolute;inset:0;background:${acc};"></div>`;
+ h+=`<div style="position:absolute;left:0;right:0;top:44px;text-align:center;color:#fff;"><div class="sc-cond" style="font-size:62px;"><span data-edit="bigHeadline">${esc(ST.bigHeadline)}</span></div><div style="font-family:'Playfair Display',serif;font-size:22px;opacity:.92;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div></div>`;
+ h+=scPh(0,`left:60px;top:168px;width:540px;height:472px;`,'sc-frame');
+ const g=[[632,168,256,228],[908,168,232,228],[632,412,256,228],[908,412,232,228]];
+ for(let i=1;i<5;i++){const c=g[i-1];h+=scPh(i,`left:${c[0]}px;top:${c[1]}px;width:${c[2]}px;height:${c[3]}px;`,'sc-frame');}
+ h+=`<div style="position:absolute;left:0;right:0;bottom:38px;text-align:center;color:#fff;"><span class="sc-cond" style="font-size:30px;vertical-align:middle;">RE/MAX</span><span style="font-family:'Oswald',sans-serif;font-size:17px;letter-spacing:.1em;margin-left:10px;">${esc(noremax(ST.agent.brk))}</span><span style="font-size:16px;margin-left:18px;opacity:.92;"><span data-edit="agent.phone">${esc(ST.agent.phone)}</span></span></div>`;
+ return h;}
+
+function soldstats(){const acc=aHex(),p=ST.props[0];
+ const chips=(ST.stats||[]).map((s,i)=>s?`<div data-edit="stats.${i}" style="background:${acc};color:#fff;padding:14px 18px;font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:18px;text-align:center;">${esc(s)}</div>`:'').join('');
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ ${scPh(0,`left:40px;top:40px;width:660px;height:564px;`,'sc-frame')}
+ <div style="position:absolute;left:730px;top:0;bottom:96px;right:44px;display:flex;flex-direction:column;justify-content:center;">
+   <div class="sc-cond" style="color:${acc};font-size:118px;"><span data-edit="bigHeadline">${esc(ST.bigHeadline)}</span></div>
+   <div style="font-family:'Playfair Display',serif;font-weight:600;font-size:26px;color:${NAVY};margin-top:6px;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div>
+   <div style="display:flex;flex-direction:column;gap:10px;margin-top:22px;">${chips}</div></div>
+ ${scContact(NAVY,'#fff')}`;}
+
+function pricespot(){const acc=aHex(),p=ST.props[0];
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ ${scPh(0,`left:0;top:0;width:660px;height:704px;`)}
+ <div style="position:absolute;left:700px;top:64px;right:44px;">
+   ${p.status?`<div style="display:inline-block;background:${acc};color:#fff;font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;padding:6px 14px;font-size:16px;letter-spacing:.08em;">${esc(p.status)}</div>`:''}
+   <div style="font-family:'Playfair Display',serif;font-weight:700;color:${acc};font-size:62px;margin-top:14px;line-height:1;"><span data-edit="props.0.price">${esc(p.price)}</span></div>
+   <div style="font-family:'Playfair Display',serif;font-weight:600;font-size:26px;color:${NAVY};margin-top:16px;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div>
+   ${ST.showSpecs&&specsLine(p)?`<div data-edit="props.0.__specs" style="font-size:18px;color:${NAVY};opacity:.7;margin-top:10px;">${esc(specsLine(p))}</div>`:''}
+   ${p.desc?`<div style="font-size:16px;color:${NAVY};opacity:.8;margin-top:14px;line-height:1.5;"><span data-edit="props.0.desc">${esc(p.desc)}</span></div>`:''}
+   <div style="display:flex;gap:14px;margin-top:24px;">
+     ${scPh(1,`position:relative;width:220px;height:300px;`,'sc-frame')}
+     ${scPh(2,`position:relative;width:220px;height:300px;`,'sc-frame')}</div></div>
+ ${scContact(acc,'#fff')}`;}
+
+function openhouse(){const acc=aHex(),p=ST.props[0];
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ ${scPh(0,`left:0;top:0;width:813px;height:800px;`)}
+ <div style="position:absolute;left:813px;top:0;right:0;bottom:0;background:${acc};color:#fff;padding:52px 34px;">
+   <div class="sc-cond" style="font-size:68px;line-height:.95;">OPEN HOUSE</div>
+   <div style="width:70px;height:4px;background:#fff;margin:22px 0;"></div>
+   <div style="font-family:'Playfair Display',serif;font-size:34px;font-weight:600;"><span data-edit="openDate">${esc(ST.openDate)}</span></div>
+   <div style="font-family:'Playfair Display',serif;font-size:30px;"><span data-edit="openTime">${esc(ST.openTime)}</span></div>
+   <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-top:26px;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div>
+   ${p.price?`<div style="font-size:22px;font-weight:700;margin-top:6px;"><span data-edit="props.0.price">${esc(p.price)}</span></div>`:''}
+   ${ST.showSpecs&&specsLine(p)?`<div data-edit="props.0.__specs" style="font-size:17px;opacity:.92;margin-top:8px;">${esc(specsLine(p))}</div>`:''}
+   <div style="position:absolute;left:46px;right:46px;bottom:52px;">
+     <div style="font-size:24px;font-weight:700;"><span data-edit="agent.phone">${esc(ST.agent.phone)}</span></div>
+     <div style="font-size:15px;opacity:.92;"><span data-edit="agent.name">${esc(ST.agent.name)}</span> · <span data-edit="agent.brk">${esc(ST.agent.brk)}</span></div></div></div>`;}
+
+function cropMarks(c){c=c||'#111';
+ return `<div style="position:absolute;left:16px;top:16px;width:24px;height:24px;border-top:2px solid ${c};border-left:2px solid ${c};"></div>
+ <div style="position:absolute;right:16px;top:16px;width:24px;height:24px;border-top:2px solid ${c};border-right:2px solid ${c};"></div>
+ <div style="position:absolute;left:16px;bottom:16px;width:24px;height:24px;border-bottom:2px solid ${c};border-left:2px solid ${c};"></div>
+ <div style="position:absolute;right:16px;bottom:16px;width:24px;height:24px;border-bottom:2px solid ${c};border-right:2px solid ${c};"></div>`;}
+
+function forsalemosaic(){const acc=aHex(),p=ST.props[0],NV='#16335f';
+ const a=(p.addr||'').split(','); const a1=a[0]||'',a2=a.slice(1).join(',').trim();
+ const bits=[]; if(p.beds)bits.push(p.beds+' BEDROOM'); if(p.baths)bits.push(p.baths+' BATH'); if(p.sqft)bits.push(p.sqft+' SQFT');
+ const stat=bits.join('   |   ');
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ <div style="position:absolute;left:0;top:0;width:1200px;height:124px;background:${acc};color:#fff;display:flex;align-items:center;">
+   <div style="padding-left:30px;flex:1;">
+     <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:34px;line-height:1;"><span data-edit="props.0.price">${esc(p.price)}</span></div>
+     <span data-edit="props.0.addr"><div style="font-size:18px;margin-top:4px;">${esc(a1)}</div>${a2?`<div style="font-size:18px;">${esc(a2)}</div>`:''}</span>
+   </div>
+   <div class="sc-cond" style="font-size:78px;padding-right:40px;"><span data-edit="bigHeadline">${esc(ST.bigHeadline)}</span></div>
+ </div>
+ ${scPh(0,`left:10px;top:134px;width:590px;height:362px;`)}
+ ${scPh(1,`left:610px;top:134px;width:260px;height:362px;`)}
+ ${scPh(2,`left:880px;top:134px;width:310px;height:176px;`)}
+ ${scPh(3,`left:880px;top:320px;width:310px;height:176px;`)}
+ ${scPh(4,`left:10px;top:506px;width:590px;height:284px;`)}
+ <div style="position:absolute;left:610px;top:506px;width:580px;height:74px;background:${NV};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-weight:600;font-size:24px;letter-spacing:.03em;">${esc(stat)}</div>
+ ${scPh(5,`left:610px;top:590px;width:186px;height:200px;`)}
+ ${scPh(6,`left:806px;top:590px;width:186px;height:200px;`)}
+ ${scPh(7,`left:1002px;top:590px;width:186px;height:200px;`)}`;}
+
+function forsalehero(){const acc=aHex(),p=ST.props[0];
+ const logo = ST.logo?`<img src="${ST.logo}" style="max-width:140px;max-height:140px;object-fit:contain;">`:`<div class="sc-cond" style="color:#fff;font-size:32px;">RE/MAX</div>`;
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ ${cropMarks('#111')}
+ ${scPh(0,`left:56px;top:64px;width:1088px;height:672px;`)}
+ <div style="position:absolute;left:6px;top:150px;width:120px;height:330px;background:${NAVY};"></div>
+ <div style="position:absolute;left:70px;top:150px;width:330px;height:330px;background:${acc};opacity:.88;"></div>
+ <div style="position:absolute;left:96px;top:176px;width:300px;height:300px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;">
+   <div class="sc-script" style="color:#fff;font-size:86px;text-align:center;line-height:.92;"><span data-edit="scriptLine">${esc(ST.scriptLine||'For Sale')}</span></div></div>
+ <div style="position:absolute;right:60px;top:90px;width:200px;height:200px;background:${acc};display:flex;align-items:center;justify-content:center;">
+   <div style="width:172px;height:172px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;">${logo}</div></div>
+ <div style="position:absolute;left:56px;right:56px;bottom:64px;height:72px;background:rgba(58,62,68,.66);color:#fff;display:flex;align-items:center;justify-content:flex-end;padding:0 32px;font-family:'Oswald',sans-serif;font-size:30px;letter-spacing:.06em;text-transform:uppercase;"><span data-edit="props.0.addr">${esc(p.addr)}</span></div>`;}
+
+function forsalegrid(){const acc=aHex(),p=ST.props[0],NV='#16335f',BLU='#1746A8';
+ const a=(p.addr||'').split(','); const a1=a[0]||'',a2=a.slice(1).join(',').trim(); const s=ST.stats||[];
+ const box=(x,y,bg,txt,si)=>`<div${si!=null?` data-edit="stats.${si}"`:''} style="position:absolute;left:${x}px;top:${y}px;width:240px;height:222px;background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;letter-spacing:.03em;padding:10px;">${esc(txt)}</div>`;
+ const gx1=700,gx2=952,gy=[60,294,528];
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ ${cropMarks('#111')}
+ <div style="position:absolute;left:60px;top:60px;width:608px;height:250px;background:${acc};color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+   <div class="sc-cond" style="font-size:84px;"><span data-edit="bigHeadline">${esc(ST.bigHeadline)}</span></div>
+   <span data-edit="props.0.addr"><div style="font-weight:700;font-size:24px;margin-top:14px;">${esc(a1)}</div>${a2?`<div style="font-weight:700;font-size:24px;">${esc(a2)}</div>`:''}</span>
+ </div>
+ ${scPh(0,`left:60px;top:330px;width:608px;height:410px;`)}
+ ${box(gx1,gy[0],BLU,s[0]||'',0)}
+ ${scPh(1,`left:${gx2}px;top:${gy[0]}px;width:240px;height:222px;`)}
+ ${scPh(2,`left:${gx1}px;top:${gy[1]}px;width:240px;height:222px;`)}
+ ${box(gx2,gy[1],NV,s[1]||'',1)}
+ ${box(gx1,gy[2],acc,s[2]||'',2)}
+ ${scPh(3,`left:${gx2}px;top:${gy[2]}px;width:240px;height:222px;`)}`;}
+
+function soldask(){const p=ST.props[0],RED='#E2231A',GRY='#8d9298',BLU='#1746A8';
+ const a=(p.addr||'').split(','); const a1=a[0]||'',a2=a.slice(1).join(',').trim();
+ return `<div style="position:absolute;inset:0;background:#fff;"></div>
+ ${cropMarks('#111')}
+ ${scPh(0,`left:40px;top:40px;width:1120px;height:664px;`)}
+ <div style="position:absolute;left:0;right:0;bottom:0;height:96px;background:${GRY};"></div>
+ <div style="position:absolute;right:0;bottom:0;width:0;height:0;border-bottom:96px solid ${BLU};border-left:200px solid transparent;"></div>
+ <div style="position:absolute;left:60px;top:712px;color:#fff;font-family:'Playfair Display',serif;font-weight:600;font-size:30px;line-height:1.12;"><span data-edit="props.0.addr">${esc(a1)}${a2?`<div style="font-size:20px;font-weight:400;">${esc(a2)}</div>`:''}</span></div>
+ <div style="position:absolute;left:24px;top:48px;width:440px;height:70px;background:${RED};color:#fff;font-family:'Playfair Display',serif;font-style:italic;font-weight:600;font-size:40px;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg);box-shadow:0 6px 16px rgba(0,0,0,.3);"><span data-edit="badge">${esc(ST.badge||'SOLD OVER ASKING')}</span></div>`;}
+
+const SHOWCASE={arc,circle,diagonal,angled,bubble,tag,
+  soldstats, pricespot, openhouse,
+  forsalemosaic, forsalehero, forsalegrid, soldask};
+
+function renderShowcase(t){
+  document.getElementById('card').innerHTML=`<div class="sc-layer">${SHOWCASE[t.fam](t)}</div>`;
+  decorateEditables();
+  document.getElementById('stageMeta').textContent=`Design ${String(T.indexOf(t)+1).padStart(2,'0')} · ${t.name}`;
+  saveLocal();
+}
+
+function showcaseIcon(t){
+  const acc='#E4002B', F='#fff', P='#c6ced8', N='#14223c';
+  const bg = t.fam==='collagefield' ? '#15499c' : (t.fam.indexOf('collage')===0 ? acc : '#f1f3f6');
+  let r=`<svg viewBox="0 0 100 67" preserveAspectRatio="none"><rect width="100" height="67" fill="${bg}"/>`;
+  const sets={
+    arc:[[0,0,55,67,P],[60,12,34,16,acc]], circle:[[60,12,32,43,P],[6,12,28,38,acc]],
+    diagonal:[[0,0,49,67,P],[51,0,49,67,P],[4,8,44,12,N]], angled:[[55,8,40,24,P],[55,38,40,24,P],[6,10,40,14,acc]],
+    bubble:[[0,0,40,67,acc],[44,4,52,59,P]], tag:[[52,8,21,28,P],[76,8,20,28,P],[52,42,44,16,N]],
+    collage6:[[33,22,34,28,F],[6,12,22,18,F],[72,10,22,18,F],[6,44,22,18,F],[72,44,22,18,F]],
+    collage5:[[33,20,34,30,F],[6,14,22,18,F],[72,14,22,18,F],[40,54,20,9,F]],
+    collagegrid:[[6,16,40,40,F],[52,16,18,18,F],[74,16,18,18,F],[52,38,18,18,F],[74,38,18,18,F]],
+    soldstats:[[4,8,52,50,P],[60,10,34,20,acc]], pricespot:[[2,4,52,55,P],[60,8,36,22,acc]],
+    openhouse:[[2,4,50,59,P],[56,0,44,67,acc]],
+    forsalemosaic:[[0,0,100,17,acc],[2,21,46,30,P],[50,21,18,30,P],[70,21,28,14,P],[70,37,28,14,P],[2,53,46,14,P],[50,53,46,7,N],[50,61,14,6,P],[68,61,14,6,P],[84,61,14,6,P]],
+    forsalehero:[[6,8,88,52,P],[8,20,28,30,acc],[78,12,16,16,acc]],
+    forsalegrid:[[5,8,48,30,acc],[5,42,48,25,P],[56,8,18,17,'#1746A8'],[76,8,20,17,P],[56,27,18,17,P],[76,27,20,17,N],[56,46,18,17,acc],[76,46,20,17,P]],
+    collagefield:[[33,22,34,28,F],[6,12,22,18,F],[72,10,22,18,F],[6,44,22,18,F],[72,44,22,18,F]],
+    collagevander:[[33,22,34,28,F],[6,12,22,18,F],[72,10,22,18,F],[6,44,22,18,F],[72,44,22,18,F]],
+    soldask:[[4,8,92,48,P],[2,8,32,12,acc],[0,58,100,9,'#8d9298'],[72,58,28,9,'#1746A8']],
+  };
+  (sets[t.fam]||[[10,10,80,47,P]]).forEach(s=>{r+=`<rect x="${s[0]}" y="${s[1]}" width="${s[2]}" height="${s[3]}" fill="${s[4]}"/>`;});
+  r+='</svg>'; return r;
+}
+
+/* ============================ RENDER CARD ============================ */
+function specsLine(p){
+  const bits=[]; if(p.beds)bits.push(`${p.beds} Bed`); if(p.baths)bits.push(`${p.baths} Bath`); if(p.sqft)bits.push(`${p.sqft} Sq Ft`);
+  return bits.join('  ·  ');
+}
+function capHTML(p,mode,pi){
+  if(p.addr==null||p.addr==='')return '';
+  const badge = p.status?`<span class="badge ${STATUS_COLOR[p.status]||'red'}">${esc(p.status)}</span>`:'';
+  const specs = (ST.showSpecs && specsLine(p))?`<div class="specs"${pi!=null?` data-edit="props.${pi}.__specs"`:''}>${esc(specsLine(p))}</div>`:'';
+  return `<div class="cap ${mode}">${badge}<div class="addr"><span${pi!=null?` data-edit="props.${pi}.addr"`:''}>${esc(p['addr'])}</span></div>`+
+         (p.price?`<div class="price"><span${pi!=null?` data-edit="props.${pi}.price"`:''}>${esc(p['price'])}</span></div>`:'')+ (mode==='full'?specs:specs) +`</div>`;
+}
+function panelHTML(p){
+  const accCls = ST.accent==='blue'?'blue-acc':'';
+  const badge = p.status?`<span class="badge ${STATUS_COLOR[p.status]||'red'}">${esc(p.status)}</span>`:'';
+  const specs = (ST.showSpecs && specsLine(p))?`<div class="specs">${esc(specsLine(p))}</div>`:'';
+  const desc = p.desc?`<div class="pdesc"><span data-edit="props.0.desc">${esc(p.desc)}</span></div>`:'';
+  return `<div class="panel ${accCls}">${badge?'<div>'+badge+'</div>':''}<div class="addr"><span data-edit="props.0.addr">${esc(p.addr)}</span></div>`+
+         (p.price?`<div class="price"><span data-edit="props.0.price">${esc(p.price)}</span></div>`:'')+specs+desc+`</div>`;
+}
+
+function render(){
+  const t=T.find(x=>x.id===ST.tpl);
+  if(!t.rects){ renderShowcase(t); return; }
+  const card=document.getElementById('card');
+  const accBg = ST.accent==='blue'?'blue-bg':'red-bg';
+  const accStrip = ST.accent==='blue'?'blue-acc':'';
+  const topH = ST.showHead?158:0;
+  const stripH=110;
+  const contentTop=topH, contentH=800-topH-stripH;
+
+  let html='';
+  // headline band
+  html+=`<div class="c-top ${ST.showHead?'show':''} ${accBg}">`+
+        (ST.showHead?`<div class="c-eyebrow"><span data-edit="eyebrow">${esc(ST.eyebrow)}</span></div><div class="c-msg"><span data-edit="msg">${esc(ST.msg)}</span></div>`:'')+`</div>`;
+
+  // content
+  html+=`<div class="c-content" style="top:${contentTop}px;height:${contentH}px;">`;
+  let slot=0;
+  const PADX=44, PADY=18; // content inset (px)
+  const innerW=1200-2*PADX, innerH=contentH-2*PADY;
+  t.rects.forEach(rc=>{
+    const left=PADX+rc.x/100*innerW;
+    const top=PADY+rc.y/100*innerH;
+    const w=rc.w/100*innerW;
+    const h=rc.h/100*innerH;
+    if(rc.role==='panel'){
+      html+=`<div class="panel ${accStrip}" style="left:${left}px;top:${top}px;width:${w}px;height:${h}px;border-left:none;border-top:4px solid ${ST.accent==='blue'?'var(--blue)':'var(--red)'};overflow:hidden;${rc.compact?'padding:16px 22px;':''}">`
+          + panelInner(ST.props[rc.prop], rc.compact, rc.prop) +`</div>`;
+    } else {
+      const pi=ST.assign[slot];
+      const src=(pi!=null&&pi>=0)?ST.photos[pi]:null;
+      const bg=src?`background-image:url(${src});`:'';
+      let cap='';
+      if(rc.prop!=null && rc.cap!=='none'){ cap=capHTML(ST.props[rc.prop], rc.cap||(t.detail==='full'?'full':'compact'), rc.prop); }
+      html+=`<div class="slot" data-photo="${slot}" style="left:${left}px;top:${top}px;width:${w}px;height:${h}px;${bg}">`
+          + (src?'':`<div class="ph">${cameraSVG()}<span>Click to add</span></div>`)
+          + `<span class="photo-hint">${src?'Click to replace':'Click to add photo'}</span>`
+          + cap +`</div>`;
+      slot++;
+    }
+  });
+  html+=`</div>`;
+
+  // agent strip
+  html+=stripHTML(accStrip);
+
+  card.innerHTML=html;
+  decorateEditables();
+  document.getElementById('stageMeta').textContent=`Layout ${String(T.indexOf(t)+1).padStart(2,'0')} · ${t.name}`;
+  saveLocal();
+}
+
+function panelInner(p, compact, pi){
+  const badge = p.status?`<span class="badge ${STATUS_COLOR[p.status]||'red'}">${esc(p.status)}</span>`:'';
+  const specs = (ST.showSpecs && specsLine(p))?`<div class="specs"${compact?' style="font-size:13px;margin-top:6px;"':''}${pi!=null?` data-edit="props.${pi}.__specs"`:''}>${esc(specsLine(p))}</div>`:'';
+  const desc = (!compact && p.desc)?`<div class="pdesc"${pi!=null?` data-edit="props.${pi}.desc"`:''}>${esc(p['desc'])}</div>`:'';
+  const addrStyle = compact?' style="font-size:22px;"':'';
+  const priceStyle = compact?' style="font-size:19px;margin-top:4px;"':'';
+  return (badge?`<div style="margin-bottom:${compact?6:10}px">${badge}</div>`:'')
+    +`<div class="addr"${addrStyle}><span${pi!=null?` data-edit="props.${pi}.addr"`:''}>${esc(p['addr'])}</span></div>`
+    +(p.price?`<div class="price"${priceStyle}><span${pi!=null?` data-edit="props.${pi}.price"`:''}>${esc(p['price'])}</span></div>`:'')+specs+desc;
+}
+
+function stripHTML(accStrip){
+  const a=ST.agent;
+  const parts=(a.name||'').trim().split(' ');
+  const first=parts.shift()||''; const rest=parts.join(' ');
+  const brkName = esc(a.brk||'');
+  const brand = ST.logo
+     ? `<img src="${ST.logo}" alt="brokerage logo"><div class="s-brkblock" data-edit="agent.brk">${brkName}</div>`
+     : `<div class="s-brkblock s-brkonly" data-edit="agent.brk">${brkName}</div>`;
+  return `<div class="strip ${accStrip}">
+    <div>
+      <div class="s-name" data-edit="agent.name"><span class="r">${esc(first)}</span> <span class="b">${esc(rest)}</span></div>
+      <div class="s-broker"><span data-edit="agent.broker">${esc(a.broker)}</span></div>
+      ${a.creds?`<div class="s-creds"><span data-edit="agent.creds">${esc(a.creds)}</span></div>`:''}
+    </div>
+    <div class="s-divider"></div>
+    <div class="s-contact">
+      <div class="s-phone"><span data-edit="agent.phone">${esc(a.phone)}</span></div>
+      <div class="s-line"><span data-edit="agent.email">${esc(a.email)}</span></div>
+      <div class="s-line"><span data-edit="agent.web">${esc(a.web)}</span></div>
+    </div>
+    <div class="s-brand">${brand}</div>
+  </div>`;
+}
+
+function cameraSVG(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6h0a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="12.5" r="3.2"/></svg>';}
+
+/* ============================ PHOTOS ============================ */
+function reassignSlots(){
+  const t=T.find(x=>x.id===ST.tpl); const n=photoSlotCount(t);
+  const next=[];
+  for(let i=0;i<n;i++) next[i]= (ST.assign[i]!=null)?ST.assign[i] : (i<ST.photos.length?i:-1);
+  ST.assign=next;
+}
+document.getElementById('photoIn').addEventListener('change',e=>{
+  const files=[...e.target.files]; let pending=files.length;
+  files.forEach(f=>{
+    const rd=new FileReader();
+    rd.onload=()=>{ST.photos.push(rd.result); if(--pending===0)afterUpload();};
+    rd.readAsDataURL(f);
+  });
+  e.target.value='';
+});
+function afterUpload(){
+  // auto-fill empty slots in order
+  const t=T.find(x=>x.id===ST.tpl); const n=photoSlotCount(t);
+  for(let i=0;i<n;i++) if(ST.assign[i]==null||ST.assign[i]<0){ if(i<ST.photos.length)ST.assign[i]=i; }
+  buildTray(); buildPlacement(); render();
+}
+function removePhoto(i){
+  ST.photos.splice(i,1);
+  ST.assign=ST.assign.map(a=> a===i?-1 : (a>i?a-1:a));
+  buildTray(); buildPlacement(); render();
+}
+function clearPhotos(){ST.photos=[];ST.assign=ST.assign.map(()=>-1);buildTray();buildPlacement();render();}
+
+document.getElementById('logoIn').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const rd=new FileReader(); rd.onload=()=>{ST.logo=rd.result;render();}; rd.readAsDataURL(f); e.target.value='';
+});
+function removeLogo(){ST.logo=null;render();}
+
+/* ============================ CONTROLS WIRING ============================ */
+document.getElementById('tgHead').onchange=e=>{ST.showHead=e.target.checked;render();};
+document.getElementById('tgSpecs').onchange=e=>{ST.showSpecs=e.target.checked;render();};
+document.getElementById('fEyebrow').oninput=e=>{ST.eyebrow=e.target.value;render();};
+document.getElementById('fMsg').oninput=e=>{ST.msg=e.target.value;render();};
+document.querySelectorAll('#accentSeg button').forEach(b=>{
+  b.onclick=()=>{ST.accent=b.dataset.acc;
+    document.querySelectorAll('#accentSeg button').forEach(x=>{x.className='';});
+    b.className='on '+(ST.accent==='red'?'red-on':'blue-on'); render();};
+});
+['name','broker','creds','phone','email','web','brk'].forEach(k=>{
+  const id={name:'aName',broker:'aBroker',creds:'aCreds',phone:'aPhone',email:'aEmail',web:'aWeb',brk:'aBrk'}[k];
+  document.getElementById(id).oninput=e=>{ST.agent[k]=e.target.value;render();};
+});
+[['fBig','bigHeadline'],['fScript','scriptLine'],['fBadge','badge'],['fODate','openDate'],['fOTime','openTime'],['fCollage','collageFooter']].forEach(([id,k])=>{
+  const el=document.getElementById(id); if(el) el.oninput=e=>{ST[k]=e.target.value;render();};
+});
+[0,1,2].forEach(i=>{const el=document.getElementById('fStat'+i); if(el) el.oninput=e=>{ST.stats[i]=e.target.value;render();};});
+document.getElementById('agentPhotoIn').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const rd=new FileReader(); rd.onload=()=>{ST.agentPhoto=rd.result;render();}; rd.readAsDataURL(f); e.target.value='';
+});
+
+function cycleTpl(d){
+  const i=T.findIndex(x=>x.id===ST.tpl); const ni=(i+d+T.length)%T.length;
+  ST.tpl=T[ni].id; reassignSlots(); buildTplGrid(); buildPlacement(); buildProps(); render();
+}
+
+/* ============================ EXPORT ============================ */
+function exportPNG(){
+  const card=document.getElementById('card');
+  const scaler=document.getElementById('cardScaler');
+  const prev=scaler.style.transform; scaler.style.transform='scale(1)';
+  document.body.classList.add('exporting');
+  html2canvas(card,{scale:3,useCORS:true,backgroundColor:'#ffffff',width:1200,height:800,windowWidth:1200,windowHeight:800})
+    .then(cv=>{
+      scaler.style.transform=prev;
+      document.body.classList.remove('exporting');
+      const a=document.createElement('a');
+      a.download='postcard-back-'+ST.tpl+'.png'; a.href=cv.toDataURL('image/png'); a.click();
+    }).catch(err=>{scaler.style.transform=prev; document.body.classList.remove('exporting'); alert('Export failed: '+err);});
+}
+function renderCard(cb){
+  const card=document.getElementById('card');
+  const scaler=document.getElementById('cardScaler');
+  const prev=scaler.style.transform; scaler.style.transform='scale(1)';
+  document.body.classList.add('exporting');
+  html2canvas(card,{scale:3,useCORS:true,backgroundColor:'#ffffff',width:1200,height:800,windowWidth:1200,windowHeight:800})
+    .then(cv=>{ scaler.style.transform=prev; document.body.classList.remove('exporting'); cb(cv); })
+    .catch(err=>{scaler.style.transform=prev; document.body.classList.remove('exporting'); alert('Export failed: '+err);});
+}
+function downloadPDF(){
+  renderCard(cv=>{
+    const J=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
+    if(!J){alert('PDF library not loaded.');return;}
+    const pdf=new J({orientation:'landscape',unit:'in',format:[6,4]});
+    pdf.addImage(cv.toDataURL('image/png'),'PNG',0,0,6,4,undefined,'FAST');
+    pdf.save('postcard-back-'+ST.tpl+'.pdf');
+  });
+}
+function printPDF(){
+  renderCard(cv=>{
+    const w=window.open('','_blank');
+    if(!w){alert('Pop-up blocked. Allow pop-ups to print, or use Download PDF.');return;}
+    w.document.write('<html><head><title>Postcard Back</title><style>@page{size:6in 4in;margin:0}html,body{margin:0;padding:0}img{width:6in;height:4in;display:block}</style></head><body><img src="'+cv.toDataURL('image/png')+'" onload="window.focus();window.print();"></body></html>');
+    w.document.close();
+  });
+}
+
+/* ============================ LOCAL SAVE ============================ */
+function saveLocal(){
+  try{
+    const {photos,logo,assign,agentPhoto,...rest}=ST; // skip heavy image data
+    localStorage.setItem('pcBackDesigner', JSON.stringify(rest));
+  }catch(e){}
+}
+function loadLocal(){
+  try{
+    const raw=localStorage.getItem('pcBackDesigner'); if(!raw)return;
+    const d=JSON.parse(raw); Object.assign(ST,d);
+    document.getElementById('tgHead').checked=ST.showHead;
+    document.getElementById('tgSpecs').checked=ST.showSpecs;
+    document.getElementById('fEyebrow').value=ST.eyebrow;
+    document.getElementById('fMsg').value=ST.msg;
+    const a=ST.agent;
+    document.getElementById('aName').value=a.name; document.getElementById('aBroker').value=a.broker;
+    document.getElementById('aCreds').value=a.creds; document.getElementById('aPhone').value=a.phone;
+    document.getElementById('aEmail').value=a.email; document.getElementById('aWeb').value=a.web;
+    document.getElementById('aBrk').value=a.brk;
+    const setv=(id,v)=>{const el=document.getElementById(id); if(el&&v!=null)el.value=v;};
+    setv('fBig',ST.bigHeadline); setv('fScript',ST.scriptLine); setv('fBadge',ST.badge);
+    setv('fODate',ST.openDate); setv('fOTime',ST.openTime); setv('fCollage',ST.collageFooter);
+    if(ST.stats){setv('fStat0',ST.stats[0]);setv('fStat1',ST.stats[1]);setv('fStat2',ST.stats[2]);}
+    document.querySelectorAll('#accentSeg button').forEach(x=>{x.className= x.dataset.acc===ST.accent?('on '+(ST.accent==='red'?'red-on':'blue-on')):'';});
+  }catch(e){}
+}
+
+/* ============================ FIT TO STAGE ============================ */
+function fit(){
+  const stage=document.querySelector('.stage');
+  const avail=Math.min(stage.clientWidth-72, 1000);
+  const scale=Math.min(1, avail/1200);
+  const s=document.getElementById('cardScaler');
+  s.style.transform=`scale(${scale})`;
+  s.style.height=(800*scale)+'px'; s.style.width=(1200*scale)+'px';
+}
+window.addEventListener('resize',fit);
+
+/* ============================ CLICK-TO-EDIT ============================ */
+function getPath(path){const ps=path.split('.');let o=ST;for(const k of ps){if(o==null)return '';o=o[/^\d+$/.test(k)?+k:k];}return o==null?'':o;}
+function setPath(path,val){const ps=path.split('.');let o=ST;for(let i=0;i<ps.length-1;i++){const k=ps[i];o=o[/^\d+$/.test(k)?+k:k];}const last=ps[ps.length-1];o[/^\d+$/.test(last)?+last:last]=val;}
+
+function syncInputs(){
+  const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null&&el.value!==String(v))el.value=v;};
+  set('fEyebrow',ST.eyebrow);set('fMsg',ST.msg);
+  set('fBig',ST.bigHeadline);set('fScript',ST.scriptLine);set('fBadge',ST.badge);
+  set('fODate',ST.openDate);set('fOTime',ST.openTime);set('fCollage',ST.collageFooter);
+  if(ST.stats){set('fStat0',ST.stats[0]);set('fStat1',ST.stats[1]);set('fStat2',ST.stats[2]);}
+  const a=ST.agent;
+  set('aName',a.name);set('aBroker',a.broker);set('aCreds',a.creds);set('aPhone',a.phone);
+  set('aEmail',a.email);set('aWeb',a.web);set('aBrk',a.brk);
+  buildProps();
+}
+
+function decorateEditables(){
+  const card=document.getElementById('card');
+  card.querySelectorAll('[data-edit]').forEach(el=>{el.setAttribute('contenteditable','true');el.spellcheck=false;});
+  card.querySelectorAll('[data-photo]').forEach(el=>{
+    const key=el.getAttribute('data-photo');
+    let filled=false;
+    if(key==='agent')filled=!!ST.agentPhoto;
+    else{const i=+key;filled=ST.assign[i]!=null&&ST.assign[i]>=0&&ST.photos[ST.assign[i]]!=null;}
+    if(filled){
+      const x=document.createElement('button');
+      x.type='button';x.className='photo-x';x.textContent='\u00d7';
+      x.setAttribute('data-photo-x',key);x.title='Remove this photo';
+      el.appendChild(x);
+    }
+  });
+}
+
+let PHOTO_TARGET=null;
+function openPhotoFor(key){PHOTO_TARGET=key;document.getElementById('inlinePhotoIn').click();}
+function clearSlot(key){
+  if(key==='agent'){ST.agentPhoto=null;}
+  else{ST.assign[+key]=-1;}
+  buildTray();buildPlacement();render();
+}
+
+(function initInlineEditing(){
+  if(!document.getElementById('inlinePhotoIn')){
+    const inp=document.createElement('input');
+    inp.type='file';inp.id='inlinePhotoIn';inp.accept='image/*';inp.style.display='none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change',e=>{
+      const f=e.target.files[0];if(!f){PHOTO_TARGET=null;return;}
+      const rd=new FileReader();
+      rd.onload=()=>{
+        if(PHOTO_TARGET==='agent'){ST.agentPhoto=rd.result;}
+        else if(PHOTO_TARGET!=null){const slot=+PHOTO_TARGET;ST.photos.push(rd.result);ST.assign[slot]=ST.photos.length-1;}
+        PHOTO_TARGET=null;buildTray();buildPlacement();render();
+      };
+      rd.readAsDataURL(f);e.target.value='';
+    });
+  }
+  const card=document.getElementById('card');
+  card.addEventListener('click',e=>{
+    const x=e.target.closest('[data-photo-x]');
+    if(x){e.preventDefault();e.stopPropagation();clearSlot(x.getAttribute('data-photo-x'));return;}
+    if(e.target.closest('[data-edit]'))return;
+    const ph=e.target.closest('[data-photo]');
+    if(ph){openPhotoFor(ph.getAttribute('data-photo'));}
+  });
+  card.addEventListener('keydown',e=>{
+    const t=e.target.closest('[data-edit]');
+    if(t&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();t.blur();}
+  });
+  card.addEventListener('focusout',e=>{
+    const t=e.target.closest('[data-edit]');if(!t)return;
+    const path=t.getAttribute('data-edit');
+    let v=(t.innerText||'').replace(/\u00a0/g,' ');
+    if(path.endsWith('.__specs')){
+      v=v.replace(/\s*\n\s*/g,' ').trim();
+      const base=path.slice(0,-8);
+      const grab=re=>{const m=v.match(re);return m?m[1].trim():null;};
+      const beds=grab(/([\d,]+)\s*bed/i), baths=grab(/([\d,]+)\s*bath/i), sqft=grab(/([\d,]+)\s*(?:sq|sf)/i);
+      let any=false;
+      if(beds!=null){setPath(base+'.beds',beds);any=true;}
+      if(baths!=null){setPath(base+'.baths',baths);any=true;}
+      if(sqft!=null){setPath(base+'.sqft',sqft);any=true;}
+      if(any){ST.showSpecs=true;const tg=document.getElementById('tgSpecs');if(tg)tg.checked=true;}
+      syncInputs();render();return;
+    }
+    if(path.endsWith('.addr'))v=v.replace(/\s*\n\s*/g,', ').replace(/,\s*,/g,',').trim().replace(/,\s*$/,'');
+    else v=v.replace(/\s*\n\s*/g,' ').trim();
+    if(String(getPath(path))===v)return;
+    setPath(path,v);syncInputs();render();
+  });
+})();
+
+/* ============================ INIT ============================ */
+loadLocal();
+reassignSlots();
+buildTplGrid(); buildTray(); buildPlacement(); buildProps(); render(); fit();
+</script>
+</body>
+</html>

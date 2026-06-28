@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF → Private Offering · Pinnacle Listing System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  :root{ --navy:#16243f; --navy-deep:#0f1830; --panel:#1b2a4a; --gold:#c9a84c; --gold-soft:#d3b25a; --cream:#f8f4ea; --muted:#8a93a8; --line:#2a3a5c; --bad:#d46a6a; --ok:#5bbb7b;
+    --display:'Playfair Display',Georgia,serif; --body:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);background:var(--navy);color:var(--cream);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px clamp(16px,4vw,34px);border-bottom:1px solid var(--line);background:var(--navy-deep);position:sticky;top:0;z-index:20;}
+  .topbar .brand{font-family:var(--display);font-style:italic;font-size:18px;}
+  .topbar .brand small{display:block;font-style:normal;font-family:var(--body);font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-top:2px;}
+  .wrap{display:grid;grid-template-columns:minmax(340px,440px) 1fr;gap:22px;padding:22px clamp(16px,4vw,34px);align-items:start;}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr;}}
+  .card{background:var(--navy-deep);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px;}
+  .card h2{font-family:var(--display);font-size:17px;font-weight:500;margin-bottom:4px;}
+  .card .sub{font-size:11.5px;color:var(--muted);margin-bottom:14px;}
+  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:26px 18px;text-align:center;cursor:pointer;transition:.2s;background:var(--panel);}
+  .drop:hover,.drop.drag{border-color:var(--gold);background:#1f3052;}
+  .drop b{color:var(--gold-soft);}
+  .drop .hint{font-size:11px;color:var(--muted);margin-top:6px;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .field{display:flex;flex-direction:column;gap:4px;margin-bottom:11px;flex:1;min-width:0;}
+  .field.half{flex:1 1 calc(50% - 5px);}
+  label{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+  input,select,textarea{font-family:var(--body);font-size:13px;color:var(--cream);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);}
+  textarea{resize:vertical;min-height:46px;line-height:1.5;}
+  .stat-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+  .stat-row input{flex:1;}
+  .stat-row .x{flex:0 0 auto;background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:7px;width:32px;height:34px;cursor:pointer;font-size:15px;}
+  .stat-row .x:hover{border-color:var(--bad);color:var(--bad);}
+  .addbtn{font-size:11px;font-weight:600;color:var(--gold-soft);background:transparent;border:1px dashed var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;}
+  .addbtn:hover{border-color:var(--gold);}
+  details{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  details summary{cursor:pointer;padding:11px 14px;font-weight:600;font-size:13px;background:var(--panel);list-style:none;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary::before{content:'▸ ';color:var(--gold);}
+  details[open] summary::before{content:'▾ ';}
+  details .inner{padding:14px;}
+  .thumbs{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;}
+  .thumb{position:relative;width:54px;}
+  .thumb img{width:100%;border:1px solid var(--line);border-radius:4px;display:block;}
+  .thumb span{position:absolute;bottom:2px;right:3px;font-size:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:3px;padding:0 3px;}
+  .bigbtn{display:block;width:100%;font-family:var(--body);font-size:14px;font-weight:600;letter-spacing:.04em;border:none;border-radius:10px;padding:13px;cursor:pointer;margin-top:8px;}
+  .bigbtn.gold{background:var(--gold);color:var(--navy);}
+  .bigbtn.gold:hover{background:var(--gold-soft);}
+  .bigbtn.ghost{background:var(--panel);color:var(--cream);border:1px solid var(--gold);}
+  .bigbtn:disabled{opacity:.45;cursor:not-allowed;}
+  .status{font-size:12px;color:var(--muted);margin-top:10px;min-height:16px;}
+  .status b{color:var(--gold-soft);}
+  .prev-wrap{position:sticky;top:78px;}
+  .prev-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .prev-head .sz{font-size:11px;color:var(--muted);}
+  iframe{width:100%;height:78vh;border:1px solid var(--line);border-radius:12px;background:#0b1622;}
+  .empty{height:78vh;border:1px dashed var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:13px;padding:24px;}
+  .note{font-size:11px;color:var(--muted);line-height:1.7;margin-top:12px;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">PDF → Private Offering<small>Pinnacle Listing System</small></div>
+    <div style="font-size:11px;color:var(--muted)">Self-contained · share the file directly</div>
+  </div>
+
+  <div class="wrap">
+    <!-- LEFT: controls -->
+    <div>
+      <div class="card">
+        <h2>1 · Drop your PDF</h2>
+        <div class="sub">Each page becomes a full-width plate, embedded in the page so the HTML works on its own.</div>
+        <div class="drop" id="drop">
+          <div><b>Choose a PDF</b> or drag it here</div>
+          <div class="hint">Brochure, feature sheet, floor plans — any PDF</div>
+          <input type="file" id="file" accept="application/pdf" style="display:none">
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div class="field" style="flex:1">
+            <label>Image quality</label>
+            <select id="quality">
+              <option value="std" selected>Standard — smaller file</option>
+              <option value="high">High — sharper, larger file</option>
+            </select>
+          </div>
+        </div>
+        <div class="status" id="loadStatus"></div>
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+
+      <div class="card">
+        <h2>2 · Details</h2>
+        <div class="sub">Pre-filled — edit per listing. The contact block stays the same each time.</div>
+
+        <details open>
+          <summary>Header &amp; Hero</summary>
+          <div class="inner">
+            <div class="row">
+              <div class="field half"><label>Brand line (header)</label><input id="brandMain" value="156 Tower Hill Road"></div>
+              <div class="field half"><label>Header subtitle</label><input id="brandSmall" value="A Private Offering"></div>
+            </div>
+            <div class="field"><label>Hero eyebrow</label><input id="heroEyebrow" value="The Collector Edition · Vol. I"></div>
+            <div class="field"><label>Hero title (big italic)</label><input id="heroTitle" value="The Ravine Residence"></div>
+            <div class="field"><label>Location line</label><input id="heroLoc" value="Jefferson · Richmond Hill · Ontario"></div>
+            <div class="row">
+              <div class="field half"><label>CTA label</label><input id="ctaLabel" value="Book a Viewing"></div>
+              <div class="field half"><label>CTA link</label><input id="ctaHref" value="#contact"></div>
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Stats</summary>
+          <div class="inner">
+            <div id="statList"></div>
+            <button class="addbtn" id="addStat" type="button">+ Add stat</button>
+          </div>
+        </details>
+
+        <details>
+          <summary>Page title &amp; description (SEO / link preview)</summary>
+          <div class="inner">
+            <div class="field"><label>Browser / link title</label><input id="titleMeta" value="156 Tower Hill Road · A Private Offering"></div>
+            <div class="field"><label>Description</label><textarea id="descMeta">The Ravine Residence — 156 Tower Hill Road, Jefferson, Richmond Hill. A rare ravine-backing estate with a self-contained walk-out lower level.</textarea></div>
+          </div>
+        </details>
+
+        <details>
+          <summary>Contact block</summary>
+          <div class="inner">
+            <div class="row">
+              <div class="field half"><label>Eyebrow</label><input id="contactEyebrow" value="Exclusively Presented"></div>
+              <div class="field half"><label>By-line</label><input id="contactBy" value="— By Appointment Only —"></div>
+            </div>
+            <div class="field"><label>Name</label><input id="agentName" value="Peter Luo"></div>
+            <div class="row">
+              <div class="field half"><label>Designations</label><input id="agentDesig" value="SRS · MCNE"></div>
+              <div class="field half"><label>Role</label><input id="agentRole" value="Broker · Pinnacle Listing System"></div>
+            </div>
+            <div class="field"><label>Brokerage</label><input id="agentFirm" value="RE/MAX Realtron Realty Inc., Brokerage"></div>
+            <div class="row">
+              <div class="field half"><label>Direct phone</label><input id="tel" value="+1 (647) 824-3718"></div>
+              <div class="field half"><label>Email</label><input id="email" value="peterluo@peterluo.com"></div>
+            </div>
+            <div class="field"><label>Website</label><input id="website" value="www.peterluo.com"></div>
+            <div class="field"><label>Disclaimer</label><textarea id="disclaimer">All information deemed reliable but not guaranteed · Not intended to solicit clients under contract</textarea></div>
+          </div>
+        </details>
+
+        <details>
+          <summary>Output</summary>
+          <div class="inner">
+            <div class="field"><label>File name</label><input id="slug" value="156-tower-hill-road"></div>
+          </div>
+        </details>
+      </div>
+
+      <div class="card">
+        <h2>3 · Generate</h2>
+        <button class="bigbtn ghost" id="previewBtn" type="button" disabled>↻ Build preview</button>
+        <button class="bigbtn gold" id="downloadBtn" type="button" disabled>⤓ Download HTML</button>
+        <div class="status" id="genStatus"></div>
+        <div class="note">The HTML embeds every page as an image, so it's a single file you can drop into any folder, upload to your site, or send as-is. No image hosting needed.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: preview -->
+    <div class="prev-wrap">
+      <div class="prev-head"><h2 style="font-family:var(--display);font-weight:500;font-size:17px">Preview</h2><span class="sz" id="sizeTag"></span></div>
+      <div class="empty" id="empty">Drop a PDF and hit <b style="color:var(--gold-soft);margin:0 4px">Build preview</b> to see your offering page here.</div>
+      <iframe id="preview" style="display:none"></iframe>
+    </div>
+  </div>
+
+<script>
+  const OUTPUT_CSS = `  :root {
+    --navy:#0b1622; --navy-soft:#102234; --gold:#c8a45a; --gold-bright:#d8bd7e;
+    --cream:#f3ede1; --muted:#9fb0c0; --line:rgba(200,164,90,.28);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:'DM Sans',sans-serif; color:var(--cream); background:var(--navy);
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(200,164,90,.10), transparent 45%),
+      radial-gradient(circle at 85% 100%, rgba(30,70,110,.30), transparent 50%);
+    background-attachment:fixed; -webkit-font-smoothing:antialiased; line-height:1.7;
+  }
+  /* sticky header */
+  header {
+    position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
+    padding:14px clamp(18px,5vw,48px); backdrop-filter:blur(10px);
+    background:rgba(11,22,34,.72); border-bottom:1px solid var(--line);
+  }
+  .brand { font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(15px,2.2vw,19px); letter-spacing:.02em; }
+  .brand small { display:block; font-family:'DM Sans',sans-serif; font-style:normal; font-size:9.5px; letter-spacing:.34em; color:var(--gold); text-transform:uppercase; margin-top:2px; }
+  .cta {
+    font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--navy);
+    background:var(--gold); padding:11px 20px; border-radius:2px; text-decoration:none;
+    transition:.25s; white-space:nowrap; font-weight:500;
+  }
+  .cta:hover { background:var(--gold-bright); transform:translateY(-1px); }
+  /* hero */
+  .hero { text-align:center; padding:clamp(64px,12vw,140px) 24px clamp(40px,7vw,72px); }
+  .hero .eyebrow { font-size:11px; letter-spacing:.42em; text-transform:uppercase; color:var(--gold); margin-bottom:26px; }
+  .hero h1 { font-family:'Playfair Display',serif; font-style:italic; font-weight:400; font-size:clamp(38px,8vw,82px); line-height:1.05; letter-spacing:.01em; }
+  .hero .loc { font-size:12px; letter-spacing:.34em; text-transform:uppercase; color:var(--muted); margin-top:20px; }
+  .stats { display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(20px,6vw,64px); margin-top:46px; }
+  .stats .s { min-width:64px; }
+  .stats .n { font-family:'Playfair Display',serif; font-size:clamp(24px,4vw,34px); color:var(--cream); }
+  .stats .l { font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--gold); margin-top:6px; }
+  .rule { width:54px; height:1px; background:var(--gold); margin:40px auto 0; opacity:.8; }
+  /* plates */
+  .gallery { max-width:920px; margin:0 auto; padding:clamp(30px,6vw,60px) clamp(14px,4vw,28px) 20px; display:flex; flex-direction:column; gap:clamp(26px,5vw,54px); }
+  .plate { opacity:0; transform:translateY(26px); transition:opacity .9s ease, transform .9s ease; }
+  .plate.in { opacity:1; transform:none; }
+  .plate img { width:100%; height:auto; display:block; border:1px solid var(--line); border-radius:3px;
+    box-shadow:0 24px 60px rgba(0,0,0,.5); }
+  /* contact */
+  #contact { margin-top:clamp(50px,9vw,90px); padding:clamp(56px,10vw,96px) 24px clamp(40px,7vw,64px);
+    border-top:1px solid var(--line); text-align:center;
+    background:linear-gradient(180deg, transparent, rgba(8,16,25,.85)); }
+  #contact .eyebrow { font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(26px,5vw,40px); }
+  #contact .by { font-size:11px; letter-spacing:.32em; text-transform:uppercase; color:var(--gold); margin-top:12px; }
+  .name { font-family:'Playfair Display',serif; font-size:30px; margin-top:38px; }
+  .desig { font-size:11px; letter-spacing:.3em; color:var(--gold); margin-top:8px; }
+  .role { font-size:11px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); margin-top:22px; }
+  .firm { font-family:'Playfair Display',serif; font-style:italic; font-size:16px; margin-top:8px; color:var(--cream); }
+  .contacts { display:flex; flex-wrap:wrap; justify-content:center; gap:14px 34px; margin-top:30px; }
+  .contacts a { color:var(--cream); text-decoration:none; font-size:14px; letter-spacing:.03em; border-bottom:1px solid transparent; transition:.2s; }
+  .contacts a:hover { color:var(--gold-bright); border-color:var(--gold); }
+  .contacts .k { display:block; font-size:9.5px; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); margin-bottom:5px; }
+  .disclaimer { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); opacity:.65; margin-top:48px; line-height:2; }`;
+
+  const $ = id => document.getElementById(id);
+  let PAGES = [];            // base64 JPEG data URLs, one per page
+  let lastBlobUrl = null;
+
+  if (window['pdfjsLib']) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function slugify(s){ return (s||'').toLowerCase().split(',')[0].trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+
+  // ---------- stats editor ----------
+  const DEFAULT_STATS = [['4+1','Beds'],['5','Baths'],['3,800','Sq Ft'],['50 ft','Lot']];
+  function addStatRow(n='', l=''){
+    const div = document.createElement('div'); div.className='stat-row';
+    div.innerHTML = `<input placeholder="4+1" value="${esc(n)}"><input placeholder="Beds" value="${esc(l)}"><button class="x" type="button" title="Remove">×</button>`;
+    div.querySelector('.x').onclick = () => div.remove();
+    $('statList').appendChild(div);
+  }
+  DEFAULT_STATS.forEach(s => addStatRow(s[0], s[1]));
+  $('addStat').onclick = () => addStatRow();
+  function getStats(){
+    return [...$('statList').querySelectorAll('.stat-row')].map(r=>{
+      const i = r.querySelectorAll('input');
+      return { n:i[0].value.trim(), l:i[1].value.trim() };
+    }).filter(s => s.n || s.l);
+  }
+
+  // auto slug from brand line
+  $('brandMain').addEventListener('input', () => { $('slug').value = slugify($('brandMain').value) || 'offering'; });
+
+  // ---------- PDF → images ----------
+  $('drop').onclick = () => $('file').click();
+  $('file').onchange = e => { if(e.target.files[0]) handlePDF(e.target.files[0]); };
+  ['dragover','dragenter'].forEach(ev => $('drop').addEventListener(ev, e=>{ e.preventDefault(); $('drop').classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev => $('drop').addEventListener(ev, e=>{ e.preventDefault(); $('drop').classList.remove('drag'); }));
+  $('drop').addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(f && f.type==='application/pdf') handlePDF(f); });
+
+  async function handlePDF(file){
+    if(!window['pdfjsLib']){ $('loadStatus').innerHTML = '<b style="color:var(--bad)">PDF engine didn\'t load.</b> Check your connection and refresh.'; return; }
+    const q = $('quality').value === 'high' ? {scale:2.2, jpeg:0.9} : {scale:1.6, jpeg:0.82};
+    PAGES = []; $('thumbs').innerHTML=''; $('previewBtn').disabled = true; $('downloadBtn').disabled = true;
+    $('loadStatus').innerHTML = 'Reading <b>'+esc(file.name)+'</b>…';
+    try{
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+      for(let p=1; p<=pdf.numPages; p++){
+        $('loadStatus').innerHTML = 'Rendering page <b>'+p+'</b> of '+pdf.numPages+'…';
+        const page = await pdf.getPage(p);
+        const vp = page.getViewport({scale:q.scale});
+        const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,c.width,c.height);
+        await page.render({canvasContext:ctx, viewport:vp}).promise;
+        const url = c.toDataURL('image/jpeg', q.jpeg);
+        PAGES.push(url);
+        const t = document.createElement('div'); t.className='thumb';
+        t.innerHTML = '<img src="'+url+'"><span>'+p+'</span>';
+        $('thumbs').appendChild(t);
+      }
+      $('loadStatus').innerHTML = '<b style="color:var(--ok)">'+PAGES.length+' page'+(PAGES.length>1?'s':'')+' ready.</b> Edit details, then build the preview.';
+      $('previewBtn').disabled = false; $('downloadBtn').disabled = false;
+    }catch(err){
+      console.error(err);
+      $('loadStatus').innerHTML = '<b style="color:var(--bad)">Could not read that PDF.</b> Try re-saving it or another file.';
+    }
+  }
+
+  // ---------- collect values ----------
+  function vals(){
+    return {
+      brandMain:$('brandMain').value, brandSmall:$('brandSmall').value,
+      heroEyebrow:$('heroEyebrow').value, heroTitle:$('heroTitle').value, heroLoc:$('heroLoc').value,
+      ctaLabel:$('ctaLabel').value, ctaHref:$('ctaHref').value,
+      titleMeta:$('titleMeta').value, descMeta:$('descMeta').value,
+      contactEyebrow:$('contactEyebrow').value, contactBy:$('contactBy').value,
+      agentName:$('agentName').value, agentDesig:$('agentDesig').value, agentRole:$('agentRole').value, agentFirm:$('agentFirm').value,
+      tel:$('tel').value, email:$('email').value, website:$('website').value, disclaimer:$('disclaimer').value,
+      stats:getStats(), altBase:$('brandMain').value || 'Listing'
+    };
+  }
+
+  // ---------- build the offering HTML ----------
+  function buildHTML(){
+    const v = vals();
+    const stats = v.stats.map(s => `<div class="s"><div class="n">${esc(s.n)}</div><div class="l">${esc(s.l)}</div></div>`).join('\n      ');
+    const plates = PAGES.map((src,i) => `      <figure class="plate" data-reveal><img loading="lazy" src="${src}" alt="${esc(v.altBase)} — page ${i+1}"></figure>`).join('\n');
+    const telHref = (v.tel||'').replace(/[^+\d]/g,'');
+    const webHref = /^https?:\/\//i.test(v.website) ? v.website : ('https://' + v.website.replace(/^\/+/,''));
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${esc(v.titleMeta)}</title>
+<meta name="description" content="${esc(v.descMeta)}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+${OUTPUT_CSS}
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">${esc(v.brandMain)}<small>${esc(v.brandSmall)}</small></div>
+    <a class="cta" href="${esc(v.ctaHref)}">${esc(v.ctaLabel)}</a>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">${esc(v.heroEyebrow)}</div>
+    <h1>${esc(v.heroTitle)}</h1>
+    <div class="loc">${esc(v.heroLoc)}</div>
+    <div class="stats">
+      ${stats}
+    </div>
+    <div class="rule"></div>
+  </section>
+
+  <main class="gallery">
+${plates}
+  </main>
+
+  <footer id="contact">
+    <div class="eyebrow">${esc(v.contactEyebrow)}</div>
+    <div class="by">${esc(v.contactBy)}</div>
+    <div class="name">${esc(v.agentName)}</div>
+    <div class="desig">${esc(v.agentDesig)}</div>
+    <div class="role">${esc(v.agentRole)}</div>
+    <div class="firm">${esc(v.agentFirm)}</div>
+    <div class="contacts">
+      <a href="tel:${esc(telHref)}"><span class="k">Direct</span>${esc(v.tel)}</a>
+      <a href="mailto:${esc(v.email)}"><span class="k">Email</span>${esc(v.email)}</a>
+      <a href="${esc(webHref)}" target="_blank" rel="noopener"><span class="k">Website</span>${esc(v.website)}</a>
+    </div>
+    <div class="disclaimer">${esc(v.disclaimer)}</div>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold:0.12 });
+    document.querySelectorAll('[data-reveal]').forEach(el=>io.observe(el));
+  <\/script>
+</body>
+</html>`;
+  }
+
+  function fmtSize(bytes){ return bytes > 1048576 ? (bytes/1048576).toFixed(1)+' MB' : Math.round(bytes/1024)+' KB'; }
+
+  $('previewBtn').onclick = () => {
+    if(!PAGES.length){ $('genStatus').innerHTML='<b style="color:var(--bad)">Add a PDF first.</b>'; return; }
+    const html = buildHTML();
+    if(lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+    lastBlobUrl = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+    $('empty').style.display='none';
+    const f = $('preview'); f.style.display='block'; f.src = lastBlobUrl;
+    $('sizeTag').textContent = fmtSize(new Blob([html]).size) + ' · ' + PAGES.length + ' pages';
+    $('genStatus').innerHTML = '<b style="color:var(--ok)">Preview built.</b> Scroll inside it, then download.';
+  };
+
+  $('downloadBtn').onclick = () => {
+    if(!PAGES.length){ $('genStatus').innerHTML='<b style="color:var(--bad)">Add a PDF first.</b>'; return; }
+    const html = buildHTML();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+    a.download = (slugify($('slug').value) || 'offering') + '.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    $('genStatus').innerHTML = '<b style="color:var(--ok)">Downloaded '+esc(a.download)+'.</b> Drop it in a folder or upload it anywhere.';
+  };
+</script>
+</body>
+</html>
