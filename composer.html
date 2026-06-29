@@ -146,6 +146,39 @@
   .wk-cell.sched{color:#9aa3b2}.wk-cell.none{color:#dde1e8}.wk-cell.failed{background:rgba(180,80,63,.12);color:#b4503f}
   .wklegend{display:flex;gap:14px;flex-wrap:wrap;font-size:.66rem;color:var(--muted);margin-top:10px}
   .wklegend span{display:flex;align-items:center;gap:4px}
+  .wk-day{position:relative}
+  .wk-add{position:absolute;top:4px;right:4px;z-index:2;width:24px;height:24px;border:1px solid var(--gold);background:#fffdf7;color:var(--gold-deep);border-radius:7px;font-size:1rem;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit}
+  .wk-add:hover{background:var(--gold);color:#fff}
+  .wk-more{display:inline-block;margin-left:5px;background:var(--gold);color:#fff;font-size:.54rem;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle}
+  /* day popup — mini week-view for one day */
+  #dayPopDlg{max-width:96vw;width:auto;min-width:320px}
+  #dayPopDlg .db{max-height:74vh;overflow:auto}
+  .dpgrid{display:grid;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;min-width:max-content}
+  .dpgrid>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 8px;min-width:0}
+  .dp-corner{position:sticky;left:0;z-index:3;background:var(--navy);color:var(--cream);font-weight:700;font-size:.56rem;display:flex;align-items:flex-end}
+  .dp-col{background:var(--cream-2);display:flex;flex-direction:column;gap:5px}
+  .dp-col.prim{background:#fff}
+  .dp-tl{display:flex;align-items:center;gap:6px;justify-content:space-between}
+  .dp-time{border:1px solid var(--line);border-radius:6px;padding:3px 5px;font-family:inherit;font-size:.74rem;width:96px}
+  .dp-x{border:none;background:none;color:#b9c0cc;cursor:pointer;font-size:.78rem;line-height:1;padding:2px}.dp-x:hover{color:#b4503f}
+  .dp-th{font-weight:800;color:var(--navy);font-size:.74rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dp-tags{display:flex;gap:4px;flex-wrap:wrap}
+  .dp-tag{font-size:.56rem;font-weight:800;padding:2px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em}
+  .dp-tag.pat{background:#eef0f4;color:var(--muted)}
+  .dp-tag.rec{background:var(--gold);color:#fff;cursor:pointer}
+  .dp-tag.one{background:#fff;border:1px solid var(--gold);color:var(--gold-deep);cursor:pointer}
+  .dp-cap{font-size:.62rem;color:#3f495c;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .dp-prop{width:100%;border:1px dashed var(--gold);border-radius:6px;padding:2px 5px;font-family:ui-monospace,monospace;font-size:.62rem;background:#fffdf7;color:var(--navy)}
+  .dp-edit{border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 6px;font-size:.64rem;font-weight:700;color:var(--navy);cursor:pointer;font-family:inherit;margin-top:auto}
+  .dp-edit:hover{border-color:var(--gold)}
+  .dp-addcol{background:var(--cream-2);display:flex;align-items:flex-start;justify-content:center}
+  .dp-add{width:38px;height:38px;border:1px dashed var(--gold);background:#fffdf7;color:var(--gold-deep);border-radius:9px;font-size:1.2rem;font-weight:700;cursor:pointer;font-family:inherit}
+  .dp-add:hover{background:var(--gold);color:#fff}
+  .dp-surf{position:sticky;left:0;z-index:1;background:#fff;font-weight:700;color:var(--navy);font-size:.66rem;display:flex;align-items:center;gap:4px;justify-content:space-between}
+  .dp-surf.auto{border-left:3px solid var(--auto)}.dp-surf .ti{font-size:.5rem;font-weight:800;color:var(--auto)}
+  .dp-cell{display:flex;align-items:center;justify-content:center;font-size:.92rem;min-height:28px;background:#fff}
+  .dp-cell.posted{background:rgba(47,125,87,.14);color:var(--auto)}.dp-cell.due{background:rgba(166,121,42,.16);color:var(--assist)}
+  .dp-cell.sched{color:#9aa3b2}.dp-cell.none{color:#dde1e8}.dp-cell.failed{background:rgba(180,80,63,.12);color:#b4503f}.dp-cell.pad{background:var(--cream-2)}
   .daycard{border:1px solid var(--line);border-radius:11px;padding:10px;background:var(--cream-2);display:flex;flex-direction:column;gap:7px;min-height:140px;cursor:pointer;transition:.12s}
   .daycard:hover{border-color:var(--gold)}
   .daycard .dn{display:flex;align-items:baseline;justify-content:space-between;gap:4px}
@@ -190,11 +223,23 @@
   .tg-cell{display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;color:var(--auto);background:#fff;min-height:32px;user-select:none}
   .tg-cell.on{background:rgba(47,125,87,.13)}
   .tg-cell:hover{background:var(--cream)}
-  #dayDlg{max-width:420px;width:92%}
+  #dayDlg{max-width:460px;width:92%}
+  #dayDlg .db{max-height:72vh;overflow:auto}
   #dayDlg .frow{display:flex;gap:10px}#dayDlg .frow .f{flex:1}
   #dayDlg .db .f{margin-bottom:12px}
   #dayDlg .db label{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--gold-deep);margin-bottom:5px}
   #dayDlg .db input,#dayDlg .db select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:.86rem}
+  .tg-extra{font-size:.56rem;font-weight:800;background:var(--gold);color:#fff;padding:1px 6px;border-radius:999px;vertical-align:middle;margin-left:3px}
+  .dx-sec{margin-top:6px;border-top:1px dashed var(--line);padding-top:12px}
+  .dx-sec-h{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--navy);margin-bottom:8px}
+  .dx-empty{font-size:.76rem;color:var(--muted);margin:0 0 8px;line-height:1.4}
+  .dx-card{border:1px solid var(--gold);border-radius:11px;padding:11px 12px;margin-bottom:11px;background:#fffdf7}
+  .dx-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .dx-n{font-size:.74rem;font-weight:800;color:var(--gold-deep)}
+  .dx-del{border:none;background:none;color:#b9c0cc;cursor:pointer;font-size:.9rem;line-height:1;padding:2px}.dx-del:hover{color:#b4503f}
+  .dx-add{margin-top:8px}
+  .dx-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip.mini{padding:4px 9px;font-size:.7rem;border-radius:999px}
   .tplrow{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:9px;background:var(--cream-2)}
   .tplrow .tr1{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
   .tplrow .dn2{font-weight:800;color:var(--navy);font-size:.82rem;min-width:34px}
@@ -358,6 +403,12 @@
   <div class="da"><button class="btn" id="dayDone">Done</button></div>
 </dialog>
 
+<dialog id="dayPopDlg">
+  <div class="dh" id="dpTitle">Day</div>
+  <div class="db" id="dpBody"></div>
+  <div class="da"><button class="btn ghost" id="dpClose">Close</button></div>
+</dialog>
+
 <dialog id="bankDlg">
   <div class="dh">Caption bank</div>
   <div class="db">
@@ -411,7 +462,7 @@
     fri:{theme:'Just Sold',media:'📷',time:'12:00',group:'Success',folder:'{property}/sold/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','linkedin','whatsapp','nextdoor','threads']},
     sat:{theme:'Open house',media:'🎬',time:'10:00',group:'Activity',folder:'{property}/listing/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','whatsapp','youtube']},
     sun:{theme:'Long-form',media:'🎬📝',time:'19:00',group:'Story',folder:'images/',targets:['telegram','youtube','wechat','facebook_en','facebook_zh','instagram_en','instagram_zh']}
-  }};
+  },extra:{}};
   let template=JSON.parse(JSON.stringify(DEFAULT_TPL));
   let dayProps={}; // { weekStart: { dayKey: propertySlug } } — per-day listing overrides
   // ---------- caption bank (bilingual angles + platform-tagged snippets) ----------
@@ -628,6 +679,7 @@
     };
     // carry weekly-plan linkage so an edited generated post stays mapped to its day card
     if(prev.day)post.day=prev.day;if(prev.weekStart)post.weekStart=prev.weekStart;if(prev.folder)post.folder=prev.folder;
+    if(prev.recurring!==undefined)post.recurring=prev.recurring;if(prev.recSlot!==undefined)post.recSlot=prev.recSlot;if(prev.property!==undefined&&!post.property)post.property=prev.property;
     if(editingId){queue=queue.map(p=>p.id===editingId?post:p);}else{queue.push(post);}
     dbPut(post);resetForm();render();buildWeek();
   };
@@ -738,7 +790,7 @@
   function mondayOf(d){const x=new Date(d);const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);x.setHours(0,0,0,0);return x;}
   function ymd(d){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
   function resolveFolder(f,prop){return (f||'').replace('{property}',prop||'{property}');}
-  function curWeekStart(){return $('weekStart').value||ymd(mondayOf(new Date()));}
+  function curWeekStart(){const v=$('weekStart').value;return ymd(mondayOf(v?new Date(v+'T00:00'):new Date()));}
   function weekDefaultProp(){return ($('activeProp').value||'').trim();}
   function propFor(ws,key){const wk=dayProps[ws]||{};return (wk[key]||'').trim()||weekDefaultProp();}
   function setDayProp(ws,key,val){if(!dayProps[ws])dayProps[ws]={};if(val)dayProps[ws][key]=val;else delete dayProps[ws][key];setPut('dayProps',dayProps);}
@@ -767,7 +819,8 @@
     // day-column headers
     DAYS.forEach(d=>{
       const t=template.days[d.key]||{};
-      const post=queue.find(p=>p.day===d.key&&p.weekStart===ws);
+      const posts=postsForDay(ws,d.key);
+      const post=primaryPost(posts);
       const dt=new Date(ws+'T00:00');dt.setDate(dt.getDate()+d.offset);
       const needsProp=(t.folder||'').includes('{property}');
       const h=document.createElement('div');h.className='wk-day';h.dataset.day=d.key;
@@ -775,7 +828,9 @@
       if(!post){st='not generated';stcls='empty';}
       else if(post.media&&post.media.length){st='media set';stcls='ready';}
       else{st='add media';stcls='needs';}
-      let inner='<div class="wk-dn">'+d.name+' '+(dt.getMonth()+1)+'/'+dt.getDate()+'</div>'+
+      const more=posts.length>1?'<span class="wk-more" title="'+posts.length+' posts this day">+'+(posts.length-1)+'</span>':'';
+      let inner='<button class="wk-add" data-day="'+d.key+'" title="Add a post to '+d.name+'">＋</button>'+
+        '<div class="wk-dn">'+d.name+' '+(dt.getMonth()+1)+'/'+dt.getDate()+more+'</div>'+
         '<div class="wk-bt"><span class="b">'+(t.media||'')+'</span><span class="wk-th">'+esc(t.theme||'')+'</span></div>'+
         '<div class="wk-tm">🕐 '+(t.time||'')+'</div>'+
         '<div class="wk-st '+stcls+'">'+st+'</div>';
@@ -786,11 +841,13 @@
       }
       if(needsProp){const ov=(dayProps[ws]&&dayProps[ws][d.key])||'';inner+='<input class="wk-prop" data-day="'+d.key+'" value="'+esc(ov)+'" placeholder="'+esc(def||'listing')+'" list="propList">';}
       h.innerHTML=inner;
-      h.onclick=()=>{ if(post)editPost(post.id); else toast('Generate this week first to fill '+d.name); };
+      h.onclick=()=>openDayPop(d.key);
+      const addB=h.querySelector('.wk-add');
+      if(addB)addB.addEventListener('click',e=>{e.stopPropagation();addOneOff(d.key,true);});
       const inp=h.querySelector('.wk-prop');
       if(inp){
         inp.addEventListener('click',e=>e.stopPropagation());
-        inp.addEventListener('change',e=>{e.stopPropagation();setDayProp(ws,d.key,inp.value.trim());const np=propFor(ws,d.key);const ep=queue.find(p=>p.day===d.key&&p.weekStart===ws);if(ep){ep.property=np;ep.folder=resolveFolder((template.days[d.key]||{}).folder,np);ep.title=genTitle(template.days[d.key]||{},np,new Date(ep.scheduledLocal||(ws+'T00:00')));dbPut(ep);render();}buildWeek();});
+        inp.addEventListener('change',e=>{e.stopPropagation();setDayProp(ws,d.key,inp.value.trim());const np=propFor(ws,d.key);const ep=primaryPost(postsForDay(ws,d.key));if(ep){ep.property=np;ep.folder=resolveFolder((template.days[d.key]||{}).folder,np);ep.title=genTitle(template.days[d.key]||{},np,new Date(ep.scheduledLocal||(ws+'T00:00')));dbPut(ep);render();}buildWeek();});
       }
       grid.appendChild(h);
     });
@@ -801,7 +858,7 @@
       grid.appendChild(lab);
       DAYS.forEach(d=>{
         const t=template.days[d.key]||{};
-        const post=queue.find(pp=>pp.day===d.key&&pp.weekStart===ws);
+        const post=primaryPost(postsForDay(ws,d.key));
         const dt=new Date(ws+'T00:00');dt.setDate(dt.getDate()+d.offset);
         const due=post?new Date(post.scheduledFor||0).getTime()<=now:false;
         const cs=cellStatus(post,p.key,t,due);
@@ -815,6 +872,93 @@
     host.appendChild(lg);
   }
 
+  // ---------- multi-post per day: one-offs + recurring extras ----------
+  function normTpl(){ if(!template.extra)template.extra={}; DAYS.forEach(d=>{ if(!Array.isArray(template.extra[d.key]))template.extra[d.key]=[]; }); }
+  function postsForDay(ws,key){ return queue.filter(p=>p.day===key&&p.weekStart===ws).sort((a,b)=>new Date(a.scheduledFor||0)-new Date(b.scheduledFor||0)); }
+  function primaryPost(posts){ return posts.find(p=>p.recurring&&(p.recSlot==null))||posts[0]||null; }
+  function hhmm(d){const p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes());}
+  function dayDate(ws,key){ const off=(DAYS.find(d=>d.key===key)||{offset:0}).offset; const dt=new Date(ws+'T00:00'); dt.setDate(dt.getDate()+off); return dt; }
+  function nextSlotTime(ws,key){
+    const posts=postsForDay(ws,key);
+    if(posts.length){ const last=new Date(posts[posts.length-1].scheduledFor||0); last.setHours(last.getHours()+1); return hhmm(last); }
+    return (template.days[key]||{}).time||'12:00';
+  }
+  function buildPost(ws,key,t,prop,dt,angle,recurring,recSlot,timeOverride,titleTheme){
+    const local=ymd(dt)+'T'+(timeOverride||t.time||'12:00');
+    const targets=(t.targets||[]).map(k=>{const p=PMAP[k];return p?{platform:p.key,label:p.label,lang:p.lang,tier:p.tier,status:'queued'}:null;}).filter(Boolean);
+    return {id:uid(),created:new Date().toISOString(),scheduledFor:new Date(local).toISOString(),scheduledLocal:local,status:'queued',
+      title:genTitle({theme:titleTheme||t.theme||'Post'},prop,dt),media:[],
+      captions:{en:angle?angle.en:'',zh:angle?angle.zh:''},commentLinks:{en:'',zh:''},targets,
+      day:key,weekStart:ws,property:prop,folder:resolveFolder(t.folder,prop),recurring:!!recurring,recSlot:recSlot!=null?recSlot:null};
+  }
+  function addOneOff(key,thenOpen){
+    const ws=curWeekStart();const t=template.days[key]||{};const prop=propFor(ws,key);const dt=dayDate(ws,key);
+    const post=buildPost(ws,key,t,prop,dt,null,false,null,nextSlotTime(ws,key),'Extra');
+    queue.push(post);dbPut(post);render();buildWeek();
+    if(thenOpen)openDayPop(key);
+  }
+  function promoteRecurring(post){
+    normTpl();const key=post.day;const t=template.days[key]||{};const id='x'+Math.random().toString(16).slice(2,8);
+    template.extra[key].push({id,theme:(post.title||'Extra').split(' · ')[0]||'Extra',media:t.media||'📷',
+      time:(post.scheduledLocal||'').split('T')[1]||t.time||'12:00',group:t.group||'',
+      folder:t.folder||'images/',targets:(post.targets||[]).map(x=>x.platform)});
+    setPut('template',template);post.recurring=true;post.recSlot=id;dbPut(post);render();buildWeek();
+    toast('Now recurring every '+((DAYS.find(d=>d.key===key)||{}).name||key));
+  }
+  function demoteRecurring(post){
+    normTpl();const key=post.day;
+    if(post.recSlot!=null){template.extra[key]=(template.extra[key]||[]).filter(s=>s.id!==post.recSlot);setPut('template',template);}
+    post.recurring=false;post.recSlot=null;dbPut(post);render();buildWeek();
+    toast('Changed to one-off (this week only)');
+  }
+  // floating day popup — a mini week-view scoped to one day
+  function openDayPop(key){
+    normTpl();
+    const ws=curWeekStart();const d=DAYS.find(x=>x.key===key)||{name:key,offset:0};
+    const dt=dayDate(ws,key);const now=Date.now();
+    const posts=postsForDay(ws,key);const prim=template.days[key]||{};const rep=primaryPost(posts);
+    $('dpTitle').textContent=d.name+' '+(dt.getMonth()+1)+'/'+dt.getDate()+' — '+posts.length+' post'+(posts.length===1?'':'s');
+    const host=$('dpBody');host.innerHTML='';
+    if(posts.length===0){
+      host.innerHTML='<p style="font-size:.82rem;color:var(--muted);margin:0 0 12px">No posts for this day yet.</p>';
+      const b=document.createElement('button');b.className='btn';b.textContent='＋ Add a post';b.onclick=()=>{addOneOff(key,false);openDayPop(key);};host.appendChild(b);
+      if(!$('dayPopDlg').open)$('dayPopDlg').showModal();return;
+    }
+    const grid=document.createElement('div');grid.className='dpgrid';
+    grid.style.gridTemplateColumns='minmax(104px,128px) repeat('+posts.length+',minmax(150px,1fr)) 64px';
+    const corner=document.createElement('div');corner.className='dp-corner';corner.textContent='Surface \\ Post';grid.appendChild(corner);
+    posts.forEach(p=>{
+      const head=document.createElement('div');head.className='dp-col'+(rep===p?' prim':'');
+      const tm=(p.scheduledLocal||'').split('T')[1]||'';
+      const recBadge=(p.recurring&&p.recSlot==null)?'<span class="dp-tag pat" title="Part of the weekly pattern — edit in the pattern editor">pattern</span>'
+        :(p.recurring?'<span class="dp-tag rec" data-rec="off" data-id="'+p.id+'" title="Click to change to one-off">⟳ weekly</span>'
+                     :'<span class="dp-tag one" data-rec="on" data-id="'+p.id+'" title="Click to make recurring every week">one-off</span>');
+      const en=esc((p.captions.en||'').trim());
+      const needsProp=(prim.folder||'').includes('{property}')||(p.folder||'').includes('{property}');
+      head.innerHTML='<div class="dp-tl"><input type="time" class="dp-time" data-id="'+p.id+'" value="'+tm+'"><button class="dp-x" data-id="'+p.id+'" title="Delete this post">✕</button></div>'+
+        '<div class="dp-th">'+esc((p.title||'').split(' · ')[0]||'Post')+'</div>'+
+        '<div class="dp-tags">'+recBadge+'</div>'+
+        (en?'<div class="dp-cap">'+en+'</div>':'')+
+        (needsProp?'<input class="dp-prop" data-id="'+p.id+'" value="'+esc(p.property||'')+'" placeholder="listing" list="propList">':'')+
+        '<button class="dp-edit" data-id="'+p.id+'">✎ Edit full</button>';
+      grid.appendChild(head);
+    });
+    const addh=document.createElement('div');addh.className='dp-addcol';addh.innerHTML='<button class="dp-add" title="Add another post to this day">＋</button>';grid.appendChild(addh);
+    PLATFORMS.forEach(p=>{
+      const lab=document.createElement('div');lab.className='dp-surf '+p.tier;lab.innerHTML='<span>'+esc(shortLabel(p))+'</span>'+(p.tier==='auto'?'<span class="ti">AUTO</span>':'');grid.appendChild(lab);
+      posts.forEach(po=>{const due=new Date(po.scheduledFor||0).getTime()<=now;const cs=cellStatus(po,p.key,prim,due);const cl=document.createElement('div');cl.className='dp-cell '+cs.cls;cl.textContent=cs.txt;grid.appendChild(cl);});
+      const pad=document.createElement('div');pad.className='dp-cell pad';grid.appendChild(pad);
+    });
+    host.appendChild(grid);
+    host.querySelectorAll('.dp-time').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po||!inp.value)return;const date=(po.scheduledLocal||'').split('T')[0]||ymd(dt);po.scheduledLocal=date+'T'+inp.value;po.scheduledFor=new Date(po.scheduledLocal).toISOString();dbPut(po);render();buildWeek();openDayPop(key);}));
+    host.querySelectorAll('.dp-prop').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po)return;po.property=inp.value.trim();po.folder=resolveFolder((template.days[key]||{}).folder,po.property);po.title=genTitle({theme:(po.title||'Post').split(' · ')[0]},po.property,dt);if(po.recurring&&po.recSlot==null)setDayProp(ws,key,po.property);dbPut(po);render();buildWeek();openDayPop(key);}));
+    host.querySelectorAll('.dp-tag[data-rec]').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(b.dataset.rec==='on')promoteRecurring(po);else demoteRecurring(po);openDayPop(key);}));
+    host.querySelectorAll('.dp-x').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(!confirm('Delete this post?'))return;if(po.recurring&&po.recSlot!=null){normTpl();template.extra[po.day]=(template.extra[po.day]||[]).filter(s=>s.id!==po.recSlot);setPut('template',template);}queue=queue.filter(x=>x.id!==po.id);dbDel(po.id);if(editingId===po.id)resetForm();render();buildWeek();openDayPop(key);}));
+    host.querySelectorAll('.dp-edit').forEach(b=>b.addEventListener('click',()=>{$('dayPopDlg').close();editPost(b.dataset.id);}));
+    const addBtn=host.querySelector('.dp-add');if(addBtn)addBtn.addEventListener('click',()=>{addOneOff(key,false);openDayPop(key);});
+    if(!$('dayPopDlg').open)$('dayPopDlg').showModal();
+  }
+
   // ---------- template editor ----------
   function pinOptions(group,pin){
     const grp=(bank.captions||[]).filter(c=>c.g===group);
@@ -823,9 +967,11 @@
     return html;
   }
   let tplDraft=null;
+  let tplExtraDraft={}; // mirrors template.extra while the pattern editor is open
   function dayHeaderInner(d){
     const t=tplDraft[d.key]||{};
-    return '<div class="tg-dn">'+d.name+'</div>'+
+    const ex=(tplExtraDraft[d.key]||[]).length;
+    return '<div class="tg-dn">'+d.name+(ex?' <span class="tg-extra" title="'+ex+' extra recurring post'+(ex===1?'':'s')+'">+'+ex+'</span>':'')+'</div>'+
       '<div class="tg-sum"><span class="tg-badge">'+(t.media||'')+'</span><span class="tg-th">'+esc(t.theme||'—')+'</span></div>'+
       '<div class="tg-meta">🕐 '+(t.time||'')+' · '+(t.pin?'📌':'↻')+'</div>'+
       '<div class="tg-fold">'+esc(t.folder||'')+'</div>'+
@@ -835,6 +981,8 @@
   function openTpl(focusDay){
     tplDraft=JSON.parse(JSON.stringify(template.days||{}));
     DAYS.forEach(d=>{if(!tplDraft[d.key])tplDraft[d.key]={theme:'',media:'📷',time:'09:00',group:'',folder:'',targets:[],pin:''};if(!tplDraft[d.key].targets)tplDraft[d.key].targets=[];});
+    tplExtraDraft=JSON.parse(JSON.stringify(template.extra||{}));
+    DAYS.forEach(d=>{if(!Array.isArray(tplExtraDraft[d.key]))tplExtraDraft[d.key]=[];});
     const wrap=$('tplRows');wrap.innerHTML='';
     const grid=document.createElement('div');grid.className='tplgrid';
     const corner=document.createElement('div');corner.className='tg-corner';corner.textContent='Surface \\ Day';grid.appendChild(corner);
@@ -859,6 +1007,40 @@
     $('tplDlg').showModal();
     if(focusDay)setTimeout(()=>openDay(focusDay),0);
   }
+  // ---- extra recurring slots inside the per-day pattern editor ----
+  function slotTargetsChips(slot){
+    return PLATFORMS.map(p=>{
+      const on=(slot.targets||[]).includes(p.key);
+      return '<span class="chip mini'+(on?' on':'')+'" data-key="'+p.key+'">'+esc(shortLabel(p))+'</span>';
+    }).join('');
+  }
+  function renderDayExtras(key){
+    const list=$('dExtraList');if(!list)return;
+    const arr=tplExtraDraft[key]||(tplExtraDraft[key]=[]);
+    list.innerHTML='';
+    if(!arr.length){list.innerHTML='<p class="dx-empty">No extra recurring posts on this day yet — add one below to schedule a second (or third) post every '+esc((DAYS.find(d=>d.key===key)||{}).name||'day')+'.</p>';return;}
+    arr.forEach((slot,i)=>{
+      const grpOpts=[...new Set(BANK.map(b=>b.g))].map(g=>'<option'+(slot.group===g?' selected':'')+'>'+esc(g)+'</option>').join('');
+      const badgeOpts=['📷','🎬','📝','🎬📝','📷📝'].map(b=>'<option'+(slot.media===b?' selected':'')+'>'+b+'</option>').join('');
+      const card=document.createElement('div');card.className='dx-card';
+      card.innerHTML=
+        '<div class="dx-h"><span class="dx-n">＋ Post '+(i+2)+'</span><button class="dx-del" title="Remove this recurring post">✕</button></div>'+
+        '<div class="f"><label>Theme</label><input class="dxTheme" value="'+esc(slot.theme||'')+'"></div>'+
+        '<div class="frow"><div class="f"><label>Media</label><select class="dxMedia">'+badgeOpts+'</select></div>'+
+        '<div class="f"><label>Time</label><input class="dxTime" type="time" value="'+(slot.time||'')+'"></div></div>'+
+        '<div class="f"><label>Caption angle (group)</label><select class="dxGroup">'+grpOpts+'</select></div>'+
+        '<div class="f"><label>Caption</label><select class="dxPin">'+pinOptions(slot.group,slot.pin)+'</select></div>'+
+        '<div class="f"><label>R2 folder</label><input class="dxFolder" value="'+esc(slot.folder||'')+'" placeholder="{property}/sold/"></div>'+
+        '<div class="f"><label>Surfaces</label><div class="dx-chips">'+slotTargetsChips(slot)+'</div></div>';
+      const q=s=>card.querySelector(s);
+      const syncSlot=()=>{slot.theme=q('.dxTheme').value;slot.media=q('.dxMedia').value;slot.time=q('.dxTime').value;slot.group=q('.dxGroup').value;slot.pin=q('.dxPin').value;slot.folder=q('.dxFolder').value;};
+      card.querySelectorAll('.dxTheme,.dxMedia,.dxTime,.dxGroup,.dxPin,.dxFolder').forEach(el=>el.addEventListener('input',syncSlot));
+      q('.dxGroup').addEventListener('change',()=>{q('.dxPin').innerHTML=pinOptions(q('.dxGroup').value,'');syncSlot();});
+      q('.dx-del').addEventListener('click',()=>{arr.splice(i,1);renderDayExtras(key);refreshHeader(key);});
+      card.querySelectorAll('.dx-chips .chip').forEach(ch=>ch.addEventListener('click',()=>{const k=ch.dataset.key;const a=slot.targets||(slot.targets=[]);const idx=a.indexOf(k);if(idx>=0)a.splice(idx,1);else a.push(k);ch.classList.toggle('on');}));
+      list.appendChild(card);
+    });
+  }
   // floating per-day editor
   function openDay(key){
     const t=tplDraft[key];const d=DAYS.find(x=>x.key===key);
@@ -866,54 +1048,62 @@
     const badgeOpts=['📷','🎬','📝','🎬📝','📷📝'].map(b=>'<option'+(t.media===b?' selected':'')+'>'+b+'</option>').join('');
     $('dayTitle').textContent=d.name+' — pattern';
     $('dayBody').innerHTML=
+      '<div id="dPrimary">'+
       '<div class="f"><label>Theme</label><input id="dTheme" value="'+esc(t.theme||'')+'"></div>'+
       '<div class="frow"><div class="f"><label>Media</label><select id="dMedia">'+badgeOpts+'</select></div>'+
       '<div class="f"><label>Time</label><input id="dTime" type="time" value="'+(t.time||'')+'"></div></div>'+
       '<div class="f"><label>Caption angle (group)</label><select id="dGroup">'+grpOpts+'</select></div>'+
       '<div class="f"><label>Caption</label><select id="dPin">'+pinOptions(t.group,t.pin)+'</select></div>'+
-      '<div class="f"><label>R2 folder</label><input id="dFolder" value="'+esc(t.folder||'')+'" placeholder="{property}/sold/"></div>';
+      '<div class="f"><label>R2 folder</label><input id="dFolder" value="'+esc(t.folder||'')+'" placeholder="{property}/sold/"></div>'+
+      '</div>'+
+      '<div class="dx-sec"><div class="dx-sec-h">Additional recurring posts</div><div id="dExtraList"></div>'+
+      '<button class="btn dx-add" id="dAddSlot">＋ Add a recurring post on '+esc(d.name)+'</button></div>';
     const sync=()=>{t.theme=$('dTheme').value;t.media=$('dMedia').value;t.time=$('dTime').value;t.group=$('dGroup').value;t.pin=$('dPin').value;t.folder=$('dFolder').value;};
     $('dGroup').addEventListener('change',()=>{$('dPin').innerHTML=pinOptions($('dGroup').value,'');sync();});
-    $('dayBody').querySelectorAll('input,select').forEach(el=>el.addEventListener('input',sync));
+    ['dTheme','dMedia','dTime','dGroup','dPin','dFolder'].forEach(id=>$(id).addEventListener('input',sync));
+    renderDayExtras(key);
+    $('dAddSlot').onclick=()=>{
+      if(!Array.isArray(tplExtraDraft[key]))tplExtraDraft[key]=[];
+      const id='x'+Math.random().toString(16).slice(2,8);
+      tplExtraDraft[key].push({id,theme:'',media:t.media||'📷',time:t.time||'12:00',group:t.group||'',pin:'',folder:t.folder||'',targets:(t.targets||[]).slice()});
+      renderDayExtras(key);refreshHeader(key);
+    };
     $('dayDone').onclick=()=>{sync();refreshHeader(key);$('dayDlg').close();};
     $('dayDlg').showModal();
   }
-  function readTpl(){return {version:1,days:JSON.parse(JSON.stringify(tplDraft))};}
+  function readTpl(){return {version:1,days:JSON.parse(JSON.stringify(tplDraft)),extra:JSON.parse(JSON.stringify(tplExtraDraft||{}))};}
   $('tplSave').onclick=async()=>{template=readTpl();setPut('template',template);buildWeek();await pushTpl();$('tplDlg').close();toast('Pattern saved');};
   $('tplReset').onclick=()=>{if(confirm('Reset the weekly pattern to defaults?')){template=JSON.parse(JSON.stringify(DEFAULT_TPL));openTpl();}};
   $('tplCancel').onclick=()=>$('tplDlg').close();
   $('editTpl').onclick=()=>openTpl();
 
-  // ---------- generate this week (clean slate) ----------
+  // ---------- generate this week (rebuilds recurring posts, keeps one-offs) ----------
   $('genWeek').onclick=()=>{
+    normTpl();
     const ws=curWeekStart();
-    if(queue.length && !confirm('Generate this week will REPLACE the entire queue ('+queue.length+' posts) with a fresh 7-day plan. Continue?'))return;
+    const oneoffThisWeek=queue.filter(p=>!p.recurring&&p.weekStart===ws).length;
+    let extraCount=0;DAYS.forEach(d=>extraCount+=(template.extra[d.key]||[]).length);
+    let msg='Generate this week will rebuild the '+(7+extraCount)+' recurring post'+((7+extraCount)===1?'':'s')+' for week of '+ws+'.';
+    if(oneoffThisWeek)msg+='\nYour '+oneoffThisWeek+' one-off post'+(oneoffThisWeek===1?'':'s')+' this week will be kept.';
+    msg+='\nContinue?';
+    if(queue.length && !confirm(msg))return;
     setPut('activeProp',weekDefaultProp());
-    const posts=[];
+    // remove only this week's recurring posts; preserve one-offs + other weeks + ad-hoc
+    queue.filter(p=>p.recurring&&p.weekStart===ws).forEach(p=>dbDel(p.id));
+    queue=queue.filter(p=>!(p.recurring&&p.weekStart===ws));
+    const fresh=[];
     DAYS.forEach(d=>{
       const t=template.days[d.key]||{};
       const prop=propFor(ws,d.key);
       const dt=new Date(ws+'T00:00');dt.setDate(dt.getDate()+d.offset);
-      const local=ymd(dt)+'T'+(t.time||'09:00');
-      const targets=(t.targets||[]).map(k=>{const p=PMAP[k];return p?{platform:p.key,label:p.label,lang:p.lang,tier:p.tier,status:'queued'}:null;}).filter(Boolean);
-      const angle=pickCaption(t);
-      posts.push({
-        id:uid(),created:new Date().toISOString(),
-        scheduledFor:new Date(local).toISOString(),scheduledLocal:local,
-        status:'queued',
-        title:genTitle(t,prop,dt),
-        media:[],
-        captions:{en:angle?angle.en:'',zh:angle?angle.zh:''},
-        commentLinks:{en:'',zh:''},
-        targets,
-        day:d.key,weekStart:ws,property:prop,folder:resolveFolder(t.folder,prop)
+      fresh.push(buildPost(ws,d.key,t,prop,dt,pickCaption(t),true,null,t.time,t.theme));
+      (template.extra[d.key]||[]).forEach(slot=>{
+        fresh.push(buildPost(ws,d.key,slot,prop,dt,pickCaption(slot),true,slot.id,slot.time,slot.theme));
       });
     });
-    // clean slate: clear queue + db, then load the generated week
-    queue.forEach(p=>dbDel(p.id));
-    queue=posts;queue.forEach(dbPut);
+    fresh.forEach(p=>{queue.push(p);dbPut(p);});
     render();buildWeek();
-    toast('Generated 7 posts for week of '+ws);
+    toast('Generated '+fresh.length+' posts for week of '+ws);
   };
 
   // ---------- template sync (repo master + IndexedDB cache) ----------
@@ -1014,9 +1204,14 @@
   buildPlats();buildBanks();resetForm();
   // week panel defaults
   $('weekStart').value=ymd(mondayOf(new Date()));
-  $('weekStart').addEventListener('change',buildWeek);
+  $('weekStart').addEventListener('change',()=>{
+    const v=$('weekStart').value;
+    if(v) $('weekStart').value=ymd(mondayOf(new Date(v+'T00:00')));
+    buildWeek();
+  });
   $('activeProp').addEventListener('input',()=>{setPut('activeProp',$('activeProp').value.trim());buildWeek();});
   $('weekCollapse').onclick=()=>{const b=$('weekBody');const hide=b.style.display!=='none';b.style.display=hide?'none':'';$('weekCollapse').textContent=hide?'▸':'▾';};
+  $('dpClose').onclick=()=>$('dayPopDlg').close();
   openDB().then(async()=>{
     let b=await setGet('baseUrl');
     if(!b){b='https://media.peterluo.homes/';setPut('baseUrl',b);}
@@ -1025,6 +1220,7 @@
     const ap=await setGet('activeProp');if(ap)$('activeProp').value=ap;
     const dp=await setGet('dayProps');if(dp)dayProps=dp;
     const tpl=await setGet('template');if(tpl&&tpl.days){template=tpl;}else{await pullTpl();}
+    normTpl();
     const bk=await setGet('bank');if(bk&&bk.captions){bank=Object.assign({snippets:[]},bk);}else{await pullBank();}
     const br=await setGet('bankRot');if(br)bankRot=br;
     rebuildBankUI();
