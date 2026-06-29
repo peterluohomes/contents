@@ -104,7 +104,7 @@
         <label class="f">Listing (For Sale) variants</label>
         <input type="number" id="lc-count" value="3" min="1" max="6">
         <button class="download" id="lc-gen" style="width:100%;margin-top:13px">Generate lifecycle set</button>
-        <p style="font-size:11px;color:var(--muted);margin-top:9px;line-height:1.55">Makes <b style="color:var(--cream)">Coming Soon · N × For Sale · Just Sold · Sold &amp; Closed</b> from the current photo(s), address &amp; footer — downloads each as <code>{slug}-{stage}.jpg</code>. Fine-tune any single card below, then re-download it. (R2 upload comes next.)</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:9px;line-height:1.55">Makes <b style="color:var(--cream)">Coming Soon · Just Listed · N × For Sale · Just Sold · Sold &amp; Closed</b> from the current photo(s), address &amp; footer — downloads each by purpose: <code>comingsoon.jpg · justlisted.jpg · forsale.jpg · justsold.jpg · soldclosed.jpg</code>. Fine-tune any single card below, then re-download it. (R2 upload comes next.)</p>
       </div>
 
       <div class="group">
@@ -604,8 +604,8 @@ Steps to GO & top schools"></textarea>
   const LIFECYCLE_PRE={badge:'COMING SOON',head:'Something special\nis coming to',accent:'the market.',sub:'Be the first to see it →',url:'peterluo.homes/showing'};
   const LIFECYCLE_SOLD={badge:'JUST SOLD',head:'Another home,\nanother happy',accent:'family.',sub:'What\u2019s your home worth? →',url:'peterluo.homes/valuation'};
   const LIFECYCLE_CLOSED={badge:'SOLD & CLOSED',head:'Keys handed over —\na new chapter',accent:'begins.',sub:'Get my free seller\u2019s guide →',url:'peterluo.homes/guide'};
+  const LIFECYCLE_LISTED={badge:'JUST LISTED',head:'Just listed —\nyour next',accent:'home awaits.',sub:'Book a private showing →',url:'peterluo.homes/showing'};
   const LISTING_VARIANTS=[
-    {badge:'JUST LISTED',head:'Just listed —\nyour next',accent:'home awaits.',sub:'Book a private showing →',url:'peterluo.homes/showing'},
     {badge:'NOW FOR SALE',head:'The kind of home\nthat makes you',accent:'smile.',sub:'See it in person →',url:'peterluo.homes/showing'},
     {badge:'FOR SALE',head:'Space to live,\nroom to',accent:'grow.',sub:'Book your viewing today →',url:'peterluo.homes/showing'},
     {badge:'OPEN HOUSE',head:'Open house\nthis',accent:'weekend.',sub:'Come by this weekend →',url:'peterluo.homes/showing'},
@@ -640,11 +640,14 @@ Steps to GO & top schools"></textarea>
     const oL=layout,oS=schemeIdx,oP=panelSide,oFB=fullBleed,oH=heroSide; _origFeatures=$('features').value;
     const collageReady = !!cSlots.hero.img && (!!cSlots.wide.img||!!cSlots.small1.img||!!cSlots.small2.img);
     // Coming Soon — full-bleed photo teaser when a split photo is loaded, else clean split
-    const jobs=[{...LIFECYCLE_PRE,stage:'preparing',file:slug+'-preparing',
+    const jobs=[{...LIFECYCLE_PRE,stage:'preparing',file:'comingsoon',
       look:{scheme:0,side:'right',layout:'split',fullBleed:!!splitSlot.img,hideFeatures:true}}];
+    // Just Listed — flagship announcement (navy & gold, features shown)
+    jobs.push({...LIFECYCLE_LISTED,stage:'listing',file:'justlisted',
+      look:{scheme:0,side:'left',layout:(collageReady?'collage':'split'),hero:'right',fullBleed:false,hideFeatures:false}});
     // Listing variants — go wild: weighted scheme + alternating side + collage (if ready) + features toggle
     for(let i=0;i<n;i++){
-      jobs.push({...LISTING_VARIANTS[i%LISTING_VARIANTS.length],stage:'listing',file:slug+'-listing-'+(i+1),
+      jobs.push({...LISTING_VARIANTS[i%LISTING_VARIANTS.length],stage:'listing',file:(n===1?'forsale':'forsale-'+(i+1)),
         look:{
           scheme:weightedScheme(i+1),
           side:(i%2===0)?'left':'right',
@@ -656,8 +659,8 @@ Steps to GO & top schools"></textarea>
     }
     // Sold / Closed — fixed: navy, split, left, features off (milestone cards)
     const fixedLook={scheme:0,side:'left',layout:'split',fullBleed:false,hideFeatures:true};
-    jobs.push({...LIFECYCLE_SOLD,stage:'sold',file:slug+'-sold',look:{...fixedLook}},
-              {...LIFECYCLE_CLOSED,stage:'closed',file:slug+'-closed',look:{...fixedLook}});
+    jobs.push({...LIFECYCLE_SOLD,stage:'sold',file:'justsold',look:{...fixedLook}},
+              {...LIFECYCLE_CLOSED,stage:'closed',file:'soldclosed',look:{...fixedLook}});
     const manifest={property:slug,generated:new Date().toISOString(),base:R2BASE,cards:[]};
     const btn=$('lc-gen'); btn.disabled=true; const lbl=btn.textContent;
     try{
@@ -692,8 +695,14 @@ Steps to GO & top schools"></textarea>
   function lgVal(id){const el=$(id);return el?(el.value||'').trim():'';}
   function slugFromAddress(a){a=(a||'').split(',')[0];return a.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');}
   function stageFiles(prop,stage){
-    if(stage==='listing'){const n=clamp(parseInt(($('lc-count')||{}).value,10)||3,1,6);const a=[];for(let i=1;i<=n;i++)a.push(prop+'-listing-'+i);return a;}
-    return [prop+'-'+stage];
+    if(stage==='preparing')return ['comingsoon'];
+    if(stage==='sold')return ['justsold'];
+    if(stage==='closed')return ['soldclosed'];
+    // listing folder: the Just Listed announcement + N For Sale variants
+    const n=clamp(parseInt(($('lc-count')||{}).value,10)||3,1,6);
+    const a=['justlisted'];
+    if(n===1)a.push('forsale'); else for(let i=1;i<=n;i++)a.push('forsale-'+i);
+    return a;
   }
   function lgRow(rows,label,url){
     const row=document.createElement('div');row.className='lg-row';

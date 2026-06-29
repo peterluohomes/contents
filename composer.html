@@ -377,11 +377,11 @@
 <dialog id="ghDlg">
   <div class="dh">GitHub sync — composer writes queue.json, reads status.json</div>
   <div class="db">
-    <div class="f"><label>Owner / repo</label><input id="ghRepo" placeholder="peterluohomes/social-scheduler"></div>
+    <div class="f"><label>Owner / repo</label><input id="ghRepo" placeholder="peterluohomes/scheduler"></div>
     <div class="f"><label>Queue path</label><input id="ghPath" placeholder="queue.json"></div>
     <div class="f"><label>Template path</label><input id="ghTpl" placeholder="template.json"></div>
     <div class="f"><label>Bank path</label><input id="ghBank" placeholder="bank.json"></div>
-    <div class="f"><label>status.json URL (public, read-only)</label><input id="ghStatus" placeholder="https://peterluo.homes/status.json"></div>
+    <div class="f"><label>status.json URL (public, read-only)</label><input id="ghStatus" placeholder="https://peterluo.homes/scheduler/status.json"></div>
     <div class="f"><label>Fine-grained token — Contents: read &amp; write, this repo only</label><input id="ghToken" type="password" placeholder="github_pat_..."></div>
     <p style="font-size:.76rem;color:var(--muted);margin:0">Stored only in this browser, on this machine — never committed to the repo. The composer only ever writes queue.json; it reads status.json but never writes it.</p>
   </div>
@@ -581,7 +581,8 @@
 
   // ---------- state + storage (graceful: IndexedDB local, memory fallback) ----------
   let queue=[]; let editingId=null; let db=null;
-  let gh={owner:'',repo:'',path:'queue.json',tplPath:'template.json',bankPath:'bank.json',statusUrl:'',token:'',branch:''};
+  const GH_DEFAULTS={owner:'peterluohomes',repo:'scheduler',path:'queue.json',tplPath:'template.json',bankPath:'bank.json',statusUrl:'https://peterluo.homes/scheduler/status.json',token:'',branch:''};
+  let gh=Object.assign({},GH_DEFAULTS);
   let statusMap={};
   const DB='pls-scheduler', STORE='queue', SET='settings';
   function openDB(){return new Promise(res=>{try{
@@ -1216,7 +1217,7 @@
     let b=await setGet('baseUrl');
     if(!b){b='https://media.peterluo.homes/';setPut('baseUrl',b);}
     $('baseUrl').value=b;
-    const g=await setGet('gh');if(g){gh=Object.assign({path:'queue.json',tplPath:'template.json',bankPath:'bank.json'},g);}
+    const g=await setGet('gh');gh=Object.assign({},GH_DEFAULTS,g||{});['owner','repo','statusUrl'].forEach(k=>{if(!gh[k])gh[k]=GH_DEFAULTS[k];});
     const ap=await setGet('activeProp');if(ap)$('activeProp').value=ap;
     const dp=await setGet('dayProps');if(dp)dayProps=dp;
     const tpl=await setGet('template');if(tpl&&tpl.days){template=tpl;}else{await pullTpl();}
