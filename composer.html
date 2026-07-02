@@ -379,7 +379,6 @@
           </div>
         </div></div>
       <div id="ribbon" class="ribbon"></div>
-      <div id="queue" class="qtimeline"><div class="empty">No posts yet — generate a week or add a one-off above.</div></div>
     </div>
 
   </div>
@@ -729,21 +728,6 @@
   function render(){
     queue.sort((a,b)=>new Date(a.scheduledFor)-new Date(b.scheduledFor));
     $('qcount').textContent=queue.length;
-    const wrap=$('queue');
-    if(!queue.length){wrap.innerHTML='<div class="empty">No posts yet. Build one on the left.</div>';return;}
-    const now=Date.now();wrap.innerHTML='';
-    queue.forEach(p=>{
-      const due=new Date(p.scheduledFor).getTime()<=now;
-      const el=document.createElement('div');el.className='qchip'+(due?' due':'');
-      const oneoff=p.weekStart?'':'<span class="adhoc">one-off</span>';
-      el.innerHTML='<div class="qt">'+esc(p.title)+'</div>'+
-        '<div class="qw">'+fmtWhen(p.scheduledFor)+'</div>'+
-        '<div class="qs">'+(overallPill(p.id)||'')+oneoff+'</div>'+
-        '<button class="qx" data-d="'+p.id+'" title="Delete">✕</button>';
-      el.onclick=()=>editPost(p.id);
-      el.querySelector('.qx').onclick=e=>{e.stopPropagation();delPost(p.id);};
-      wrap.appendChild(el);
-    });
   }
   function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 
@@ -850,10 +834,12 @@
       else if(post.media&&post.media.length){st='media set';stcls='ready';}
       else{st='add media';stcls='needs';}
       const more=posts.length>1?'<span class="wk-more" title="'+posts.length+' posts this day">+'+(posts.length-1)+'</span>':'';
+      const first=posts[0]||null;
+      const timeLabel=first?((first.scheduledLocal||'').split('T')[1]||t.time||''):(t.time||'');
       let inner='<button class="wk-add" data-day="'+d.key+'" title="Add a post to '+d.name+'">＋</button>'+
         '<div class="wk-dn">'+d.name+' '+(dt.getMonth()+1)+'/'+dt.getDate()+more+'</div>'+
         '<div class="wk-bt"><span class="b">'+(t.media||'')+'</span><span class="wk-th">'+esc(t.theme||'')+'</span></div>'+
-        '<div class="wk-tm">🕐 '+(t.time||'')+'</div>'+
+        '<div class="wk-tm">🕐 '+timeLabel+'</div>'+
         '<div class="wk-st '+stcls+'">'+st+'</div>';
       if(post){
         const en=(post.captions.en||'').trim();const zh=(post.captions.zh||'').trim();
