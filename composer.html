@@ -190,6 +190,11 @@
   .dp-addcol{background:var(--cream-2);display:flex;align-items:flex-start;justify-content:center}
   .dp-add{width:38px;height:38px;border:1px dashed var(--gold);background:#fffdf7;color:var(--gold-deep);border-radius:9px;font-size:1.2rem;font-weight:700;cursor:pointer;font-family:inherit}
   .dp-add:hover{background:var(--gold);color:#fff}
+  .dp-time-ro{font-size:.72rem;font-weight:800;color:var(--gold-deep)}
+  .dp-media{display:flex;gap:5px;flex-wrap:wrap;margin:2px 0}
+  .dp-media img{width:38px;height:38px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+  .dp-mfile{width:38px;height:38px;border-radius:6px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+  .dp-mnone{font-size:.62rem;color:var(--muted);font-style:italic}
   .dp-surf{position:sticky;left:0;z-index:1;background:#fff;font-weight:700;color:var(--navy);font-size:.66rem;display:flex;align-items:center;gap:4px;justify-content:space-between}
   .dp-surf.auto{border-left:3px solid var(--auto)}.dp-surf .ti{font-size:.5rem;font-weight:800;color:var(--auto)}
   .dp-cell{display:flex;align-items:center;justify-content:center;font-size:.92rem;min-height:28px;background:#fff}
@@ -1011,20 +1016,8 @@
     });
   }
 
-  function addOneOffForDate(dateStr,mode){
-    const dt=new Date(dateStr+'T00:00');const key=keyForDate(dt);const ws=ymd(mondayOf(dt));
-    const t=template.days[key]||{};const prop=propFor(ws,key);
-    let time=nextSlotTimeForDate(dateStr,t);
-    const nowT=hhmm(new Date());
-    if(mode==='past'&&time>=nowT)time=hhmm(new Date(Date.now()-3600000));
-    if(mode==='future'&&time<nowT)time=hhmm(new Date(Date.now()+3600000));
-    const post=buildPost(ws,key,t,prop,dt,null,false,null,time,'Extra');
-    queue.push(post);dbPut(post);render();buildWeek();buildRibbon();
-    openDatePop(dateStr,mode);
-  }
-
   function openDatePop(dateStr,mode){
-    const now=Date.now();const dt=new Date(dateStr+'T00:00');const key=keyForDate(dt);const ws=ymd(mondayOf(dt));
+    const now=Date.now();const dt=new Date(dateStr+'T00:00');const key=keyForDate(dt);
     let posts=postsOnDate(dateStr);
     if(mode==='past')posts=posts.filter(p=>new Date(p.scheduledFor||0).getTime()<now);
     else if(mode==='future')posts=posts.filter(p=>new Date(p.scheduledFor||0).getTime()>=now);
@@ -1034,43 +1027,34 @@
     $('dpTitle').textContent=dLabel+' — '+posts.length+' post'+(posts.length===1?'':'s');
     const host=$('dpBody');host.innerHTML='';
     if(posts.length===0){
-      host.innerHTML='<p style="font-size:.82rem;color:var(--muted);margin:0 0 12px">No posts for this '+(mode?'window':'day')+'.</p>';
-      const b=document.createElement('button');b.className='btn';b.textContent='＋ Add a post';b.onclick=()=>addOneOffForDate(dateStr,mode);host.appendChild(b);
+      host.innerHTML='<p style="font-size:.82rem;color:var(--muted);margin:0">No posts scheduled for this '+(mode?'window':'day')+'.</p>';
       if(!$('dayPopDlg').open)$('dayPopDlg').showModal();return;
     }
     const grid=document.createElement('div');grid.className='dpgrid';
-    grid.style.gridTemplateColumns='minmax(104px,128px) repeat('+posts.length+',minmax(150px,1fr)) 64px';
+    grid.style.gridTemplateColumns='minmax(104px,128px) repeat('+posts.length+',minmax(160px,1fr))';
     const corner=document.createElement('div');corner.className='dp-corner';corner.textContent='Surface \\ Post';grid.appendChild(corner);
-    const rep=primaryPost(posts);
     posts.forEach(p=>{
-      const head=document.createElement('div');head.className='dp-col'+(rep===p?' prim':'');
-      const tm=(p.scheduledLocal||'').split('T')[1]||'';
-      const recBadge=(p.recurring&&p.recSlot==null)?'<span class="dp-tag pat" title="Part of the weekly pattern — edit in the pattern editor">pattern</span>'
-        :(p.recurring?'<span class="dp-tag rec" data-rec="off" data-id="'+p.id+'" title="Click to change to one-off">⟳ weekly</span>'
-                     :'<span class="dp-tag one" data-rec="on" data-id="'+p.id+'" title="Click to make recurring every week">one-off</span>');
+      const head=document.createElement('div');head.className='dp-col';
+      const tmLabel=p.scheduledFor?new Date(p.scheduledFor).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'';
       const en=esc((p.captions.en||'').trim());
-      const needsProp=(prim.folder||'').includes('{property}')||(p.folder||'').includes('{property}');
-      head.innerHTML='<div class="dp-tl"><input type="time" class="dp-time" data-id="'+p.id+'" value="'+tm+'"><button class="dp-x" data-id="'+p.id+'" title="Delete this post">✕</button></div>'+
-        '<div class="dp-th">'+esc((p.title||'').split(' · ')[0]||'Post')+'</div>'+
-        '<div class="dp-tags">'+recBadge+'</div>'+
-        (en?'<div class="dp-cap">'+en+'</div>':'')+
-        (needsProp?'<input class="dp-prop" data-id="'+p.id+'" value="'+esc(p.property||'')+'" placeholder="listing" list="propList">':'')+
-        '<button class="dp-edit" data-id="'+p.id+'">✎ Edit full</button>';
+      const zh=esc((p.captions.zh||'').trim());
+      const media=p.media||[];
+      const mediaHtml=media.length?('<div class="dp-media">'+media.map(m=>m.type==='video'
+          ?'<div class="dp-mfile" title="'+esc(m.filename||'')+'">🎬</div>'
+          :'<img src="'+esc(m.url)+'" title="'+esc(m.filename||'')+'" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;dp-mfile&quot;>🖼</div>\'">'
+        ).join('')+'</div>'):'<div class="dp-mnone">No media</div>';
+      head.innerHTML='<div class="dp-time-ro">'+esc(tmLabel)+'</div>'+
+        '<div class="dp-th">'+esc(p.title||'Post')+'</div>'+
+        mediaHtml+
+        (en?'<div class="dp-cap"><b>EN</b> '+en+'</div>':'')+
+        (zh?'<div class="dp-cap zh"><b>中</b> '+zh+'</div>':'');
       grid.appendChild(head);
     });
-    const addh=document.createElement('div');addh.className='dp-addcol';addh.innerHTML='<button class="dp-add" title="Add another post">＋</button>';grid.appendChild(addh);
     PLATFORMS.forEach(pf=>{
       const lab=document.createElement('div');lab.className='dp-surf '+pf.tier;lab.innerHTML='<span>'+esc(shortLabel(pf))+'</span>'+(pf.tier==='auto'?'<span class="ti">AUTO</span>':'');grid.appendChild(lab);
       posts.forEach(po=>{const due=new Date(po.scheduledFor||0).getTime()<=now;const cs=cellStatus(po,pf.key,prim,due);const cl=document.createElement('div');cl.className='dp-cell '+cs.cls;cl.textContent=cs.txt;grid.appendChild(cl);});
-      const pad=document.createElement('div');pad.className='dp-cell pad';grid.appendChild(pad);
     });
     host.appendChild(grid);
-    host.querySelectorAll('.dp-time').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po||!inp.value)return;const date=(po.scheduledLocal||'').split('T')[0]||dateStr;po.scheduledLocal=date+'T'+inp.value;po.scheduledFor=new Date(po.scheduledLocal).toISOString();dbPut(po);render();buildWeek();buildRibbon();openDatePop(dateStr,mode);}));
-    host.querySelectorAll('.dp-prop').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po)return;po.property=inp.value.trim();po.folder=resolveFolder(prim.folder,po.property);po.title=genTitle({theme:(po.title||'Post').split(' · ')[0]},po.property,dt);if(po.recurring&&po.recSlot==null)setDayProp(ws,key,po.property);dbPut(po);render();buildWeek();buildRibbon();openDatePop(dateStr,mode);}));
-    host.querySelectorAll('.dp-tag[data-rec]').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(b.dataset.rec==='on')promoteRecurring(po);else demoteRecurring(po);openDatePop(dateStr,mode);}));
-    host.querySelectorAll('.dp-x').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(!confirm('Delete this post?'))return;if(po.recurring&&po.recSlot!=null){normTpl();template.extra[po.day]=(template.extra[po.day]||[]).filter(s=>s.id!==po.recSlot);setPut('template',template);}queue=queue.filter(x=>x.id!==po.id);dbDel(po.id);if(editingId===po.id)resetForm();render();buildWeek();buildRibbon();openDatePop(dateStr,mode);}));
-    host.querySelectorAll('.dp-edit').forEach(b=>b.addEventListener('click',()=>{$('dayPopDlg').close();editPost(b.dataset.id);}));
-    const addBtn=host.querySelector('.dp-add');if(addBtn)addBtn.addEventListener('click',()=>addOneOffForDate(dateStr,mode));
     if(!$('dayPopDlg').open)$('dayPopDlg').showModal();
   }
 
