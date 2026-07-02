@@ -122,6 +122,22 @@
   .qmore{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);width:100%}
   .qmore[hidden]{display:none}
   .adhoc{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--gold-deep);background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:1px 6px;margin-left:6px}
+  /* ±6 day ribbon — split at "now" */
+  .ribbon{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+  .ribbon-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .rcell{border:1px solid var(--line);border-radius:10px;padding:7px 8px;background:var(--cream-2);cursor:pointer;min-height:60px;display:flex;flex-direction:column;gap:3px;transition:.12s}
+  .rcell:hover{border-color:var(--gold)}
+  .rcell.today{background:#fffdf7;border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+  .rcell.empty{opacity:.55}
+  .rcell .rd{font-weight:800;color:var(--navy);font-size:.68rem;line-height:1.2}
+  .rcell .rc{font-size:.6rem;color:var(--muted);font-weight:600}
+  .rcell .rdots{display:flex;gap:3px;flex-wrap:wrap;margin-top:auto}
+  .rcell .rdot{width:7px;height:7px;border-radius:999px;background:#dde1e8}
+  .rcell .rdot.posted{background:var(--auto)}
+  .rcell .rdot.failed{background:#b4503f}
+  .rcell .rdot.due{background:var(--assist)}
+  .rcell .rdot.sched{background:#9aa3b2}
+  @media (max-width:640px){.ribbon-row{grid-template-columns:repeat(4,1fr)}}
   /* weekly status matrix */
   .wkgrid{display:grid;grid-template-columns:minmax(116px,150px) repeat(7,minmax(118px,1fr));border:1px solid var(--line);border-radius:12px;overflow-x:auto;background:#fff}
   .wkgrid>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 8px;min-width:0}
@@ -362,6 +378,7 @@
             <button class="btn ghost" id="ghBtn">⚙ Sync</button>
           </div>
         </div></div>
+      <div id="ribbon" class="ribbon"></div>
       <div id="queue" class="qtimeline"><div class="empty">No posts yet — generate a week or add a one-off above.</div></div>
     </div>
 
@@ -682,7 +699,7 @@
     if(prev.day)post.day=prev.day;if(prev.weekStart)post.weekStart=prev.weekStart;if(prev.folder)post.folder=prev.folder;
     if(prev.recurring!==undefined)post.recurring=prev.recurring;if(prev.recSlot!==undefined)post.recSlot=prev.recSlot;if(prev.property!==undefined&&!post.property)post.property=prev.property;
     if(editingId){queue=queue.map(p=>p.id===editingId?post:p);}else{queue.push(post);}
-    dbPut(post);resetForm();render();buildWeek();
+    dbPut(post);resetForm();render();buildWeek();buildRibbon();
   };
 
   function editPost(id){
@@ -705,7 +722,7 @@
     card.scrollIntoView({behavior:'smooth',block:'start'});
     const mm=$('media');if(mm){setTimeout(()=>{mm.focus();const v=mm.value;mm.setSelectionRange(v.length,v.length);},350);}
   }
-  function delPost(id){if(!confirm('Delete this post?'))return;queue=queue.filter(p=>p.id!==id);dbDel(id);if(editingId===id)resetForm();render();}
+  function delPost(id){if(!confirm('Delete this post?'))return;queue=queue.filter(p=>p.id!==id);dbDel(id);if(editingId===id)resetForm();render();buildWeek();buildRibbon();}
 
   // ---------- render queue ----------
   function fmtWhen(iso){const d=new Date(iso);return d.toLocaleString([], {weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
@@ -765,7 +782,10 @@
       const g=await fetch(ghUrl()+ghRef(),{headers:ghH()});
       if(!g.ok){const e=await g.json().catch(()=>({}));throw new Error(g.status+' '+(e.message||'')+(g.status===404?' — is queue.json committed on the default branch?':''));}
       const data=JSON.parse(b64utf8((await g.json()).content));
-      queue=Array.isArray(data)?data:(data.posts||[]);queue.forEach(dbPut);render();toast('Pulled queue.json ✓');
+      const pulled=Array.isArray(data)?data:(data.posts||[]);
+      const pulledIds=new Set(pulled.map(p=>p.id));
+      queue.forEach(p=>{if(!pulledIds.has(p.id))dbDel(p.id);}); // reconcile: drop local records the repo no longer has
+      queue=pulled;queue.forEach(dbPut);render();buildWeek();buildRibbon();toast('Pulled queue.json ✓');
     }catch(e){alert('Pull failed: '+e.message);}
   }
   async function fetchStatus(){
@@ -775,7 +795,7 @@
       else if(gh.owner&&gh.repo&&gh.token){const r=await fetch(ghUrl('status.json')+ghRef(),{headers:ghH()});if(r.ok)txt=b64utf8((await r.json()).content);}
       statusMap=txt?(JSON.parse(txt).statuses||{}):{};
     }catch(e){statusMap={};}
-    render();buildWeek();
+    render();buildWeek();buildRibbon();
   }
   function tgMark(id,key){const s=statusMap[id];if(!s||!s.targets)return '';const t=s.targets[key];if(!t)return '';const m={posted:' <span class="ok">✓</span>',failed:' <span class="no">✕</span>',nudged:' <span class="wait">⏳</span>'};return m[t.status]||'';}
   function overallPill(id){const s=statusMap[id];if(!s||!s.overall||s.overall==='queued')return '';return '<span class="ovl '+s.overall+'">'+s.overall+'</span>';}
@@ -848,7 +868,7 @@
       const inp=h.querySelector('.wk-prop');
       if(inp){
         inp.addEventListener('click',e=>e.stopPropagation());
-        inp.addEventListener('change',e=>{e.stopPropagation();setDayProp(ws,d.key,inp.value.trim());const np=propFor(ws,d.key);const ep=primaryPost(postsForDay(ws,d.key));if(ep){ep.property=np;ep.folder=resolveFolder((template.days[d.key]||{}).folder,np);ep.title=genTitle(template.days[d.key]||{},np,new Date(ep.scheduledLocal||(ws+'T00:00')));dbPut(ep);render();}buildWeek();});
+        inp.addEventListener('change',e=>{e.stopPropagation();setDayProp(ws,d.key,inp.value.trim());const np=propFor(ws,d.key);const ep=primaryPost(postsForDay(ws,d.key));if(ep){ep.property=np;ep.folder=resolveFolder((template.days[d.key]||{}).folder,np);ep.title=genTitle(template.days[d.key]||{},np,new Date(ep.scheduledLocal||(ws+'T00:00')));dbPut(ep);render();}buildWeek();buildRibbon();});
       }
       grid.appendChild(h);
     });
@@ -895,7 +915,7 @@
   function addOneOff(key,thenOpen){
     const ws=curWeekStart();const t=template.days[key]||{};const prop=propFor(ws,key);const dt=dayDate(ws,key);
     const post=buildPost(ws,key,t,prop,dt,null,false,null,nextSlotTime(ws,key),'Extra');
-    queue.push(post);dbPut(post);render();buildWeek();
+    queue.push(post);dbPut(post);render();buildWeek();buildRibbon();
     if(thenOpen)openDayPop(key);
   }
   function promoteRecurring(post){
@@ -903,13 +923,13 @@
     template.extra[key].push({id,theme:(post.title||'Extra').split(' · ')[0]||'Extra',media:t.media||'📷',
       time:(post.scheduledLocal||'').split('T')[1]||t.time||'12:00',group:t.group||'',
       folder:t.folder||'images/',targets:(post.targets||[]).map(x=>x.platform)});
-    setPut('template',template);post.recurring=true;post.recSlot=id;dbPut(post);render();buildWeek();
+    setPut('template',template);post.recurring=true;post.recSlot=id;dbPut(post);render();buildWeek();buildRibbon();
     toast('Now recurring every '+((DAYS.find(d=>d.key===key)||{}).name||key));
   }
   function demoteRecurring(post){
     normTpl();const key=post.day;
     if(post.recSlot!=null){template.extra[key]=(template.extra[key]||[]).filter(s=>s.id!==post.recSlot);setPut('template',template);}
-    post.recurring=false;post.recSlot=null;dbPut(post);render();buildWeek();
+    post.recurring=false;post.recSlot=null;dbPut(post);render();buildWeek();buildRibbon();
     toast('Changed to one-off (this week only)');
   }
   // floating day popup — a mini week-view scoped to one day
@@ -951,12 +971,120 @@
       const pad=document.createElement('div');pad.className='dp-cell pad';grid.appendChild(pad);
     });
     host.appendChild(grid);
-    host.querySelectorAll('.dp-time').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po||!inp.value)return;const date=(po.scheduledLocal||'').split('T')[0]||ymd(dt);po.scheduledLocal=date+'T'+inp.value;po.scheduledFor=new Date(po.scheduledLocal).toISOString();dbPut(po);render();buildWeek();openDayPop(key);}));
-    host.querySelectorAll('.dp-prop').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po)return;po.property=inp.value.trim();po.folder=resolveFolder((template.days[key]||{}).folder,po.property);po.title=genTitle({theme:(po.title||'Post').split(' · ')[0]},po.property,dt);if(po.recurring&&po.recSlot==null)setDayProp(ws,key,po.property);dbPut(po);render();buildWeek();openDayPop(key);}));
+    host.querySelectorAll('.dp-time').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po||!inp.value)return;const date=(po.scheduledLocal||'').split('T')[0]||ymd(dt);po.scheduledLocal=date+'T'+inp.value;po.scheduledFor=new Date(po.scheduledLocal).toISOString();dbPut(po);render();buildWeek();buildRibbon();openDayPop(key);}));
+    host.querySelectorAll('.dp-prop').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po)return;po.property=inp.value.trim();po.folder=resolveFolder((template.days[key]||{}).folder,po.property);po.title=genTitle({theme:(po.title||'Post').split(' · ')[0]},po.property,dt);if(po.recurring&&po.recSlot==null)setDayProp(ws,key,po.property);dbPut(po);render();buildWeek();buildRibbon();openDayPop(key);}));
     host.querySelectorAll('.dp-tag[data-rec]').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(b.dataset.rec==='on')promoteRecurring(po);else demoteRecurring(po);openDayPop(key);}));
-    host.querySelectorAll('.dp-x').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(!confirm('Delete this post?'))return;if(po.recurring&&po.recSlot!=null){normTpl();template.extra[po.day]=(template.extra[po.day]||[]).filter(s=>s.id!==po.recSlot);setPut('template',template);}queue=queue.filter(x=>x.id!==po.id);dbDel(po.id);if(editingId===po.id)resetForm();render();buildWeek();openDayPop(key);}));
+    host.querySelectorAll('.dp-x').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(!confirm('Delete this post?'))return;if(po.recurring&&po.recSlot!=null){normTpl();template.extra[po.day]=(template.extra[po.day]||[]).filter(s=>s.id!==po.recSlot);setPut('template',template);}queue=queue.filter(x=>x.id!==po.id);dbDel(po.id);if(editingId===po.id)resetForm();render();buildWeek();buildRibbon();openDayPop(key);}));
     host.querySelectorAll('.dp-edit').forEach(b=>b.addEventListener('click',()=>{$('dayPopDlg').close();editPost(b.dataset.id);}));
     const addBtn=host.querySelector('.dp-add');if(addBtn)addBtn.addEventListener('click',()=>{addOneOff(key,false);openDayPop(key);});
+    if(!$('dayPopDlg').open)$('dayPopDlg').showModal();
+  }
+
+  // ---------- ±6 day ribbon (queue-driven, not template-driven — works across weeks/past) ----------
+  function keyForDate(dt){ return DAYS[(dt.getDay()+6)%7].key; }
+  function postsOnDate(dateStr){ return queue.filter(p=>(p.scheduledLocal||'').slice(0,10)===dateStr); }
+  function nextSlotTimeForDate(dateStr,t){
+    const posts=postsOnDate(dateStr).sort((a,b)=>new Date(a.scheduledFor||0)-new Date(b.scheduledFor||0));
+    if(posts.length){const last=new Date(posts[posts.length-1].scheduledFor||0);last.setHours(last.getHours()+1);return hhmm(last);}
+    return (t||{}).time||'12:00';
+  }
+  function buildRibbon(){
+    const host=$('ribbon');if(!host)return;
+    const now=new Date();const nowMs=now.getTime();
+    const todayStr=ymd(now);
+    const mkDay=off=>{const d=new Date(now.getFullYear(),now.getMonth(),now.getDate());d.setDate(d.getDate()+off);return d;};
+    const rows=[[],[]];
+    for(let i=-6;i<=-1;i++)rows[0].push({date:mkDay(i),mode:null});
+    rows[0].push({date:mkDay(0),mode:'past'});
+    rows[1].push({date:mkDay(0),mode:'future'});
+    for(let i=1;i<=6;i++)rows[1].push({date:mkDay(i),mode:null});
+    host.innerHTML='';
+    rows.forEach(row=>{
+      const rEl=document.createElement('div');rEl.className='ribbon-row';
+      row.forEach(info=>{
+        const dateStr=ymd(info.date);
+        let posts=postsOnDate(dateStr);
+        if(info.mode==='past')posts=posts.filter(p=>new Date(p.scheduledFor||0).getTime()<nowMs);
+        else if(info.mode==='future')posts=posts.filter(p=>new Date(p.scheduledFor||0).getTime()>=nowMs);
+        const cell=document.createElement('div');
+        cell.className='rcell'+(dateStr===todayStr?' today':'')+(posts.length?'':' empty');
+        const label=info.date.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'})+(info.mode==='past'?' · so far':info.mode==='future'?' · upcoming':'');
+        const dots=posts.slice(0,10).map(p=>{
+          const due=new Date(p.scheduledFor||0).getTime()<=nowMs;
+          const ov=statusMap[p.id]&&statusMap[p.id].overall;
+          const cls=ov==='posted'?'posted':ov==='failed'?'failed':due?'due':'sched';
+          return '<span class="rdot '+cls+'" title="'+esc((p.title||'').split(' · ')[0]||'')+'"></span>';
+        }).join('');
+        cell.innerHTML='<div class="rd">'+esc(label)+'</div>'+
+          '<div class="rc">'+(posts.length?posts.length+' post'+(posts.length===1?'':'s'):'—')+'</div>'+
+          '<div class="rdots">'+dots+'</div>';
+        cell.onclick=()=>openDatePop(dateStr,info.mode);
+        rEl.appendChild(cell);
+      });
+      host.appendChild(rEl);
+    });
+  }
+
+  function addOneOffForDate(dateStr,mode){
+    const dt=new Date(dateStr+'T00:00');const key=keyForDate(dt);const ws=ymd(mondayOf(dt));
+    const t=template.days[key]||{};const prop=propFor(ws,key);
+    let time=nextSlotTimeForDate(dateStr,t);
+    const nowT=hhmm(new Date());
+    if(mode==='past'&&time>=nowT)time=hhmm(new Date(Date.now()-3600000));
+    if(mode==='future'&&time<nowT)time=hhmm(new Date(Date.now()+3600000));
+    const post=buildPost(ws,key,t,prop,dt,null,false,null,time,'Extra');
+    queue.push(post);dbPut(post);render();buildWeek();buildRibbon();
+    openDatePop(dateStr,mode);
+  }
+
+  function openDatePop(dateStr,mode){
+    const now=Date.now();const dt=new Date(dateStr+'T00:00');const key=keyForDate(dt);const ws=ymd(mondayOf(dt));
+    let posts=postsOnDate(dateStr);
+    if(mode==='past')posts=posts.filter(p=>new Date(p.scheduledFor||0).getTime()<now);
+    else if(mode==='future')posts=posts.filter(p=>new Date(p.scheduledFor||0).getTime()>=now);
+    posts.sort((a,b)=>new Date(a.scheduledFor||0)-new Date(b.scheduledFor||0));
+    const prim=template.days[key]||{};
+    const dLabel=dt.toLocaleDateString([],{weekday:'long',month:'short',day:'numeric'})+(mode==='past'?' — earlier today':mode==='future'?' — later today':'');
+    $('dpTitle').textContent=dLabel+' — '+posts.length+' post'+(posts.length===1?'':'s');
+    const host=$('dpBody');host.innerHTML='';
+    if(posts.length===0){
+      host.innerHTML='<p style="font-size:.82rem;color:var(--muted);margin:0 0 12px">No posts for this '+(mode?'window':'day')+'.</p>';
+      const b=document.createElement('button');b.className='btn';b.textContent='＋ Add a post';b.onclick=()=>addOneOffForDate(dateStr,mode);host.appendChild(b);
+      if(!$('dayPopDlg').open)$('dayPopDlg').showModal();return;
+    }
+    const grid=document.createElement('div');grid.className='dpgrid';
+    grid.style.gridTemplateColumns='minmax(104px,128px) repeat('+posts.length+',minmax(150px,1fr)) 64px';
+    const corner=document.createElement('div');corner.className='dp-corner';corner.textContent='Surface \\ Post';grid.appendChild(corner);
+    const rep=primaryPost(posts);
+    posts.forEach(p=>{
+      const head=document.createElement('div');head.className='dp-col'+(rep===p?' prim':'');
+      const tm=(p.scheduledLocal||'').split('T')[1]||'';
+      const recBadge=(p.recurring&&p.recSlot==null)?'<span class="dp-tag pat" title="Part of the weekly pattern — edit in the pattern editor">pattern</span>'
+        :(p.recurring?'<span class="dp-tag rec" data-rec="off" data-id="'+p.id+'" title="Click to change to one-off">⟳ weekly</span>'
+                     :'<span class="dp-tag one" data-rec="on" data-id="'+p.id+'" title="Click to make recurring every week">one-off</span>');
+      const en=esc((p.captions.en||'').trim());
+      const needsProp=(prim.folder||'').includes('{property}')||(p.folder||'').includes('{property}');
+      head.innerHTML='<div class="dp-tl"><input type="time" class="dp-time" data-id="'+p.id+'" value="'+tm+'"><button class="dp-x" data-id="'+p.id+'" title="Delete this post">✕</button></div>'+
+        '<div class="dp-th">'+esc((p.title||'').split(' · ')[0]||'Post')+'</div>'+
+        '<div class="dp-tags">'+recBadge+'</div>'+
+        (en?'<div class="dp-cap">'+en+'</div>':'')+
+        (needsProp?'<input class="dp-prop" data-id="'+p.id+'" value="'+esc(p.property||'')+'" placeholder="listing" list="propList">':'')+
+        '<button class="dp-edit" data-id="'+p.id+'">✎ Edit full</button>';
+      grid.appendChild(head);
+    });
+    const addh=document.createElement('div');addh.className='dp-addcol';addh.innerHTML='<button class="dp-add" title="Add another post">＋</button>';grid.appendChild(addh);
+    PLATFORMS.forEach(pf=>{
+      const lab=document.createElement('div');lab.className='dp-surf '+pf.tier;lab.innerHTML='<span>'+esc(shortLabel(pf))+'</span>'+(pf.tier==='auto'?'<span class="ti">AUTO</span>':'');grid.appendChild(lab);
+      posts.forEach(po=>{const due=new Date(po.scheduledFor||0).getTime()<=now;const cs=cellStatus(po,pf.key,prim,due);const cl=document.createElement('div');cl.className='dp-cell '+cs.cls;cl.textContent=cs.txt;grid.appendChild(cl);});
+      const pad=document.createElement('div');pad.className='dp-cell pad';grid.appendChild(pad);
+    });
+    host.appendChild(grid);
+    host.querySelectorAll('.dp-time').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po||!inp.value)return;const date=(po.scheduledLocal||'').split('T')[0]||dateStr;po.scheduledLocal=date+'T'+inp.value;po.scheduledFor=new Date(po.scheduledLocal).toISOString();dbPut(po);render();buildWeek();buildRibbon();openDatePop(dateStr,mode);}));
+    host.querySelectorAll('.dp-prop').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po)return;po.property=inp.value.trim();po.folder=resolveFolder(prim.folder,po.property);po.title=genTitle({theme:(po.title||'Post').split(' · ')[0]},po.property,dt);if(po.recurring&&po.recSlot==null)setDayProp(ws,key,po.property);dbPut(po);render();buildWeek();buildRibbon();openDatePop(dateStr,mode);}));
+    host.querySelectorAll('.dp-tag[data-rec]').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(b.dataset.rec==='on')promoteRecurring(po);else demoteRecurring(po);openDatePop(dateStr,mode);}));
+    host.querySelectorAll('.dp-x').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(!confirm('Delete this post?'))return;if(po.recurring&&po.recSlot!=null){normTpl();template.extra[po.day]=(template.extra[po.day]||[]).filter(s=>s.id!==po.recSlot);setPut('template',template);}queue=queue.filter(x=>x.id!==po.id);dbDel(po.id);if(editingId===po.id)resetForm();render();buildWeek();buildRibbon();openDatePop(dateStr,mode);}));
+    host.querySelectorAll('.dp-edit').forEach(b=>b.addEventListener('click',()=>{$('dayPopDlg').close();editPost(b.dataset.id);}));
+    const addBtn=host.querySelector('.dp-add');if(addBtn)addBtn.addEventListener('click',()=>addOneOffForDate(dateStr,mode));
     if(!$('dayPopDlg').open)$('dayPopDlg').showModal();
   }
 
@@ -1073,7 +1201,7 @@
     $('dayDlg').showModal();
   }
   function readTpl(){return {version:1,days:JSON.parse(JSON.stringify(tplDraft)),extra:JSON.parse(JSON.stringify(tplExtraDraft||{}))};}
-  $('tplSave').onclick=async()=>{template=readTpl();setPut('template',template);buildWeek();await pushTpl();$('tplDlg').close();toast('Pattern saved');};
+  $('tplSave').onclick=async()=>{template=readTpl();setPut('template',template);buildWeek();buildRibbon();await pushTpl();$('tplDlg').close();toast('Pattern saved');};
   $('tplReset').onclick=()=>{if(confirm('Reset the weekly pattern to defaults?')){template=JSON.parse(JSON.stringify(DEFAULT_TPL));openTpl();}};
   $('tplCancel').onclick=()=>$('tplDlg').close();
   $('editTpl').onclick=()=>openTpl();
@@ -1103,7 +1231,7 @@
       });
     });
     fresh.forEach(p=>{queue.push(p);dbPut(p);});
-    render();buildWeek();
+    render();buildWeek();buildRibbon();
     toast('Generated '+fresh.length+' posts for week of '+ws);
   };
 
@@ -1208,9 +1336,9 @@
   $('weekStart').addEventListener('change',()=>{
     const v=$('weekStart').value;
     if(v) $('weekStart').value=ymd(mondayOf(new Date(v+'T00:00')));
-    buildWeek();
+    buildWeek();buildRibbon();
   });
-  $('activeProp').addEventListener('input',()=>{setPut('activeProp',$('activeProp').value.trim());buildWeek();});
+  $('activeProp').addEventListener('input',()=>{setPut('activeProp',$('activeProp').value.trim());buildWeek();buildRibbon();});
   $('weekCollapse').onclick=()=>{const b=$('weekBody');const hide=b.style.display!=='none';b.style.display=hide?'none':'';$('weekCollapse').textContent=hide?'▸':'▾';};
   $('dpClose').onclick=()=>$('dayPopDlg').close();
   openDB().then(async()=>{
@@ -1226,7 +1354,7 @@
     const br=await setGet('bankRot');if(br)bankRot=br;
     rebuildBankUI();
     const saved=await dbAll();if(saved&&saved.length){queue=saved;}
-    render();buildWeek();fetchStatus();
+    render();buildWeek();buildRibbon();fetchStatus();
   });
 })();
 </script>
