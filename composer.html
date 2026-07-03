@@ -193,6 +193,7 @@
   .dp-time-ro{font-size:.72rem;font-weight:800;color:var(--gold-deep)}
   .dp-media{display:flex;gap:5px;flex-wrap:wrap;margin:2px 0}
   .dp-media img{width:38px;height:38px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+  .dp-media video{width:100%;max-width:220px;max-height:130px;border-radius:6px;border:1px solid var(--line);background:#000;display:block}
   .dp-mfile{width:38px;height:38px;border-radius:6px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.9rem}
   .dp-mnone{font-size:.62rem;color:var(--muted);font-style:italic}
   .dp-link{font-size:.6rem;color:#3f495c;line-height:1.3;word-break:break-all}
@@ -1049,7 +1050,7 @@
         :(p.recurring?'<span class="dp-tag pat">weekly extra</span>':'<span class="dp-tag one">one-off</span>');
       const media=p.media||[];
       const mediaHtml=media.length?('<div class="dp-media">'+media.map(m=>m.type==='video'
-          ?'<div class="dp-mfile" title="'+esc(m.filename||'')+'">🎬</div>'
+          ?'<video src="'+esc(m.url)+'" controls preload="metadata" playsinline title="'+esc(m.filename||'')+'" onerror="this.outerHTML=\'<div class=&quot;dp-mfile&quot;>🎬</div>\'"></video>'
           :'<img src="'+esc(m.url)+'" title="'+esc(m.filename||'')+'" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;dp-mfile&quot;>🖼</div>\'">'
         ).join('')+'</div>'):'<div class="dp-mnone">No media</div>';
       head.innerHTML='<div class="dp-time-ro">'+esc(tmLabel)+'</div>'+
