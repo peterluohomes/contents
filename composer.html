@@ -85,7 +85,7 @@
   .tg .ok{color:var(--auto);font-weight:800}.tg .no{color:#a33;font-weight:800}.tg .wait{color:var(--assist);font-weight:800}
   #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:var(--cream);padding:11px 18px;border-radius:10px;font-size:.86rem;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.25s;z-index:50;border:1px solid var(--gold)}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  /* ---------- weekly plan panel ---------- */
+  /* ---------- weekly plan panel (queue-driven, no pattern) ---------- */
   .week{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:20px;box-shadow:var(--shadow)}
   .week .wh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .week .wh h2{font-family:"Playfair Display",serif;font-weight:600;font-size:1.2rem;color:var(--navy);margin:0}
@@ -94,11 +94,6 @@
   .weekbar .wf{display:flex;flex-direction:column;gap:4px}
   .weekbar label{font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-deep)}
   .weekbar input{border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:.86rem}
-  .weekbar .gen{background:var(--gold);color:var(--navy);border:1px solid var(--gold-deep);border-radius:9px;padding:9px 16px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit}
-  .weekbar .gen:hover{background:#cba954}
-  .weekbar .tpl{background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 13px;font-size:.84rem;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit}
-  .weekbar .tpl:hover{border-color:var(--gold)}
-  .weekgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}
   /* stacked layout: compose (middle, compressed) + queue (bottom, timeline) */
   .stack{display:flex;flex-direction:column;gap:20px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -142,34 +137,30 @@
   .wkgrid{display:grid;grid-template-columns:minmax(116px,150px) repeat(7,minmax(118px,1fr));border:1px solid var(--line);border-radius:12px;overflow-x:auto;background:#fff}
   .wkgrid>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 8px;min-width:0}
   .wk-corner{position:sticky;left:0;z-index:3;background:var(--navy);color:var(--cream);font-weight:700;font-size:.6rem;display:flex;align-items:flex-end}
-  .wk-day{background:var(--cream-2);cursor:pointer;display:flex;flex-direction:column;gap:2px}
+  .wk-day{background:var(--cream-2);cursor:pointer;display:flex;flex-direction:column;gap:2px;position:relative}
   .wk-day:hover{background:var(--cream)}
   .wk-dn{font-weight:800;color:var(--navy);font-size:.74rem}
-  .wk-bt{display:flex;align-items:center;gap:4px}.wk-bt .b{font-size:.9rem}
-  .wk-th{font-weight:700;color:var(--navy);font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .wk-tm{font-size:.6rem;color:var(--muted);font-weight:600}
   .wk-st{font-size:.56rem;font-weight:800;padding:1px 6px;border-radius:999px;align-self:flex-start;text-transform:uppercase;letter-spacing:.03em}
-  .wk-st.ready{background:rgba(47,125,87,.13);color:var(--auto)}.wk-st.needs{background:rgba(166,121,42,.15);color:var(--assist)}.wk-st.empty{background:#eef0f4;color:var(--muted)}
-  .wk-prop{width:100%;border:1px dashed var(--gold);border-radius:6px;padding:2px 5px;font-family:ui-monospace,monospace;font-size:.58rem;background:#fffdf7;color:var(--navy)}
+  .wk-st.ready{background:rgba(47,125,87,.13);color:var(--auto)}.wk-st.empty{background:#eef0f4;color:var(--muted)}
   .wk-cap{font-size:.62rem;color:#3f495c;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .wk-cap.zh{color:#5a6275}
-  .wk-surf{position:sticky;left:0;z-index:1;background:#fff;font-weight:700;color:var(--navy);font-size:.7rem;display:flex;align-items:center;gap:4px;justify-content:space-between}
+  .wk-surf{position:sticky;left:0;z-index:1;background:#fff;font-weight:700;color:var(--navy);font-size:.7rem;display:flex;align-items:center;gap:4px;justify-content:space-between;min-width:0}
+  .wk-surf span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .wk-surf.auto{border-left:3px solid var(--auto)}
-  .wk-surf .ti{font-size:.5rem;font-weight:800;color:var(--auto)}
+  .wk-surf .ti{font-size:.5rem;font-weight:800;color:var(--auto);flex:0 0 auto}
   .wk-cell{display:flex;align-items:center;justify-content:center;font-size:.95rem;min-height:30px;background:#fff}
   .wk-cell.posted{background:rgba(47,125,87,.14);color:var(--auto)}
   .wk-cell.due{background:rgba(166,121,42,.16);color:var(--assist)}
   .wk-cell.sched{color:#9aa3b2}.wk-cell.none{color:#dde1e8}.wk-cell.failed{background:rgba(180,80,63,.12);color:#b4503f}
   .wklegend{display:flex;gap:14px;flex-wrap:wrap;font-size:.66rem;color:var(--muted);margin-top:10px}
   .wklegend span{display:flex;align-items:center;gap:4px}
-  .wk-day{position:relative}
   .wk-add{position:absolute;top:4px;right:4px;z-index:2;width:24px;height:24px;border:1px solid var(--gold);background:#fffdf7;color:var(--gold-deep);border-radius:7px;font-size:1rem;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit}
   .wk-add:hover{background:var(--gold);color:#fff}
   .wk-more{display:inline-block;margin-left:5px;background:var(--gold);color:#fff;font-size:.54rem;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle}
   /* day popup — mini week-view for one day */
-  #dayPopDlg{max-width:96vw;width:auto;min-width:320px}
+  #dayPopDlg{max-width:min(96vw,1180px);width:auto;min-width:320px}
   #dayPopDlg .db{max-height:74vh;overflow:auto}
-  .dpgrid{display:grid;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;min-width:max-content}
+  .dpgrid{display:grid;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;width:100%;min-width:100%}
   .dpgrid>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 8px;min-width:0}
   .dp-corner{position:sticky;left:0;z-index:3;background:var(--navy);color:var(--cream);font-weight:700;font-size:.56rem;display:flex;align-items:flex-end}
   .dp-col{background:var(--cream-2);display:flex;flex-direction:column;gap:5px}
@@ -199,86 +190,12 @@
   .dp-link{font-size:.6rem;color:#3f495c;line-height:1.3;word-break:break-all}
   .dp-link a{color:var(--gold-deep)}
   .dp-tag.prop{background:#fff;border:1px dashed var(--gold);color:var(--navy);font-family:ui-monospace,monospace;text-transform:none;letter-spacing:0}
-  .dp-surf{position:sticky;left:0;z-index:1;background:#fff;font-weight:700;color:var(--navy);font-size:.66rem;display:flex;align-items:center;gap:4px;justify-content:space-between}
-  .dp-surf.auto{border-left:3px solid var(--auto)}.dp-surf .ti{font-size:.5rem;font-weight:800;color:var(--auto)}
+  .dp-surf{position:sticky;left:0;z-index:1;background:#fff;font-weight:700;color:var(--navy);font-size:.66rem;display:flex;align-items:center;gap:4px;justify-content:space-between;min-width:0}
+  .dp-surf span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .dp-surf.auto{border-left:3px solid var(--auto)}.dp-surf .ti{font-size:.5rem;font-weight:800;color:var(--auto);flex:0 0 auto}
   .dp-cell{display:flex;align-items:center;justify-content:center;font-size:.92rem;min-height:28px;background:#fff}
   .dp-cell.posted{background:rgba(47,125,87,.14);color:var(--auto)}.dp-cell.due{background:rgba(166,121,42,.16);color:var(--assist)}
   .dp-cell.sched{color:#9aa3b2}.dp-cell.none{color:#dde1e8}.dp-cell.failed{background:rgba(180,80,63,.12);color:#b4503f}.dp-cell.pad{background:var(--cream-2)}
-  .daycard{border:1px solid var(--line);border-radius:11px;padding:10px;background:var(--cream-2);display:flex;flex-direction:column;gap:7px;min-height:140px;cursor:pointer;transition:.12s}
-  .daycard:hover{border-color:var(--gold)}
-  .daycard .dn{display:flex;align-items:baseline;justify-content:space-between;gap:4px}
-  .daycard .dname{font-weight:800;color:var(--navy);font-size:.82rem;letter-spacing:.02em}
-  .daycard .dbadge{font-size:.92rem}
-  .daycard .dtheme{font-size:.74rem;font-weight:700;color:var(--gold-deep);text-transform:uppercase;letter-spacing:.03em}
-  .daycard .dtime{font-size:.72rem;color:var(--muted);font-weight:600}
-  .daycard .dfolder{font-size:.66rem;color:var(--muted);font-family:ui-monospace,monospace;word-break:break-all}
-  .daycard .dprop{width:100%;border:1px dashed var(--gold);border-radius:7px;padding:4px 7px;font-family:ui-monospace,monospace;font-size:.66rem;background:#fffdf7;color:var(--navy);margin-top:2px}
-  .daycard .dcapmode{font-size:.62rem;color:var(--muted);font-weight:600}
-  .daycard .dprop:focus{outline:none;border-style:solid}
-  .daycard .dtargets{font-size:.66rem;color:var(--muted);margin-top:auto}
-  .daycard .dsurf{display:flex;flex-wrap:wrap;gap:3px;margin-top:2px}
-  .daycard .schip{font-size:.6rem;font-weight:700;padding:1px 5px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--navy);white-space:nowrap}
-  .daycard .schip.auto{background:rgba(47,125,87,.12);border-color:rgba(47,125,87,.35);color:var(--auto)}
-  .daycard .schip.assist{background:var(--cream);border-color:var(--line);color:#5a6275}
-  .daycard .dcap{font-size:.7rem;color:#475066;line-height:1.35;max-height:46px;overflow:hidden;white-space:pre-wrap}
-  .daycard.filled{background:#fff;border-color:var(--gold)}
-  .daycard.filled .dname{color:var(--navy)}
-  .daycard .dstate{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:999px}
-  .daycard .dstate.ready{background:rgba(47,125,87,.13);color:var(--auto)}
-  .daycard .dstate.needs{background:rgba(166,121,42,.15);color:var(--assist)}
-  /* template editor */
-  /* template editor — full-screen matrix */
-  #tplDlg{max-width:96vw;width:96vw}
-  #tplDlg .db{max-height:82vh;overflow:hidden;padding-bottom:8px}
-  .tplgrid{display:grid;grid-template-columns:minmax(112px,150px) repeat(7,minmax(96px,1fr));border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:72vh}
-  .tplgrid>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px 7px}
-  .tg-corner{position:sticky;left:0;top:0;z-index:4;background:var(--navy);color:var(--cream);font-weight:700;font-size:.66rem;display:flex;align-items:flex-end}
-  .tg-day{position:sticky;top:0;z-index:2;background:var(--cream-2);display:flex;flex-direction:column;gap:3px;cursor:pointer}
-  .tg-day:hover{background:var(--cream)}
-  .tg-dn{font-weight:800;color:var(--navy);font-size:.82rem;letter-spacing:.02em}
-  .tg-sum{display:flex;align-items:center;gap:5px;min-width:0}
-  .tg-badge{font-size:.95rem}
-  .tg-th{font-weight:700;color:var(--navy);font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tg-meta{font-size:.64rem;color:var(--muted);font-weight:600}
-  .tg-fold{font-size:.58rem;color:var(--muted);font-family:ui-monospace,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tg-editbtn{font-size:.6rem;color:var(--gold-deep);font-weight:800;letter-spacing:.02em}
-  .tg-surf{position:sticky;left:0;z-index:1;background:#fff;font-weight:700;color:var(--navy);font-size:.74rem;display:flex;align-items:center;gap:5px;justify-content:space-between}
-  .tg-surf.auto{border-left:3px solid var(--auto)}
-  .tg-surf .ti{font-size:.54rem;font-weight:800;letter-spacing:.04em;color:var(--auto)}
-  .tg-cell{display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;color:var(--auto);background:#fff;min-height:32px;user-select:none}
-  .tg-cell.on{background:rgba(47,125,87,.13)}
-  .tg-cell:hover{background:var(--cream)}
-  #dayDlg{max-width:460px;width:92%}
-  #dayDlg .db{max-height:72vh;overflow:auto}
-  #dayDlg .frow{display:flex;gap:10px}#dayDlg .frow .f{flex:1}
-  #dayDlg .db .f{margin-bottom:12px}
-  #dayDlg .db label{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--gold-deep);margin-bottom:5px}
-  #dayDlg .db input,#dayDlg .db select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:.86rem}
-  .tg-extra{font-size:.56rem;font-weight:800;background:var(--gold);color:#fff;padding:1px 6px;border-radius:999px;vertical-align:middle;margin-left:3px}
-  .dx-sec{margin-top:6px;border-top:1px dashed var(--line);padding-top:12px}
-  .dx-sec-h{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--navy);margin-bottom:8px}
-  .dx-empty{font-size:.76rem;color:var(--muted);margin:0 0 8px;line-height:1.4}
-  .dx-card{border:1px solid var(--gold);border-radius:11px;padding:11px 12px;margin-bottom:11px;background:#fffdf7}
-  .dx-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-  .dx-n{font-size:.74rem;font-weight:800;color:var(--gold-deep)}
-  .dx-del{border:none;background:none;color:#b9c0cc;cursor:pointer;font-size:.9rem;line-height:1;padding:2px}.dx-del:hover{color:#b4503f}
-  .dx-add{margin-top:8px}
-  .dx-chips{display:flex;flex-wrap:wrap;gap:6px}
-  .chip.mini{padding:4px 9px;font-size:.7rem;border-radius:999px}
-  .tplrow{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:9px;background:var(--cream-2)}
-  .tplrow .tr1{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-  .tplrow .dn2{font-weight:800;color:var(--navy);font-size:.82rem;min-width:34px}
-  .tplrow input,.tplrow select{border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-family:inherit;font-size:.8rem;background:#fff}
-  .tplrow .theme{width:120px}.tplrow .time{width:92px}.tplrow .badge{width:74px}.tplrow .grp{width:130px}.tplrow .fold{flex:1;min-width:130px;font-family:ui-monospace,monospace;font-size:.74rem}
-  .tplrow .tchips{display:flex;gap:5px;flex-wrap:wrap}
-  .tplrow .tr2{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-  .tplrow .tr2 .cl{font-size:.66rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-deep)}
-  .tplrow .pin{flex:1;min-width:180px;font-size:.78rem}
-  .tplrow .tchip{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:3px 9px;font-size:.7rem;font-weight:600;cursor:pointer}
-  .tplrow .tchip.on{background:var(--navy);color:var(--cream);border-color:var(--navy)}
-  .tplrow .tchip.on.auto{background:var(--auto);border-color:var(--auto)}
-  .tplrow .tchip.on.assist{background:var(--assist);border-color:var(--assist)}
-  #tplDlg .db{max-height:62vh;overflow:auto}
   /* bank editor */
   #bankDlg{max-width:760px}
   #bankDlg .db{max-height:64vh;overflow:auto}
@@ -295,7 +212,12 @@
   .brow .pchip{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:3px 9px;font-size:.68rem;font-weight:600;cursor:pointer}
   .brow .pchip.on{background:var(--navy);color:var(--cream);border-color:var(--navy)}
   .addrow{background:#fff;border:1px dashed var(--gold);border-radius:9px;padding:9px;font-size:.82rem;font-weight:700;color:var(--gold-deep);cursor:pointer;width:100%;font-family:inherit;margin-bottom:6px}
-  @media (max-width:880px){.cols{grid-template-columns:1fr}.weekgrid{grid-template-columns:repeat(2,1fr)}}
+  .breadcrumb-field{font-size:.9rem}
+  .whenrow{display:flex;gap:8px;align-items:stretch}
+  .whenrow input{flex:1}
+  .loadjson{background:#fff;border:1px solid var(--gold);color:var(--gold-deep);border-radius:9px;padding:9px 12px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .loadjson:hover{background:var(--gold);color:#fff}
+  @media (max-width:880px){.cols{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -321,14 +243,10 @@
     <div id="weekBody">
       <div class="weekbar">
         <div class="wf"><label>Week of (Monday)</label><input type="date" id="weekStart"></div>
-        <div class="wf"><label>Active property (slug)</label><input id="activeProp" list="propList" placeholder="18-hayfield-cres"><datalist id="propList"><option value="18-hayfield-cres"><option value="217-eastcourt-rd"></datalist></div>
-        <button class="gen" id="genWeek">⚡ Generate this week</button>
-        <button class="tpl" id="editTpl">✎ Edit pattern</button>
       </div>
       <div id="weekGrid"></div>
     </div>
   </div>
-
 
   <div class="stack">
 
@@ -337,14 +255,26 @@
       <h2 id="formTitle">New post</h2>
 
       <div class="grid2">
-        <div class="f"><label>Title <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(for your reference)</span></label>
-          <input id="title" placeholder="e.g. Friday Just Sold — Hayfield"></div>
         <div class="f"><label>Schedule (your local time)</label>
-          <input type="datetime-local" id="when"></div>
+          <div class="whenrow">
+            <input type="datetime-local" id="when">
+            <button type="button" class="loadjson" id="loadJsonBtn">⤒ Load JSON</button>
+            <input type="file" id="jsonFile" accept="application/json,.json" style="display:none">
+          </div>
+        </div>
+        <div class="f"><label>Layout → Domain → Pillar → Theme <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(from generator)</span></label>
+          <input id="metaBreadcrumb" class="breadcrumb-field" placeholder="Listing Marketing › Property Marketing › Buyer Avatar Match › Multi-generation BUY-019"></div>
       </div>
 
-      <div class="f"><label>Media filenames / URLs (one per line)</label>
-        <textarea id="media" placeholder="18-hayfield-cres/sold/front.png"></textarea>
+      <div class="grid2">
+        <div class="f"><label>Title <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(for your reference)</span></label>
+          <input id="title" placeholder="e.g. Friday Just Sold — Hayfield"></div>
+        <div class="f"><label>Property address <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional — leave blank for evergreen posts)</span></label>
+          <input id="propAddr" placeholder="e.g. 18 Hayfield Cres, Richmond Hill"></div>
+      </div>
+
+      <div class="f"><label>Media filenames / URLs (one per line, full link)</label>
+        <textarea id="media" placeholder="https://media.peterluo.homes/18-hayfield-cres/sold/front.png"></textarea>
         <div class="media-prev" id="mediaPrev"></div></div>
 
       <div class="grid2">
@@ -404,28 +334,12 @@
   <div class="db">
     <div class="f"><label>Owner / repo</label><input id="ghRepo" placeholder="peterluohomes/scheduler"></div>
     <div class="f"><label>Queue path</label><input id="ghPath" placeholder="queue.json"></div>
-    <div class="f"><label>Template path</label><input id="ghTpl" placeholder="template.json"></div>
     <div class="f"><label>Bank path</label><input id="ghBank" placeholder="bank.json"></div>
     <div class="f"><label>status.json URL (public, read-only)</label><input id="ghStatus" placeholder="https://peterluo.homes/scheduler/status.json"></div>
     <div class="f"><label>Fine-grained token — Contents: read &amp; write, this repo only</label><input id="ghToken" type="password" placeholder="github_pat_..."></div>
     <p style="font-size:.76rem;color:var(--muted);margin:0">Stored only in this browser, on this machine — never committed to the repo. The composer only ever writes queue.json; it reads status.json but never writes it.</p>
   </div>
   <div class="da"><button class="btn" id="ghSave">Save</button><button class="btn ghost" id="ghCancel">Close</button></div>
-</dialog>
-
-<dialog id="tplDlg">
-  <div class="dh">Weekly pattern — set once, generate every week</div>
-  <div class="db">
-    <p style="font-size:.78rem;color:var(--muted);margin:0 0 10px">Days across the top, surfaces down the left. Tap a cell to toggle whether that surface posts that day. Each day's theme, media, time, caption, and R2 folder sit in its column header. Use <code>{property}</code> in a folder to fill the active listing at generate time.</p>
-    <div id="tplRows"></div>
-  </div>
-  <div class="da"><button class="btn" id="tplSave">Save pattern</button><button class="btn ghost" id="tplReset">Reset to default</button><button class="btn ghost" id="tplCancel">Close</button></div>
-</dialog>
-
-<dialog id="dayDlg">
-  <div class="dh" id="dayTitle">Day</div>
-  <div class="db" id="dayBody"></div>
-  <div class="da"><button class="btn" id="dayDone">Done</button></div>
 </dialog>
 
 <dialog id="dayPopDlg">
@@ -473,24 +387,6 @@
   ];
   const PMAP={};PLATFORMS.forEach(p=>PMAP[p.key]=p);
 
-  // ---------- weekly template (the permanent 7-day pattern) ----------
-  const DAYS=[
-    {key:'mon',name:'Mon',offset:0},{key:'tue',name:'Tue',offset:1},
-    {key:'wed',name:'Wed',offset:2},{key:'thu',name:'Thu',offset:3},
-    {key:'fri',name:'Fri',offset:4},{key:'sat',name:'Sat',offset:5},
-    {key:'sun',name:'Sun',offset:6}
-  ];
-  const DEFAULT_TPL={version:1,days:{
-    mon:{theme:'Market',media:'📷',time:'09:00',group:'Market',folder:'images/news/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','linkedin','whatsapp','nextdoor','threads']},
-    tue:{theme:'Community',media:'🎬',time:'18:30',group:'Neighbourhood',folder:'images/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','youtube_en','youtube_zh','whatsapp']},
-    wed:{theme:'Listing',media:'📷',time:'12:00',group:'First impression',folder:'{property}/listing/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','whatsapp','nextdoor','threads']},
-    thu:{theme:'Behind-scenes',media:'🎬',time:'18:30',group:'Preparation',folder:'{property}/preparing/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','youtube_en','youtube_zh','linkedin','whatsapp']},
-    fri:{theme:'Just Sold',media:'📷',time:'12:00',group:'Success',folder:'{property}/sold/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','linkedin','whatsapp','nextdoor','threads']},
-    sat:{theme:'Open house',media:'🎬',time:'10:00',group:'Activity',folder:'{property}/listing/',targets:['telegram','facebook_en','instagram_en','facebook_zh','instagram_zh','wechat','red','whatsapp','youtube_en','youtube_zh']},
-    sun:{theme:'Long-form',media:'🎬📝',time:'19:00',group:'Story',folder:'images/',targets:['telegram','youtube_en','youtube_zh','wechat','facebook_en','facebook_zh','instagram_en','instagram_zh']}
-  },extra:{}};
-  let template=JSON.parse(JSON.stringify(DEFAULT_TPL));
-  let dayProps={}; // { weekStart: { dayKey: propertySlug } } — per-day listing overrides
   // ---------- caption bank (bilingual angles + platform-tagged snippets) ----------
   const DEFAULT_CAPTIONS=[
     {g:'Preparation',en:'The journey before it goes live.',zh:'上市前的精心准备。'},
@@ -594,20 +490,10 @@
   ];
   let bank={version:1,captions:JSON.parse(JSON.stringify(DEFAULT_CAPTIONS)),snippets:JSON.parse(JSON.stringify(DEFAULT_SNIPPETS))};
   let BANK=bank.captions;
-  let bankRot={}; // {group: nextIndex} — rotation counter for "rotate through group"
-  function bankFor(group){const a=BANK.filter(b=>b.g===group);return a.length?a[0]:null;}
-  function pickCaption(t){
-    const grp=(bank.captions||[]).filter(c=>c.g===t.group);
-    if(!grp.length)return {en:'',zh:''};
-    if(t.pin){const f=grp.find(c=>c.en===t.pin);if(f)return f;}      // pinned (falls back to rotate if edited away)
-    const idx=(bankRot[t.group]||0)%grp.length;                      // rotate
-    bankRot[t.group]=(idx+1)%grp.length;setPut('bankRot',bankRot);
-    return grp[idx];
-  }
 
   // ---------- state + storage (graceful: IndexedDB local, memory fallback) ----------
   let queue=[]; let editingId=null; let db=null;
-  const GH_DEFAULTS={owner:'peterluohomes',repo:'scheduler',path:'queue.json',tplPath:'template.json',bankPath:'bank.json',statusUrl:'https://peterluo.homes/scheduler/status.json',token:'',branch:''};
+  const GH_DEFAULTS={owner:'peterluohomes',repo:'scheduler',path:'queue.json',bankPath:'bank.json',statusUrl:'https://peterluo.homes/scheduler/status.json',token:'',branch:''};
   let gh=Object.assign({},GH_DEFAULTS);
   let statusMap={};
   const DB='pls-scheduler', STORE='queue', SET='settings';
@@ -666,7 +552,10 @@
   function mediaList(){
     const base=$('baseUrl').value.trim();
     return $('media').value.split('\n').map(s=>s.trim()).filter(Boolean).filter(s=>!s.endsWith('/')).map(name=>{
-      const url=/^https?:\/\//i.test(name)?name:(base+name);
+      let url;
+      if(/^https?:\/\//i.test(name)) url=name;                          // already a full URL
+      else if(/^[a-z0-9-]+(\.[a-z0-9-]+)+\//i.test(name)) url='https://'+name; // domain-rooted but missing scheme (e.g. media.peterluo.homes/...)
+      else url=base+name;                                               // plain filename — join with base URL
       const type=/\.(mp4|mov|webm|m4v)$/i.test(name)?'video':'image';
       return {filename:name.split('/').pop(),url,type};
     });
@@ -682,10 +571,49 @@
   $('media').addEventListener('input',renderMediaPrev);
   $('baseUrl').addEventListener('input',()=>{renderMediaPrev();setPut('baseUrl',$('baseUrl').value);});
 
+  // ---------- load from media-generator JSON (image maker / reel studio, etc.) ----------
+  function applyGeneratorJSON(data){
+    if(!data||typeof data!=='object'){toast('Could not read that JSON file');return;}
+    const bc=data.breadcrumb||data.layoutPath||[data.layout,data.domain,data.pillar,data.theme].filter(Boolean).join(' › ');
+    $('metaBreadcrumb').value=bc||'';
+    if(data.title)$('title').value=data.title;
+    $('propAddr').value=data.propertyAddress||data.address||data.property||'';
+    const med=data.media||data.files||data.urls||[];
+    if(Array.isArray(med)&&med.length){
+      $('media').value=med.map(m=>typeof m==='string'?m:(m.url||m.filename||'')).filter(Boolean).join('\n');
+    }
+    const caps=data.captions||{};
+    const capEn=caps.en||data.captionEn||'';
+    const capZh=caps.zh||data.captionZh||'';
+    if(capEn){$('capEn').value=capEn;}
+    if(capZh){$('capZh').value=capZh;}
+    cc('En');cc('Zh');
+    const links=data.commentLinks||{};
+    if(links.en)$('linkEn').value=links.en;
+    if(links.zh)$('linkZh').value=links.zh;
+    const trg=data.targets||data.platforms||[];
+    if(Array.isArray(trg)&&trg.length){
+      document.querySelectorAll('#plats .chip').forEach(c=>c.classList.toggle('on',trg.includes(c.dataset.key)));
+    }
+    renderMediaPrev();
+    toast('Loaded from generator JSON');
+  }
+  $('loadJsonBtn').onclick=()=>$('jsonFile').click();
+  $('jsonFile').addEventListener('change',e=>{
+    const f=e.target.files&&e.target.files[0];if(!f)return;
+    const reader=new FileReader();
+    reader.onload=()=>{try{applyGeneratorJSON(JSON.parse(reader.result));}catch(err){alert('Could not parse that JSON file.');}};
+    reader.onerror=()=>alert('Could not read that file.');
+    reader.readAsText(f);
+    e.target.value='';
+  });
+
   // ---------- add / edit ----------
   function defaultWhen(){const d=new Date(Date.now()+3600000);d.setMinutes(0,0,0);const pad=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());}
   function resetForm(){editingId=null;$('formTitle').textContent='New post';$('addBtn').textContent='Add to queue';$('addBtn').classList.remove('editing');
-    $('title').value='';$('when').value=defaultWhen();$('media').value='';$('capEn').value='';$('capZh').value='';$('linkEn').value='';$('linkZh').value='';cc('En');cc('Zh');renderMediaPrev();
+    $('title').value='';$('when').value=defaultWhen();$('media').value='';$('capEn').value='';$('capZh').value='';$('linkEn').value='';$('linkZh').value='';
+    $('metaBreadcrumb').value='';$('propAddr').value='';
+    cc('En');cc('Zh');renderMediaPrev();
     document.querySelectorAll('#plats .chip.on').forEach(c=>c.classList.remove('on'));}
   $('addBtn').onclick=()=>{
     const targets=selectedTargets();
@@ -699,6 +627,8 @@
       scheduledLocal:$('when').value,
       status:'queued',
       title:$('title').value.trim()||'(untitled)',
+      breadcrumb:$('metaBreadcrumb').value.trim(),
+      propertyAddress:$('propAddr').value.trim(),
       media:mediaList(),
       captions:{en:$('capEn').value,zh:$('capZh').value},
       commentLinks:{en:$('linkEn').value.trim(),zh:$('linkZh').value.trim()},
@@ -715,6 +645,8 @@
     const p=queue.find(x=>x.id===id);if(!p)return;editingId=id;
     $('formTitle').textContent='Edit post';$('addBtn').textContent='Save changes';$('addBtn').classList.add('editing');
     $('title').value=p.title==='(untitled)'?'':p.title;
+    $('metaBreadcrumb').value=p.breadcrumb||[p.layout,p.domain,p.pillar,p.theme].filter(Boolean).join(' › ')||'';
+    $('propAddr').value=p.propertyAddress||'';
     $('when').value=p.scheduledLocal||defaultWhen();
     const base=$('baseUrl').value.trim();
     $('media').value=(p.media||[]).map(m=>{
@@ -794,25 +726,17 @@
   function tgMark(id,key){const s=statusMap[id];if(!s||!s.targets)return '';const t=s.targets[key];if(!t)return '';const m={posted:' <span class="ok">✓</span>',failed:' <span class="no">✕</span>',nudged:' <span class="wait">⏳</span>'};return m[t.status]||'';}
   function overallPill(id){const s=statusMap[id];if(!s||!s.overall||s.overall==='queued')return '';return '<span class="ovl '+s.overall+'">'+s.overall+'</span>';}
 
-  function openGh(){$('ghRepo').value=(gh.owner&&gh.repo)?gh.owner+'/'+gh.repo:'';$('ghPath').value=gh.path||'queue.json';$('ghTpl').value=gh.tplPath||'template.json';$('ghBank').value=gh.bankPath||'bank.json';$('ghStatus').value=gh.statusUrl||'';$('ghToken').value=gh.token||'';$('ghDlg').showModal();}
-  $('ghSave').onclick=()=>{const r=($('ghRepo').value||'').trim().split('/');gh={owner:(r[0]||'').trim(),repo:(r[1]||'').trim(),path:($('ghPath').value||'queue.json').trim(),tplPath:($('ghTpl').value||'template.json').trim(),bankPath:($('ghBank').value||'bank.json').trim(),statusUrl:($('ghStatus').value||'').trim(),token:$('ghToken').value.trim()};setPut('gh',gh);$('ghDlg').close();fetchStatus();toast('Sync settings saved');};
+  function openGh(){$('ghRepo').value=(gh.owner&&gh.repo)?gh.owner+'/'+gh.repo:'';$('ghPath').value=gh.path||'queue.json';$('ghBank').value=gh.bankPath||'bank.json';$('ghStatus').value=gh.statusUrl||'';$('ghToken').value=gh.token||'';$('ghDlg').showModal();}
+  $('ghSave').onclick=()=>{const r=($('ghRepo').value||'').trim().split('/');gh={owner:(r[0]||'').trim(),repo:(r[1]||'').trim(),path:($('ghPath').value||'queue.json').trim(),bankPath:($('ghBank').value||'bank.json').trim(),statusUrl:($('ghStatus').value||'').trim(),token:$('ghToken').value.trim()};setPut('gh',gh);$('ghDlg').close();fetchStatus();toast('Sync settings saved');};
   $('ghCancel').onclick=()=>$('ghDlg').close();
   $('pushBtn').onclick=pushQueue;$('pullBtn').onclick=pullQueue;$('statusBtn').onclick=fetchStatus;$('ghBtn').onclick=openGh;
   $('moreBtn').onclick=()=>{const m=$('qmore');m.hidden=!m.hidden;};
   function toast(msg){let t=$('toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t);}t.textContent=msg;t.className='show';clearTimeout(t._t);t._t=setTimeout(()=>t.className='',2200);}
 
-  // ---------- weekly plan ----------
-  function mondayOf(d){const x=new Date(d);const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);x.setHours(0,0,0,0);return x;}
+  // ---------- date + status helpers ----------
   function ymd(d){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
-  function resolveFolder(f,prop){return (f||'').replace('{property}',prop||'{property}');}
-  function curWeekStart(){const v=$('weekStart').value;return ymd(mondayOf(v?new Date(v+'T00:00'):new Date()));}
-  function weekDefaultProp(){return ($('activeProp').value||'').trim();}
-  function propFor(ws,key){const wk=dayProps[ws]||{};return (wk[key]||'').trim()||weekDefaultProp();}
-  function setDayProp(ws,key,val){if(!dayProps[ws])dayProps[ws]={};if(val)dayProps[ws][key]=val;else delete dayProps[ws][key];setPut('dayProps',dayProps);}
-  function genTitle(t,prop,dt){return (t.theme||'')+(prop?' · '+prop:'')+' · '+(dt.getMonth()+1)+'/'+dt.getDate();}
 
   function shortLabel(p){let l=p.label;const map={'WeChat 朋友圈':'WeChat','小红书 RED':'小红书'};if(map[l])l=map[l];if(p.lang==='zh'&&!/小红书|WeChat/.test(l))l+=' 中';return l;}
-  function surfChips(keys){return '<div class="dsurf">'+(keys||[]).map(k=>{const p=PMAP[k];if(!p)return'';return '<span class="schip '+p.tier+'">'+esc(shortLabel(p))+'</span>';}).join('')+'</div>';}
   function cellStatus(post,plat,t,due){
     const targeted=post?(post.targets||[]).some(x=>x.platform===plat):(t.targets||[]).includes(plat);
     if(!targeted)return {cls:'none',txt:'·'};
@@ -826,164 +750,8 @@
     }
     return {cls:'sched',txt:'○'};
   }
-  function buildWeek(){
-    const host=$('weekGrid');if(!host)return;host.innerHTML='';
-    const ws=curWeekStart();const def=weekDefaultProp();const now=Date.now();
-    const grid=document.createElement('div');grid.className='wkgrid';
-    const corner=document.createElement('div');corner.className='wk-corner';corner.textContent='Surface \\ Day';grid.appendChild(corner);
-    // day-column headers
-    DAYS.forEach(d=>{
-      const t=template.days[d.key]||{};
-      const posts=postsForDay(ws,d.key);
-      const post=primaryPost(posts);
-      const dt=new Date(ws+'T00:00');dt.setDate(dt.getDate()+d.offset);
-      const needsProp=(t.folder||'').includes('{property}');
-      const h=document.createElement('div');h.className='wk-day';h.dataset.day=d.key;
-      let st,stcls;
-      if(!post){st='not generated';stcls='empty';}
-      else if(post.media&&post.media.length){st='media set';stcls='ready';}
-      else{st='add media';stcls='needs';}
-      const more=posts.length>1?'<span class="wk-more" title="'+posts.length+' posts this day">+'+(posts.length-1)+'</span>':'';
-      const first=posts[0]||null;
-      const timeLabel=first?((first.scheduledLocal||'').split('T')[1]||t.time||''):(t.time||'');
-      let inner='<button class="wk-add" data-day="'+d.key+'" title="Add a post to '+d.name+'">＋</button>'+
-        '<div class="wk-dn">'+d.name+' '+(dt.getMonth()+1)+'/'+dt.getDate()+more+'</div>'+
-        '<div class="wk-bt"><span class="b">'+(t.media||'')+'</span><span class="wk-th">'+esc(t.theme||'')+'</span></div>'+
-        '<div class="wk-tm">🕐 '+timeLabel+'</div>'+
-        '<div class="wk-st '+stcls+'">'+st+'</div>';
-      if(post){
-        const en=(post.captions.en||'').trim();const zh=(post.captions.zh||'').trim();
-        if(en)inner+='<div class="wk-cap">'+esc(en)+'</div>';
-        if(zh)inner+='<div class="wk-cap zh">'+esc(zh)+'</div>';
-      }
-      if(needsProp){const ov=(dayProps[ws]&&dayProps[ws][d.key])||'';inner+='<input class="wk-prop" data-day="'+d.key+'" value="'+esc(ov)+'" placeholder="'+esc(def||'listing')+'" list="propList">';}
-      h.innerHTML=inner;
-      h.onclick=()=>openDayPop(d.key);
-      const addB=h.querySelector('.wk-add');
-      if(addB)addB.addEventListener('click',e=>{e.stopPropagation();addOneOff(d.key,true);});
-      const inp=h.querySelector('.wk-prop');
-      if(inp){
-        inp.addEventListener('click',e=>e.stopPropagation());
-        inp.addEventListener('change',e=>{e.stopPropagation();setDayProp(ws,d.key,inp.value.trim());const np=propFor(ws,d.key);const ep=primaryPost(postsForDay(ws,d.key));if(ep){ep.property=np;ep.folder=resolveFolder((template.days[d.key]||{}).folder,np);ep.title=genTitle(template.days[d.key]||{},np,new Date(ep.scheduledLocal||(ws+'T00:00')));dbPut(ep);render();}buildWeek();buildRibbon();});
-      }
-      grid.appendChild(h);
-    });
-    // surface rows + status cells
-    PLATFORMS.forEach(p=>{
-      const lab=document.createElement('div');lab.className='wk-surf '+p.tier;
-      lab.innerHTML='<span>'+esc(shortLabel(p))+'</span>'+(p.tier==='auto'?'<span class="ti">AUTO</span>':'');
-      grid.appendChild(lab);
-      DAYS.forEach(d=>{
-        const t=template.days[d.key]||{};
-        const post=primaryPost(postsForDay(ws,d.key));
-        const dt=new Date(ws+'T00:00');dt.setDate(dt.getDate()+d.offset);
-        const due=post?new Date(post.scheduledFor||0).getTime()<=now:false;
-        const cs=cellStatus(post,p.key,t,due);
-        const cl=document.createElement('div');cl.className='wk-cell '+cs.cls;cl.textContent=cs.txt;
-        grid.appendChild(cl);
-      });
-    });
-    host.appendChild(grid);
-    const lg=document.createElement('div');lg.className='wklegend';
-    lg.innerHTML='<span>✓ posted</span><span>⏳ due / nudged</span><span>○ scheduled</span><span>· not targeted</span><span style="margin-left:auto">tap a day to fill it →</span>';
-    host.appendChild(lg);
-  }
-
-  // ---------- multi-post per day: one-offs + recurring extras ----------
-  function normTpl(){ if(!template.extra)template.extra={}; DAYS.forEach(d=>{ if(!Array.isArray(template.extra[d.key]))template.extra[d.key]=[]; }); }
-  function postsForDay(ws,key){ return queue.filter(p=>p.day===key&&p.weekStart===ws).sort((a,b)=>new Date(a.scheduledFor||0)-new Date(b.scheduledFor||0)); }
-  function primaryPost(posts){ return posts.find(p=>p.recurring&&(p.recSlot==null))||posts[0]||null; }
-  function hhmm(d){const p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes());}
-  function dayDate(ws,key){ const off=(DAYS.find(d=>d.key===key)||{offset:0}).offset; const dt=new Date(ws+'T00:00'); dt.setDate(dt.getDate()+off); return dt; }
-  function nextSlotTime(ws,key){
-    const posts=postsForDay(ws,key);
-    if(posts.length){ const last=new Date(posts[posts.length-1].scheduledFor||0); last.setHours(last.getHours()+1); return hhmm(last); }
-    return (template.days[key]||{}).time||'12:00';
-  }
-  function buildPost(ws,key,t,prop,dt,angle,recurring,recSlot,timeOverride,titleTheme){
-    const local=ymd(dt)+'T'+(timeOverride||t.time||'12:00');
-    const targets=(t.targets||[]).map(k=>{const p=PMAP[k];return p?{platform:p.key,label:p.label,lang:p.lang,tier:p.tier,status:'queued'}:null;}).filter(Boolean);
-    return {id:uid(),created:new Date().toISOString(),scheduledFor:new Date(local).toISOString(),scheduledLocal:local,status:'queued',
-      title:genTitle({theme:titleTheme||t.theme||'Post'},prop,dt),media:[],
-      captions:{en:angle?angle.en:'',zh:angle?angle.zh:''},commentLinks:{en:'',zh:''},targets,
-      day:key,weekStart:ws,property:prop,folder:resolveFolder(t.folder,prop),recurring:!!recurring,recSlot:recSlot!=null?recSlot:null};
-  }
-  function addOneOff(key,thenOpen){
-    const ws=curWeekStart();const t=template.days[key]||{};const prop=propFor(ws,key);const dt=dayDate(ws,key);
-    const post=buildPost(ws,key,t,prop,dt,null,false,null,nextSlotTime(ws,key),'Extra');
-    queue.push(post);dbPut(post);render();buildWeek();buildRibbon();
-    if(thenOpen)openDayPop(key);
-  }
-  function promoteRecurring(post){
-    normTpl();const key=post.day;const t=template.days[key]||{};const id='x'+Math.random().toString(16).slice(2,8);
-    template.extra[key].push({id,theme:(post.title||'Extra').split(' · ')[0]||'Extra',media:t.media||'📷',
-      time:(post.scheduledLocal||'').split('T')[1]||t.time||'12:00',group:t.group||'',
-      folder:t.folder||'images/',targets:(post.targets||[]).map(x=>x.platform)});
-    setPut('template',template);post.recurring=true;post.recSlot=id;dbPut(post);render();buildWeek();buildRibbon();
-    toast('Now recurring every '+((DAYS.find(d=>d.key===key)||{}).name||key));
-  }
-  function demoteRecurring(post){
-    normTpl();const key=post.day;
-    if(post.recSlot!=null){template.extra[key]=(template.extra[key]||[]).filter(s=>s.id!==post.recSlot);setPut('template',template);}
-    post.recurring=false;post.recSlot=null;dbPut(post);render();buildWeek();buildRibbon();
-    toast('Changed to one-off (this week only)');
-  }
-  // floating day popup — a mini week-view scoped to one day
-  function openDayPop(key){
-    normTpl();
-    const ws=curWeekStart();const d=DAYS.find(x=>x.key===key)||{name:key,offset:0};
-    const dt=dayDate(ws,key);const now=Date.now();
-    const posts=postsForDay(ws,key);const prim=template.days[key]||{};const rep=primaryPost(posts);
-    $('dpTitle').textContent=d.name+' '+(dt.getMonth()+1)+'/'+dt.getDate()+' — '+posts.length+' post'+(posts.length===1?'':'s');
-    const host=$('dpBody');host.innerHTML='';
-    if(posts.length===0){
-      host.innerHTML='<p style="font-size:.82rem;color:var(--muted);margin:0 0 12px">No posts for this day yet.</p>';
-      const b=document.createElement('button');b.className='btn';b.textContent='＋ Add a post';b.onclick=()=>{addOneOff(key,false);openDayPop(key);};host.appendChild(b);
-      if(!$('dayPopDlg').open)$('dayPopDlg').showModal();return;
-    }
-    const grid=document.createElement('div');grid.className='dpgrid';
-    grid.style.gridTemplateColumns='minmax(104px,128px) repeat('+posts.length+',minmax(150px,1fr)) 64px';
-    const corner=document.createElement('div');corner.className='dp-corner';corner.textContent='Surface \\ Post';grid.appendChild(corner);
-    posts.forEach(p=>{
-      const head=document.createElement('div');head.className='dp-col'+(rep===p?' prim':'');
-      const tm=(p.scheduledLocal||'').split('T')[1]||'';
-      const recBadge=(p.recurring&&p.recSlot==null)?'<span class="dp-tag pat" title="Part of the weekly pattern — edit in the pattern editor">pattern</span>'
-        :(p.recurring?'<span class="dp-tag rec" data-rec="off" data-id="'+p.id+'" title="Click to change to one-off">⟳ weekly</span>'
-                     :'<span class="dp-tag one" data-rec="on" data-id="'+p.id+'" title="Click to make recurring every week">one-off</span>');
-      const en=esc((p.captions.en||'').trim());
-      const needsProp=(prim.folder||'').includes('{property}')||(p.folder||'').includes('{property}');
-      head.innerHTML='<div class="dp-tl"><input type="time" class="dp-time" data-id="'+p.id+'" value="'+tm+'"><button class="dp-x" data-id="'+p.id+'" title="Delete this post">✕</button></div>'+
-        '<div class="dp-th">'+esc((p.title||'').split(' · ')[0]||'Post')+'</div>'+
-        '<div class="dp-tags">'+recBadge+'</div>'+
-        (en?'<div class="dp-cap">'+en+'</div>':'')+
-        (needsProp?'<input class="dp-prop" data-id="'+p.id+'" value="'+esc(p.property||'')+'" placeholder="listing" list="propList">':'')+
-        '<button class="dp-edit" data-id="'+p.id+'">✎ Edit full</button>';
-      grid.appendChild(head);
-    });
-    const addh=document.createElement('div');addh.className='dp-addcol';addh.innerHTML='<button class="dp-add" title="Add another post to this day">＋</button>';grid.appendChild(addh);
-    PLATFORMS.forEach(p=>{
-      const lab=document.createElement('div');lab.className='dp-surf '+p.tier;lab.innerHTML='<span>'+esc(shortLabel(p))+'</span>'+(p.tier==='auto'?'<span class="ti">AUTO</span>':'');grid.appendChild(lab);
-      posts.forEach(po=>{const due=new Date(po.scheduledFor||0).getTime()<=now;const cs=cellStatus(po,p.key,prim,due);const cl=document.createElement('div');cl.className='dp-cell '+cs.cls;cl.textContent=cs.txt;grid.appendChild(cl);});
-      const pad=document.createElement('div');pad.className='dp-cell pad';grid.appendChild(pad);
-    });
-    host.appendChild(grid);
-    host.querySelectorAll('.dp-time').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po||!inp.value)return;const date=(po.scheduledLocal||'').split('T')[0]||ymd(dt);po.scheduledLocal=date+'T'+inp.value;po.scheduledFor=new Date(po.scheduledLocal).toISOString();dbPut(po);render();buildWeek();buildRibbon();openDayPop(key);}));
-    host.querySelectorAll('.dp-prop').forEach(inp=>inp.addEventListener('change',()=>{const po=queue.find(x=>x.id===inp.dataset.id);if(!po)return;po.property=inp.value.trim();po.folder=resolveFolder((template.days[key]||{}).folder,po.property);po.title=genTitle({theme:(po.title||'Post').split(' · ')[0]},po.property,dt);if(po.recurring&&po.recSlot==null)setDayProp(ws,key,po.property);dbPut(po);render();buildWeek();buildRibbon();openDayPop(key);}));
-    host.querySelectorAll('.dp-tag[data-rec]').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(b.dataset.rec==='on')promoteRecurring(po);else demoteRecurring(po);openDayPop(key);}));
-    host.querySelectorAll('.dp-x').forEach(b=>b.addEventListener('click',()=>{const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;if(!confirm('Delete this post?'))return;if(po.recurring&&po.recSlot!=null){normTpl();template.extra[po.day]=(template.extra[po.day]||[]).filter(s=>s.id!==po.recSlot);setPut('template',template);}queue=queue.filter(x=>x.id!==po.id);dbDel(po.id);if(editingId===po.id)resetForm();render();buildWeek();buildRibbon();openDayPop(key);}));
-    host.querySelectorAll('.dp-edit').forEach(b=>b.addEventListener('click',()=>{$('dayPopDlg').close();editPost(b.dataset.id);}));
-    const addBtn=host.querySelector('.dp-add');if(addBtn)addBtn.addEventListener('click',()=>{addOneOff(key,false);openDayPop(key);});
-    if(!$('dayPopDlg').open)$('dayPopDlg').showModal();
-  }
-
-  // ---------- ±6 day ribbon (queue-driven, not template-driven — works across weeks/past) ----------
-  function keyForDate(dt){ return DAYS[(dt.getDay()+6)%7].key; }
+  // ---------- ±6 day ribbon (queue-driven) ----------
   function postsOnDate(dateStr){ return queue.filter(p=>(p.scheduledLocal||'').slice(0,10)===dateStr); }
-  function nextSlotTimeForDate(dateStr,t){
-    const posts=postsOnDate(dateStr).sort((a,b)=>new Date(a.scheduledFor||0)-new Date(b.scheduledFor||0));
-    if(posts.length){const last=new Date(posts[posts.length-1].scheduledFor||0);last.setHours(last.getHours()+1);return hhmm(last);}
-    return (t||{}).time||'12:00';
-  }
   function buildRibbon(){
     const host=$('ribbon');if(!host)return;
     const now=new Date();const nowMs=now.getTime();
@@ -1023,223 +791,139 @@
   }
 
   function openDatePop(dateStr,mode){
-    const now=Date.now();const dt=new Date(dateStr+'T00:00');const key=keyForDate(dt);
+    const now=Date.now();const dt=new Date(dateStr+'T00:00');
     let posts=postsOnDate(dateStr);
     if(mode==='past')posts=posts.filter(p=>new Date(p.scheduledFor||0).getTime()<now);
     else if(mode==='future')posts=posts.filter(p=>new Date(p.scheduledFor||0).getTime()>=now);
     posts.sort((a,b)=>new Date(a.scheduledFor||0)-new Date(b.scheduledFor||0));
-    const prim=template.days[key]||{};
     const dLabel=dt.toLocaleDateString([],{weekday:'long',month:'short',day:'numeric'})+(mode==='past'?' — earlier today':mode==='future'?' — later today':'');
     $('dpTitle').textContent=dLabel+' — '+posts.length+' post'+(posts.length===1?'':'s');
     const host=$('dpBody');host.innerHTML='';
     if(posts.length===0){
-      host.innerHTML='<p style="font-size:.82rem;color:var(--muted);margin:0">No posts scheduled for this '+(mode?'window':'day')+'.</p>';
+      host.innerHTML='<p style="font-size:.82rem;color:var(--muted);margin:0 0 12px">No posts for this day yet.</p>';
+      const b=document.createElement('button');b.className='btn';b.textContent='＋ Add a post';
+      b.onclick=()=>{addOneOff(dateStr);openDatePop(dateStr,mode);};
+      host.appendChild(b);
       if(!$('dayPopDlg').open)$('dayPopDlg').showModal();return;
     }
     const grid=document.createElement('div');grid.className='dpgrid';
-    grid.style.gridTemplateColumns='minmax(104px,128px) repeat('+posts.length+',minmax(160px,1fr))';
+    grid.style.gridTemplateColumns='minmax(96px,120px) repeat('+posts.length+',minmax(130px,1fr)) 56px';
     const corner=document.createElement('div');corner.className='dp-corner';corner.textContent='Surface \\ Post';grid.appendChild(corner);
     posts.forEach(p=>{
       const head=document.createElement('div');head.className='dp-col';
-      const tmLabel=p.scheduledFor?new Date(p.scheduledFor).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'';
+      const tm=(p.scheduledLocal||'').split('T')[1]||'';
       const en=esc((p.captions.en||'').trim());
       const zh=esc((p.captions.zh||'').trim());
       const linkEn=(p.commentLinks&&p.commentLinks.en||'').trim();
       const linkZh=(p.commentLinks&&p.commentLinks.zh||'').trim();
-      const recTag=(p.recurring&&p.recSlot==null)?'<span class="dp-tag pat">weekly pattern</span>'
-        :(p.recurring?'<span class="dp-tag pat">weekly extra</span>':'<span class="dp-tag one">one-off</span>');
+      const propAddr=p.propertyAddress||p.property||'';
       const media=p.media||[];
       const mediaHtml=media.length?('<div class="dp-media">'+media.map(m=>m.type==='video'
           ?'<video src="'+esc(m.url)+'" controls preload="metadata" playsinline title="'+esc(m.filename||'')+'" onerror="this.outerHTML=\'<div class=&quot;dp-mfile&quot;>🎬</div>\'"></video>'
           :'<img src="'+esc(m.url)+'" title="'+esc(m.filename||'')+'" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;dp-mfile&quot;>🖼</div>\'">'
         ).join('')+'</div>'):'<div class="dp-mnone">No media</div>';
-      head.innerHTML='<div class="dp-time-ro">'+esc(tmLabel)+'</div>'+
+      head.innerHTML='<div class="dp-tl"><input type="time" class="dp-time" data-id="'+p.id+'" value="'+tm+'"><button class="dp-x" data-id="'+p.id+'" title="Delete this post">✕</button></div>'+
         '<div class="dp-th">'+esc(p.title||'Post')+'</div>'+
-        '<div class="dp-tags">'+recTag+(p.property?'<span class="dp-tag prop">'+esc(p.property)+'</span>':'')+'</div>'+
+        (propAddr?'<div class="dp-tags"><span class="dp-tag prop">'+esc(propAddr)+'</span></div>':'')+
         mediaHtml+
         (en?'<div class="dp-cap"><b>EN</b> '+en+'</div>':'')+
         (zh?'<div class="dp-cap zh"><b>中</b> '+zh+'</div>':'')+
         (linkEn?'<div class="dp-link"><b>EN link</b> <a href="'+esc(linkEn)+'" target="_blank" rel="noopener">'+esc(linkEn)+'</a></div>':'')+
-        (linkZh?'<div class="dp-link"><b>中 link</b> <a href="'+esc(linkZh)+'" target="_blank" rel="noopener">'+esc(linkZh)+'</a></div>':'');
+        (linkZh?'<div class="dp-link"><b>中 link</b> <a href="'+esc(linkZh)+'" target="_blank" rel="noopener">'+esc(linkZh)+'</a></div>':'')+
+        '<button class="dp-edit" data-id="'+p.id+'">✎ Edit full</button>';
       grid.appendChild(head);
     });
+    const addh=document.createElement('div');addh.className='dp-addcol';addh.innerHTML='<button class="dp-add" title="Add another post to this day">＋</button>';grid.appendChild(addh);
     PLATFORMS.forEach(pf=>{
-      const lab=document.createElement('div');lab.className='dp-surf '+pf.tier;lab.innerHTML='<span>'+esc(shortLabel(pf))+'</span>'+(pf.tier==='auto'?'<span class="ti">AUTO</span>':'');grid.appendChild(lab);
-      posts.forEach(po=>{const due=new Date(po.scheduledFor||0).getTime()<=now;const cs=cellStatus(po,pf.key,prim,due);const cl=document.createElement('div');cl.className='dp-cell '+cs.cls;cl.textContent=cs.txt;grid.appendChild(cl);});
+      const lab=document.createElement('div');lab.className='dp-surf '+pf.tier;lab.innerHTML='<span title="'+esc(pf.label)+'">'+esc(shortLabel(pf))+'</span>'+(pf.tier==='auto'?'<span class="ti">AUTO</span>':'');grid.appendChild(lab);
+      posts.forEach(po=>{const due=new Date(po.scheduledFor||0).getTime()<=now;const cs=cellStatus(po,pf.key,{},due);const cl=document.createElement('div');cl.className='dp-cell '+cs.cls;cl.textContent=cs.txt;grid.appendChild(cl);});
+      const pad=document.createElement('div');pad.className='dp-cell pad';grid.appendChild(pad);
     });
     host.appendChild(grid);
+    host.querySelectorAll('.dp-time').forEach(inp=>inp.addEventListener('change',()=>{
+      const po=queue.find(x=>x.id===inp.dataset.id);if(!po||!inp.value)return;
+      const date=(po.scheduledLocal||'').split('T')[0]||dateStr;
+      po.scheduledLocal=date+'T'+inp.value;po.scheduledFor=new Date(po.scheduledLocal).toISOString();
+      dbPut(po);render();buildWeek();buildRibbon();openDatePop(dateStr,mode);
+    }));
+    host.querySelectorAll('.dp-x').forEach(b=>b.addEventListener('click',()=>{
+      const po=queue.find(x=>x.id===b.dataset.id);if(!po)return;
+      if(!confirm('Delete this post?'))return;
+      queue=queue.filter(x=>x.id!==po.id);dbDel(po.id);if(editingId===po.id)resetForm();
+      render();buildWeek();buildRibbon();openDatePop(dateStr,mode);
+    }));
+    host.querySelectorAll('.dp-edit').forEach(b=>b.addEventListener('click',()=>{$('dayPopDlg').close();editPost(b.dataset.id);}));
+    const addBtn=host.querySelector('.dp-add');if(addBtn)addBtn.addEventListener('click',()=>{addOneOff(dateStr);openDatePop(dateStr,mode);});
     if(!$('dayPopDlg').open)$('dayPopDlg').showModal();
   }
 
-  // ---------- template editor ----------
-  function pinOptions(group,pin){
-    const grp=(bank.captions||[]).filter(c=>c.g===group);
-    let html='<option value="">↻ Rotate through group</option>';
-    grp.forEach(c=>{html+='<option value="'+esc(c.en)+'"'+(pin===c.en?' selected':'')+'>📌 '+esc((c.en||c.zh||'').slice(0,40))+'</option>';});
-    return html;
+  // ---------- weekly plan (queue-driven calendar view, no pattern/generation) ----------
+  function mondayOf(d){const x=new Date(d);const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);x.setHours(0,0,0,0);return x;}
+  function curWeekStart(){const v=$('weekStart').value;return ymd(mondayOf(v?new Date(v+'T00:00'):new Date()));}
+  function hhmm(d){const p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes());}
+  function addOneOff(dateStr){
+    const existing=postsOnDate(dateStr).sort((a,b)=>new Date(a.scheduledFor||0)-new Date(b.scheduledFor||0));
+    let time='12:00';
+    if(existing.length){const last=new Date(existing[existing.length-1].scheduledFor||0);last.setHours(last.getHours()+1);time=hhmm(last);}
+    const local=dateStr+'T'+time;
+    const post={id:uid(),created:new Date().toISOString(),scheduledFor:new Date(local).toISOString(),scheduledLocal:local,status:'queued',
+      title:'(untitled)',layout:'',domain:'',pillar:'',theme:'',propertyAddress:'',surface:'',media:[],
+      captions:{en:'',zh:''},commentLinks:{en:'',zh:''},targets:[]};
+    queue.push(post);dbPut(post);render();buildWeek();buildRibbon();
   }
-  let tplDraft=null;
-  let tplExtraDraft={}; // mirrors template.extra while the pattern editor is open
-  function dayHeaderInner(d){
-    const t=tplDraft[d.key]||{};
-    const ex=(tplExtraDraft[d.key]||[]).length;
-    return '<div class="tg-dn">'+d.name+(ex?' <span class="tg-extra" title="'+ex+' extra recurring post'+(ex===1?'':'s')+'">+'+ex+'</span>':'')+'</div>'+
-      '<div class="tg-sum"><span class="tg-badge">'+(t.media||'')+'</span><span class="tg-th">'+esc(t.theme||'—')+'</span></div>'+
-      '<div class="tg-meta">🕐 '+(t.time||'')+' · '+(t.pin?'📌':'↻')+'</div>'+
-      '<div class="tg-fold">'+esc(t.folder||'')+'</div>'+
-      '<div class="tg-editbtn">✎ edit day</div>';
-  }
-  function refreshHeader(key){const h=document.querySelector('.tg-day[data-day="'+key+'"]');if(h){const d=DAYS.find(x=>x.key===key);h.innerHTML=dayHeaderInner(d);}}
-  function openTpl(focusDay){
-    tplDraft=JSON.parse(JSON.stringify(template.days||{}));
-    DAYS.forEach(d=>{if(!tplDraft[d.key])tplDraft[d.key]={theme:'',media:'📷',time:'09:00',group:'',folder:'',targets:[],pin:''};if(!tplDraft[d.key].targets)tplDraft[d.key].targets=[];});
-    tplExtraDraft=JSON.parse(JSON.stringify(template.extra||{}));
-    DAYS.forEach(d=>{if(!Array.isArray(tplExtraDraft[d.key]))tplExtraDraft[d.key]=[];});
-    const wrap=$('tplRows');wrap.innerHTML='';
-    const grid=document.createElement('div');grid.className='tplgrid';
-    const corner=document.createElement('div');corner.className='tg-corner';corner.textContent='Surface \\ Day';grid.appendChild(corner);
-    DAYS.forEach(d=>{
-      const h=document.createElement('div');h.className='tg-day';h.dataset.day=d.key;
-      h.innerHTML=dayHeaderInner(d);
-      h.onclick=()=>openDay(d.key);
+  function buildWeek(){
+    const host=$('weekGrid');if(!host)return;host.innerHTML='';
+    const ws=curWeekStart();const now=Date.now();
+    const dayDates=[];for(let i=0;i<7;i++){const d=new Date(ws+'T00:00');d.setDate(d.getDate()+i);dayDates.push(d);}
+    const grid=document.createElement('div');grid.className='wkgrid';
+    const corner=document.createElement('div');corner.className='wk-corner';corner.textContent='Surface \\ Day';grid.appendChild(corner);
+    dayDates.forEach(dt=>{
+      const dateStr=ymd(dt);
+      const posts=postsOnDate(dateStr).sort((a,b)=>new Date(a.scheduledFor||0)-new Date(b.scheduledFor||0));
+      const h=document.createElement('div');h.className='wk-day';
+      const dayName=dt.toLocaleDateString([],{weekday:'short'});
+      const more=posts.length>1?'<span class="wk-more" title="'+posts.length+' posts this day">+'+(posts.length-1)+'</span>':'';
+      let inner='<button class="wk-add" title="Add a post on '+dayName+'">＋</button>'+
+        '<div class="wk-dn">'+dayName+' '+(dt.getMonth()+1)+'/'+dt.getDate()+more+'</div>';
+      if(posts.length){
+        const first=posts[0];
+        const timeLabel=(first.scheduledLocal||'').split('T')[1]||'';
+        const en=(first.captions.en||'').trim();
+        inner+='<div class="wk-tm">🕐 '+timeLabel+'</div>'+
+          '<div class="wk-st ready">'+posts.length+' post'+(posts.length===1?'':'s')+'</div>'+
+          (en?'<div class="wk-cap">'+esc(en)+'</div>':'');
+      } else {
+        inner+='<div class="wk-st empty">no posts</div>';
+      }
+      h.innerHTML=inner;
+      h.onclick=()=>openDatePop(dateStr,null);
+      const addB=h.querySelector('.wk-add');
+      addB.addEventListener('click',e=>{e.stopPropagation();addOneOff(dateStr);openDatePop(dateStr,null);});
       grid.appendChild(h);
     });
     PLATFORMS.forEach(p=>{
-      const lab=document.createElement('div');lab.className='tg-surf '+p.tier;
-      lab.innerHTML='<span>'+esc(shortLabel(p))+'</span>'+(p.tier==='auto'?'<span class="ti">AUTO</span>':'');
+      const lab=document.createElement('div');lab.className='wk-surf '+p.tier;
+      lab.innerHTML='<span title="'+esc(p.label)+'">'+esc(shortLabel(p))+'</span>'+(p.tier==='auto'?'<span class="ti">AUTO</span>':'');
       grid.appendChild(lab);
-      DAYS.forEach(d=>{
-        const on=(tplDraft[d.key].targets||[]).includes(p.key);
-        const cl=document.createElement('div');cl.className='tg-cell'+(on?' on':'');cl.dataset.day=d.key;cl.dataset.plat=p.key;cl.textContent=on?'✓':'';
-        cl.onclick=()=>{const arr=tplDraft[d.key].targets;const i=arr.indexOf(p.key);if(i>=0)arr.splice(i,1);else arr.push(p.key);const o=i<0;cl.classList.toggle('on',o);cl.textContent=o?'✓':'';};
+      dayDates.forEach(dt=>{
+        const dateStr=ymd(dt);
+        const posts=postsOnDate(dateStr);
+        const targeted=posts.filter(po=>(po.targets||[]).some(t=>t.platform===p.key));
+        let cls='none',txt='·';
+        if(targeted.length){
+          const due=new Date(targeted[0].scheduledFor||0).getTime()<=now;
+          const cs=cellStatus(targeted[0],p.key,{},due);
+          cls=cs.cls;txt=cs.txt;
+        }
+        const cl=document.createElement('div');cl.className='wk-cell '+cls;cl.textContent=txt;
         grid.appendChild(cl);
       });
     });
-    wrap.appendChild(grid);
-    $('tplDlg').showModal();
-    if(focusDay)setTimeout(()=>openDay(focusDay),0);
+    host.appendChild(grid);
+    const lg=document.createElement('div');lg.className='wklegend';
+    lg.innerHTML='<span>✓ posted</span><span>⏳ due / nudged</span><span>○ scheduled</span><span>· no post</span><span style="margin-left:auto">tap a day to view/add →</span>';
+    host.appendChild(lg);
   }
-  // ---- extra recurring slots inside the per-day pattern editor ----
-  function slotTargetsChips(slot){
-    return PLATFORMS.map(p=>{
-      const on=(slot.targets||[]).includes(p.key);
-      return '<span class="chip mini'+(on?' on':'')+'" data-key="'+p.key+'">'+esc(shortLabel(p))+'</span>';
-    }).join('');
-  }
-  function renderDayExtras(key){
-    const list=$('dExtraList');if(!list)return;
-    const arr=tplExtraDraft[key]||(tplExtraDraft[key]=[]);
-    list.innerHTML='';
-    if(!arr.length){list.innerHTML='<p class="dx-empty">No extra recurring posts on this day yet — add one below to schedule a second (or third) post every '+esc((DAYS.find(d=>d.key===key)||{}).name||'day')+'.</p>';return;}
-    arr.forEach((slot,i)=>{
-      const grpOpts=[...new Set(BANK.map(b=>b.g))].map(g=>'<option'+(slot.group===g?' selected':'')+'>'+esc(g)+'</option>').join('');
-      const badgeOpts=['📷','🎬','📝','🎬📝','📷📝'].map(b=>'<option'+(slot.media===b?' selected':'')+'>'+b+'</option>').join('');
-      const card=document.createElement('div');card.className='dx-card';
-      card.innerHTML=
-        '<div class="dx-h"><span class="dx-n">＋ Post '+(i+2)+'</span><button class="dx-del" title="Remove this recurring post">✕</button></div>'+
-        '<div class="f"><label>Theme</label><input class="dxTheme" value="'+esc(slot.theme||'')+'"></div>'+
-        '<div class="frow"><div class="f"><label>Media</label><select class="dxMedia">'+badgeOpts+'</select></div>'+
-        '<div class="f"><label>Time</label><input class="dxTime" type="time" value="'+(slot.time||'')+'"></div></div>'+
-        '<div class="f"><label>Caption angle (group)</label><select class="dxGroup">'+grpOpts+'</select></div>'+
-        '<div class="f"><label>Caption</label><select class="dxPin">'+pinOptions(slot.group,slot.pin)+'</select></div>'+
-        '<div class="f"><label>R2 folder</label><input class="dxFolder" value="'+esc(slot.folder||'')+'" placeholder="{property}/sold/"></div>'+
-        '<div class="f"><label>Surfaces</label><div class="dx-chips">'+slotTargetsChips(slot)+'</div></div>';
-      const q=s=>card.querySelector(s);
-      const syncSlot=()=>{slot.theme=q('.dxTheme').value;slot.media=q('.dxMedia').value;slot.time=q('.dxTime').value;slot.group=q('.dxGroup').value;slot.pin=q('.dxPin').value;slot.folder=q('.dxFolder').value;};
-      card.querySelectorAll('.dxTheme,.dxMedia,.dxTime,.dxGroup,.dxPin,.dxFolder').forEach(el=>el.addEventListener('input',syncSlot));
-      q('.dxGroup').addEventListener('change',()=>{q('.dxPin').innerHTML=pinOptions(q('.dxGroup').value,'');syncSlot();});
-      q('.dx-del').addEventListener('click',()=>{arr.splice(i,1);renderDayExtras(key);refreshHeader(key);});
-      card.querySelectorAll('.dx-chips .chip').forEach(ch=>ch.addEventListener('click',()=>{const k=ch.dataset.key;const a=slot.targets||(slot.targets=[]);const idx=a.indexOf(k);if(idx>=0)a.splice(idx,1);else a.push(k);ch.classList.toggle('on');}));
-      list.appendChild(card);
-    });
-  }
-  // floating per-day editor
-  function openDay(key){
-    const t=tplDraft[key];const d=DAYS.find(x=>x.key===key);
-    const grpOpts=[...new Set(BANK.map(b=>b.g))].map(g=>'<option'+(t.group===g?' selected':'')+'>'+esc(g)+'</option>').join('');
-    const badgeOpts=['📷','🎬','📝','🎬📝','📷📝'].map(b=>'<option'+(t.media===b?' selected':'')+'>'+b+'</option>').join('');
-    $('dayTitle').textContent=d.name+' — pattern';
-    $('dayBody').innerHTML=
-      '<div id="dPrimary">'+
-      '<div class="f"><label>Theme</label><input id="dTheme" value="'+esc(t.theme||'')+'"></div>'+
-      '<div class="frow"><div class="f"><label>Media</label><select id="dMedia">'+badgeOpts+'</select></div>'+
-      '<div class="f"><label>Time</label><input id="dTime" type="time" value="'+(t.time||'')+'"></div></div>'+
-      '<div class="f"><label>Caption angle (group)</label><select id="dGroup">'+grpOpts+'</select></div>'+
-      '<div class="f"><label>Caption</label><select id="dPin">'+pinOptions(t.group,t.pin)+'</select></div>'+
-      '<div class="f"><label>R2 folder</label><input id="dFolder" value="'+esc(t.folder||'')+'" placeholder="{property}/sold/"></div>'+
-      '</div>'+
-      '<div class="dx-sec"><div class="dx-sec-h">Additional recurring posts</div><div id="dExtraList"></div>'+
-      '<button class="btn dx-add" id="dAddSlot">＋ Add a recurring post on '+esc(d.name)+'</button></div>';
-    const sync=()=>{t.theme=$('dTheme').value;t.media=$('dMedia').value;t.time=$('dTime').value;t.group=$('dGroup').value;t.pin=$('dPin').value;t.folder=$('dFolder').value;};
-    $('dGroup').addEventListener('change',()=>{$('dPin').innerHTML=pinOptions($('dGroup').value,'');sync();});
-    ['dTheme','dMedia','dTime','dGroup','dPin','dFolder'].forEach(id=>$(id).addEventListener('input',sync));
-    renderDayExtras(key);
-    $('dAddSlot').onclick=()=>{
-      if(!Array.isArray(tplExtraDraft[key]))tplExtraDraft[key]=[];
-      const id='x'+Math.random().toString(16).slice(2,8);
-      tplExtraDraft[key].push({id,theme:'',media:t.media||'📷',time:t.time||'12:00',group:t.group||'',pin:'',folder:t.folder||'',targets:(t.targets||[]).slice()});
-      renderDayExtras(key);refreshHeader(key);
-    };
-    $('dayDone').onclick=()=>{sync();refreshHeader(key);$('dayDlg').close();};
-    $('dayDlg').showModal();
-  }
-  function readTpl(){return {version:1,days:JSON.parse(JSON.stringify(tplDraft)),extra:JSON.parse(JSON.stringify(tplExtraDraft||{}))};}
-  $('tplSave').onclick=async()=>{template=readTpl();setPut('template',template);buildWeek();buildRibbon();await pushTpl();$('tplDlg').close();toast('Pattern saved');};
-  $('tplReset').onclick=()=>{if(confirm('Reset the weekly pattern to defaults?')){template=JSON.parse(JSON.stringify(DEFAULT_TPL));openTpl();}};
-  $('tplCancel').onclick=()=>$('tplDlg').close();
-  $('editTpl').onclick=()=>openTpl();
-
-  // ---------- generate this week (rebuilds recurring posts, keeps one-offs) ----------
-  $('genWeek').onclick=()=>{
-    normTpl();
-    const ws=curWeekStart();
-    const oneoffThisWeek=queue.filter(p=>!p.recurring&&p.weekStart===ws).length;
-    let extraCount=0;DAYS.forEach(d=>extraCount+=(template.extra[d.key]||[]).length);
-    let msg='Generate this week will rebuild the '+(7+extraCount)+' recurring post'+((7+extraCount)===1?'':'s')+' for week of '+ws+'.';
-    if(oneoffThisWeek)msg+='\nYour '+oneoffThisWeek+' one-off post'+(oneoffThisWeek===1?'':'s')+' this week will be kept.';
-    msg+='\nContinue?';
-    if(queue.length && !confirm(msg))return;
-    setPut('activeProp',weekDefaultProp());
-    // remove only this week's recurring posts; preserve one-offs + other weeks + ad-hoc
-    queue.filter(p=>p.recurring&&p.weekStart===ws).forEach(p=>dbDel(p.id));
-    queue=queue.filter(p=>!(p.recurring&&p.weekStart===ws));
-    const fresh=[];
-    DAYS.forEach(d=>{
-      const t=template.days[d.key]||{};
-      const prop=propFor(ws,d.key);
-      const dt=new Date(ws+'T00:00');dt.setDate(dt.getDate()+d.offset);
-      fresh.push(buildPost(ws,d.key,t,prop,dt,pickCaption(t),true,null,t.time,t.theme));
-      (template.extra[d.key]||[]).forEach(slot=>{
-        fresh.push(buildPost(ws,d.key,slot,prop,dt,pickCaption(slot),true,slot.id,slot.time,slot.theme));
-      });
-    });
-    fresh.forEach(p=>{queue.push(p);dbPut(p);});
-    render();buildWeek();buildRibbon();
-    toast('Generated '+fresh.length+' posts for week of '+ws);
-  };
-
-  // ---------- template sync (repo master + IndexedDB cache) ----------
-  async function pushTpl(){
-    if(!gh.owner||!gh.repo||!gh.token)return; // silent if sync not configured
-    try{
-      const path=gh.tplPath||'template.json';let sha=null;
-      const g=await fetch(ghUrl(path)+ghRef(),{headers:ghH()});if(g.ok)sha=(await g.json()).sha;
-      const body={message:'Update template.json '+new Date().toISOString(),content:utf8b64(JSON.stringify({version:1,updated:new Date().toISOString(),days:template.days},null,2))};if(sha)body.sha=sha;
-      const r=await fetch(ghUrl(path),{method:'PUT',headers:ghH(),body:JSON.stringify(body)});
-      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(r.status+' '+(e.message||''));}
-    }catch(e){toast('Template push failed: '+e.message);}
-  }
-  async function pullTpl(){
-    if(!gh.owner||!gh.repo||!gh.token)return false;
-    try{
-      const path=gh.tplPath||'template.json';
-      const g=await fetch(ghUrl(path)+ghRef(),{headers:ghH()});if(!g.ok)return false;
-      const data=JSON.parse(b64utf8((await g.json()).content));
-      if(data&&data.days){template=data;setPut('template',template);return true;}
-    }catch(e){}
-    return false;
-  }
-
 
   // ---------- caption bank editor ----------
   function bankPath(){return (gh.bankPath||'bank.json');}
@@ -1319,9 +1003,8 @@
   $('weekStart').addEventListener('change',()=>{
     const v=$('weekStart').value;
     if(v) $('weekStart').value=ymd(mondayOf(new Date(v+'T00:00')));
-    buildWeek();buildRibbon();
+    buildWeek();
   });
-  $('activeProp').addEventListener('input',()=>{setPut('activeProp',$('activeProp').value.trim());buildWeek();buildRibbon();});
   $('weekCollapse').onclick=()=>{const b=$('weekBody');const hide=b.style.display!=='none';b.style.display=hide?'none':'';$('weekCollapse').textContent=hide?'▸':'▾';};
   $('dpClose').onclick=()=>$('dayPopDlg').close();
   openDB().then(async()=>{
@@ -1329,12 +1012,7 @@
     if(!b){b='https://media.peterluo.homes/';setPut('baseUrl',b);}
     $('baseUrl').value=b;
     const g=await setGet('gh');gh=Object.assign({},GH_DEFAULTS,g||{});['owner','repo','statusUrl'].forEach(k=>{if(!gh[k])gh[k]=GH_DEFAULTS[k];});
-    const ap=await setGet('activeProp');if(ap)$('activeProp').value=ap;
-    const dp=await setGet('dayProps');if(dp)dayProps=dp;
-    const tpl=await setGet('template');if(tpl&&tpl.days){template=tpl;}else{await pullTpl();}
-    normTpl();
     const bk=await setGet('bank');if(bk&&bk.captions){bank=Object.assign({snippets:[]},bk);}else{await pullBank();}
-    const br=await setGet('bankRot');if(br)bankRot=br;
     rebuildBankUI();
     const saved=await dbAll();if(saved&&saved.length){queue=saved;}
     render();buildWeek();buildRibbon();fetchStatus();
