@@ -642,12 +642,23 @@
   };
 
   function editPost(id){
-    const p=queue.find(x=>x.id===id);if(!p)return;editingId=id;
-    $('formTitle').textContent='Edit post';$('addBtn').textContent='Save changes';$('addBtn').classList.add('editing');
+    const p=queue.find(x=>x.id===id);if(!p)return;
+    const due=new Date(p.scheduledFor||0).getTime()<=Date.now();
+    if(due){
+      // already due/likely posted — don't silently rewrite that record; fork into a fresh post instead
+      editingId=null;
+      $('formTitle').textContent='New post (based on "'+esc(p.title||'Post')+'")';
+      $('addBtn').textContent='Add to queue';$('addBtn').classList.remove('editing');
+      $('when').value=defaultWhen();
+      toast('That post is already due — this creates a new post; the original stays untouched.');
+    }else{
+      editingId=id;
+      $('formTitle').textContent='Edit post';$('addBtn').textContent='Save changes';$('addBtn').classList.add('editing');
+      $('when').value=p.scheduledLocal||defaultWhen();
+    }
     $('title').value=p.title==='(untitled)'?'':p.title;
     $('metaBreadcrumb').value=p.breadcrumb||[p.layout,p.domain,p.pillar,p.theme].filter(Boolean).join(' › ')||'';
     $('propAddr').value=p.propertyAddress||'';
-    $('when').value=p.scheduledLocal||defaultWhen();
     const base=$('baseUrl').value.trim();
     $('media').value=(p.media||[]).map(m=>{
       if(m.url&&base&&m.url.indexOf(base)===0)return m.url.slice(base.length);
