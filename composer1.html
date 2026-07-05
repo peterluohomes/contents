@@ -210,14 +210,12 @@
   .brow .pchip{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:3px 9px;font-size:.68rem;font-weight:600;cursor:pointer}
   .brow .pchip.on{background:var(--navy);color:var(--cream);border-color:var(--navy)}
   .addrow{background:#fff;border:1px dashed var(--gold);border-radius:9px;padding:9px;font-size:.82rem;font-weight:700;color:var(--gold-deep);cursor:pointer;width:100%;font-family:inherit;margin-bottom:6px}
-  .breadcrumb4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-  .breadcrumb4 input{font-size:.82rem}
+  .breadcrumb-field{font-size:.9rem}
   .whenrow{display:flex;gap:8px;align-items:stretch}
   .whenrow input{flex:1}
   .loadjson{background:#fff;border:1px solid var(--gold);color:var(--gold-deep);border-radius:9px;padding:9px 12px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
   .loadjson:hover{background:var(--gold);color:#fff}
   @media (max-width:880px){.cols{grid-template-columns:1fr}}
-  @media (max-width:640px){.breadcrumb4{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -263,24 +261,15 @@
           </div>
         </div>
         <div class="f"><label>Layout → Domain → Pillar → Theme <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(from generator)</span></label>
-          <div class="breadcrumb4">
-            <input id="metaLayout" placeholder="Layout">
-            <input id="metaDomain" placeholder="Domain">
-            <input id="metaPillar" placeholder="Pillar">
-            <input id="metaTheme" placeholder="Theme">
-          </div>
-        </div>
+          <input id="metaBreadcrumb" class="breadcrumb-field" placeholder="Listing Marketing › Property Marketing › Buyer Avatar Match › Multi-generation BUY-019"></div>
       </div>
 
       <div class="grid2">
         <div class="f"><label>Title <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(for your reference)</span></label>
           <input id="title" placeholder="e.g. Friday Just Sold — Hayfield"></div>
-        <div class="f"><label>Property address <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-          <input id="propAddr" placeholder="18 Hayfield Cres, Richmond Hill"></div>
+        <div class="f"><label>Property address <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional — leave blank for evergreen posts)</span></label>
+          <input id="propAddr" placeholder="e.g. 18 Hayfield Cres, Richmond Hill"></div>
       </div>
-
-      <div class="f"><label>Surface / post</label>
-        <input id="surfacePost" placeholder="e.g. Instagram Reel, WeChat Moments Post"></div>
 
       <div class="f"><label>Media filenames / URLs (one per line, full link)</label>
         <textarea id="media" placeholder="https://media.peterluo.homes/18-hayfield-cres/sold/front.png"></textarea>
@@ -580,13 +569,10 @@
   // ---------- load from media-generator JSON (image maker / reel studio, etc.) ----------
   function applyGeneratorJSON(data){
     if(!data||typeof data!=='object'){toast('Could not read that JSON file');return;}
-    $('metaLayout').value=data.layout||data.Layout||'';
-    $('metaDomain').value=data.domain||data.Domain||'';
-    $('metaPillar').value=data.pillar||data.Pillar||'';
-    $('metaTheme').value=data.theme||data.Theme||'';
+    const bc=data.breadcrumb||data.layoutPath||[data.layout,data.domain,data.pillar,data.theme].filter(Boolean).join(' › ');
+    $('metaBreadcrumb').value=bc||'';
     if(data.title)$('title').value=data.title;
     $('propAddr').value=data.propertyAddress||data.address||data.property||'';
-    $('surfacePost').value=data.surface||data.surfacePost||data.postType||'';
     const med=data.media||data.files||data.urls||[];
     if(Array.isArray(med)&&med.length){
       $('media').value=med.map(m=>typeof m==='string'?m:(m.url||m.filename||'')).filter(Boolean).join('\n');
@@ -600,6 +586,10 @@
     const links=data.commentLinks||{};
     if(links.en)$('linkEn').value=links.en;
     if(links.zh)$('linkZh').value=links.zh;
+    const trg=data.targets||data.platforms||[];
+    if(Array.isArray(trg)&&trg.length){
+      document.querySelectorAll('#plats .chip').forEach(c=>c.classList.toggle('on',trg.includes(c.dataset.key)));
+    }
     renderMediaPrev();
     toast('Loaded from generator JSON');
   }
@@ -617,7 +607,7 @@
   function defaultWhen(){const d=new Date(Date.now()+3600000);d.setMinutes(0,0,0);const pad=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());}
   function resetForm(){editingId=null;$('formTitle').textContent='New post';$('addBtn').textContent='Add to queue';$('addBtn').classList.remove('editing');
     $('title').value='';$('when').value=defaultWhen();$('media').value='';$('capEn').value='';$('capZh').value='';$('linkEn').value='';$('linkZh').value='';
-    $('metaLayout').value='';$('metaDomain').value='';$('metaPillar').value='';$('metaTheme').value='';$('propAddr').value='';$('surfacePost').value='';
+    $('metaBreadcrumb').value='';$('propAddr').value='';
     cc('En');cc('Zh');renderMediaPrev();
     document.querySelectorAll('#plats .chip.on').forEach(c=>c.classList.remove('on'));}
   $('addBtn').onclick=()=>{
@@ -632,12 +622,8 @@
       scheduledLocal:$('when').value,
       status:'queued',
       title:$('title').value.trim()||'(untitled)',
-      layout:$('metaLayout').value.trim(),
-      domain:$('metaDomain').value.trim(),
-      pillar:$('metaPillar').value.trim(),
-      theme:$('metaTheme').value.trim(),
+      breadcrumb:$('metaBreadcrumb').value.trim(),
       propertyAddress:$('propAddr').value.trim(),
-      surface:$('surfacePost').value.trim(),
       media:mediaList(),
       captions:{en:$('capEn').value,zh:$('capZh').value},
       commentLinks:{en:$('linkEn').value.trim(),zh:$('linkZh').value.trim()},
@@ -654,8 +640,8 @@
     const p=queue.find(x=>x.id===id);if(!p)return;editingId=id;
     $('formTitle').textContent='Edit post';$('addBtn').textContent='Save changes';$('addBtn').classList.add('editing');
     $('title').value=p.title==='(untitled)'?'':p.title;
-    $('metaLayout').value=p.layout||'';$('metaDomain').value=p.domain||'';$('metaPillar').value=p.pillar||'';$('metaTheme').value=p.theme||'';
-    $('propAddr').value=p.propertyAddress||'';$('surfacePost').value=p.surface||'';
+    $('metaBreadcrumb').value=p.breadcrumb||[p.layout,p.domain,p.pillar,p.theme].filter(Boolean).join(' › ')||'';
+    $('propAddr').value=p.propertyAddress||'';
     $('when').value=p.scheduledLocal||defaultWhen();
     const base=$('baseUrl').value.trim();
     $('media').value=(p.media||[]).map(m=>{
