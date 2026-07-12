@@ -218,6 +218,12 @@
   .loadjson{background:#fff;border:1px solid var(--gold);color:var(--gold-deep);border-radius:9px;padding:9px 12px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
   .loadjson:hover{background:var(--gold);color:#fff}
   @media (max-width:880px){.cols{grid-template-columns:1fr}}
+  .rdblock{border:1px solid #f0c4a8;border-radius:11px;padding:13px;margin-bottom:13px;background:#fff8f4}
+  .rdblock .lt{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .rdblock .flag{font-size:.64rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:#ff4500;color:#fff;border-radius:6px;padding:3px 9px}
+  .rdblock input{margin-bottom:8px}
+  .rdblock textarea{min-height:80px}
+  #redditBlock{display:none;margin-top:13px}
 </style>
 </head>
 <body>
@@ -294,6 +300,19 @@
           <textarea id="capZh" placeholder="中文文案…" oninput="cc('Zh')"></textarea>
           <div class="charcount" id="ccZh">0</div>
           <input id="linkZh" placeholder="评论区链接（CTA），可选" style="margin-top:8px;width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:.86rem">
+        </div>
+      </div>
+
+      <div id="redditBlock">
+        <div class="rdblock" id="redditRH">
+          <div class="lt"><span class="flag">r/RichmondHill</span></div>
+          <input id="rhTitle" placeholder="Post title…">
+          <textarea id="rhBody" placeholder="Post body… (write for this specific subreddit, not a repost of the social caption)"></textarea>
+        </div>
+        <div class="rdblock" id="redditTRE">
+          <div class="lt"><span class="flag">r/torontorealestate</span></div>
+          <input id="treTitle" placeholder="Post title…">
+          <textarea id="treBody" placeholder="Post body… (write for this specific subreddit, not a repost of the social caption)"></textarea>
         </div>
       </div>
 
@@ -383,7 +402,9 @@
     {key:'wechat',label:'WeChat 朋友圈',lang:'zh',tier:'assist'},
     {key:'red',label:'小红书 RED',lang:'zh',tier:'assist'},
     {key:'whatsapp',label:'WhatsApp',lang:'en',tier:'assist'},
-    {key:'nextdoor',label:'Nextdoor',lang:'en',tier:'assist'}
+    {key:'nextdoor',label:'Nextdoor',lang:'en',tier:'assist'},
+    {key:'reddit_richmondhill',label:'Reddit · r/RichmondHill',lang:'en',tier:'assist'},
+    {key:'reddit_torontorealestate',label:'Reddit · r/torontorealestate',lang:'en',tier:'assist'}
   ];
   const PMAP={};PLATFORMS.forEach(p=>PMAP[p.key]=p);
 
@@ -522,11 +543,18 @@
       PLATFORMS.filter(p=>p.tier===tier).forEach(p=>{
         const c=document.createElement('button');c.className='chip';c.dataset.key=p.key;
         c.innerHTML=p.label+' <span class="lg">'+(p.lang==='en'?'EN':'中文')+'</span>';
-        c.onclick=()=>c.classList.toggle('on');
+        c.onclick=()=>{c.classList.toggle('on');syncRedditVisibility();};
         chips.appendChild(c);
       });
       box.appendChild(chips);wrap.appendChild(box);
     });
+  }
+  function syncRedditVisibility(){
+    const on=k=>{const c=document.querySelector('#plats .chip[data-key="'+k+'"]');return c&&c.classList.contains('on');};
+    const rh=on('reddit_richmondhill'),tre=on('reddit_torontorealestate');
+    $('redditRH').style.display=rh?'block':'none';
+    $('redditTRE').style.display=tre?'block':'none';
+    $('redditBlock').style.display=(rh||tre)?'block':'none';
   }
   function selectedTargets(){
     const out=[];document.querySelectorAll('#plats .chip.on').forEach(c=>{const p=PMAP[c.dataset.key];out.push({platform:p.key,label:p.label,lang:p.lang,tier:p.tier,status:'queued'});});return out;
@@ -591,10 +619,14 @@
     const links=data.commentLinks||{};
     if(links.en)$('linkEn').value=links.en;
     if(links.zh)$('linkZh').value=links.zh;
+    const rd=data.reddit||{};
+    if(rd.richmondhill){$('rhTitle').value=rd.richmondhill.title||'';$('rhBody').value=rd.richmondhill.body||'';}
+    if(rd.torontorealestate){$('treTitle').value=rd.torontorealestate.title||'';$('treBody').value=rd.torontorealestate.body||'';}
     const trg=data.targets||data.platforms||[];
     if(Array.isArray(trg)&&trg.length){
       document.querySelectorAll('#plats .chip').forEach(c=>c.classList.toggle('on',trg.includes(c.dataset.key)));
     }
+    syncRedditVisibility();
     renderMediaPrev();
     toast('Loaded from generator JSON');
   }
@@ -613,13 +645,20 @@
   function resetForm(){editingId=null;$('formTitle').textContent='New post';$('addBtn').textContent='Add to queue';$('addBtn').classList.remove('editing');
     $('title').value='';$('when').value=defaultWhen();$('media').value='';$('capEn').value='';$('capZh').value='';$('linkEn').value='';$('linkZh').value='';
     $('metaBreadcrumb').value='';$('propAddr').value='';
+    $('rhTitle').value='';$('rhBody').value='';$('treTitle').value='';$('treBody').value='';
     cc('En');cc('Zh');renderMediaPrev();
-    document.querySelectorAll('#plats .chip.on').forEach(c=>c.classList.remove('on'));}
+    document.querySelectorAll('#plats .chip.on').forEach(c=>c.classList.remove('on'));
+    syncRedditVisibility();}
   $('addBtn').onclick=()=>{
     const targets=selectedTargets();
     if(!$('when').value){alert('Pick a schedule time.');return;}
     if(targets.length===0){alert('Select at least one platform.');return;}
     const prev=editingId?(queue.find(p=>p.id===editingId)||{}):{};
+    const rh={title:$('rhTitle').value.trim(),body:$('rhBody').value.trim()};
+    const tre={title:$('treTitle').value.trim(),body:$('treBody').value.trim()};
+    const reddit={};
+    if(rh.title||rh.body)reddit.richmondhill=rh;
+    if(tre.title||tre.body)reddit.torontorealestate=tre;
     const post={
       id:editingId||uid(),
       created:editingId?prev.created||new Date().toISOString():new Date().toISOString(),
@@ -634,6 +673,7 @@
       commentLinks:{en:$('linkEn').value.trim(),zh:$('linkZh').value.trim()},
       targets
     };
+    if(Object.keys(reddit).length)post.reddit=reddit;
     // carry weekly-plan linkage so an edited generated post stays mapped to its day card
     if(prev.day)post.day=prev.day;if(prev.weekStart)post.weekStart=prev.weekStart;if(prev.folder)post.folder=prev.folder;
     if(prev.recurring!==undefined)post.recurring=prev.recurring;if(prev.recSlot!==undefined)post.recSlot=prev.recSlot;if(prev.property!==undefined&&!post.property)post.property=prev.property;
@@ -668,7 +708,11 @@
     if(!(p.media&&p.media.length)&&p.folder)$('media').value=p.folder;
     $('capEn').value=p.captions.en||'';$('capZh').value=p.captions.zh||'';cc('En');cc('Zh');
     $('linkEn').value=p.commentLinks.en||'';$('linkZh').value=p.commentLinks.zh||'';
+    const rd=p.reddit||{};
+    $('rhTitle').value=(rd.richmondhill&&rd.richmondhill.title)||'';$('rhBody').value=(rd.richmondhill&&rd.richmondhill.body)||'';
+    $('treTitle').value=(rd.torontorealestate&&rd.torontorealestate.title)||'';$('treBody').value=(rd.torontorealestate&&rd.torontorealestate.body)||'';
     document.querySelectorAll('#plats .chip').forEach(c=>c.classList.toggle('on',(p.targets||[]).some(t=>t.platform===c.dataset.key)));
+    syncRedditVisibility();
     renderMediaPrev();
     const card=$('formTitle').closest('.card')||$('formTitle');
     card.scrollIntoView({behavior:'smooth',block:'start'});
